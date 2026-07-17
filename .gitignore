@@ -1,0 +1,6 @@
+# Ignorar credenciais locais de banco de dados
+config.js
+
+# Ignorar arquivos temporários do sistema
+.DS_Store
+Thumbs.db

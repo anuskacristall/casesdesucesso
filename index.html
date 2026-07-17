@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEBRAE MG | Mapa de Cases de Sucesso</title>
+  
+  <!-- Debug Banner Script -->
+  <script>
+    window.addEventListener('error', function(e) {
+      const errorDiv = document.getElementById('debug-error-banner') || document.createElement('div');
+      errorDiv.id = 'debug-error-banner';
+      errorDiv.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:#ef4444;color:white;padding:15px;z-index:99999;font-family:monospace;white-space:pre-wrap;font-size:12px;box-shadow:0 4px 10px rgba(0,0,0,0.3);border-bottom:3px solid #b91c1c;';
+      errorDiv.innerHTML = '<strong>⚠️ JavaScript Error:</strong> ' + e.message + '<br><em>File: ' + e.filename + ' (Line ' + e.lineno + ':' + e.colno + ')</em>';
+      if (!errorDiv.parentNode) document.documentElement.appendChild(errorDiv);
+    });
+  </script>
+  
+  <!-- Google Fonts - Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS (Local) -->
+  <link rel="stylesheet" href="lib/leaflet.css" />
+  
+  <!-- Leaflet JS (Local) -->
+  <script src="lib/leaflet.js"></script>
+
+  <!-- Leaflet Marker Cluster plugin -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+  <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+  
+  <!-- Lucide Icons (Local) -->
+  <script src="lib/lucide.min.js"></script>
+  
+  <!-- Style Sheet -->
+  <link rel="stylesheet" href="style.css?v=7">
+</head>
+<body class="light-theme">
+  <!-- Login View -->
+  <div id="login-view" class="login-wrapper">
+    <div class="login-container">
+      <img src="logo-cases-sucesso.png" alt="Mapa de Cases de Sucesso" class="login-logo-img animate-zoom">
+      
+      <div class="login-card glass-panel animate-zoom">
+        <!-- Sebrae Brand Header inside the Card -->
+        <div class="login-card-header">
+          <img src="logo-sebrae.png" alt="Sebrae" class="logo-image">
+        </div>
+
+        <div class="login-card-body">
+          <form id="login-form">
+            <div class="form-group">
+              <label for="login-email">E-mail Corporativo</label>
+              <div class="input-with-icon">
+                <i data-lucide="mail"></i>
+                <input type="email" id="login-email" placeholder="teste@sebraemg.com.br" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="login-password">Senha de Rede</label>
+              <div class="input-with-icon">
+                <i data-lucide="lock"></i>
+                <input type="password" id="login-password" placeholder="••••••••" required>
+              </div>
+            </div>
+
+            <div id="login-error" class="login-error-message">
+              <i data-lucide="alert-circle"></i>
+              <span>E-mail ou senha incorretos!</span>
+            </div>
+            
+            <button type="submit" id="btn-login" class="btn btn-primary btn-login-submit">
+              <span>Entrar no Painel</span>
+            </button>
+          </form>
+          
+          <div class="login-footer">
+            <p>Desenvolvido para demonstração interna</p>
+            <span class="demo-badge">Acesso Demo: teste@sebraemg.com.br | teste123</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Grid Layout (Dashboard View) -->
+  <div id="dashboard-view" class="app-container" style="display: none;">
+    
+    <!-- Top Header -->
+    <header class="main-header">
+      <div class="logo-area">
+        <div class="logo-img-container">
+          <img src="logo-sebrae.png" alt="Sebrae" class="logo-image">
+        </div>
+        <div class="logo-text">
+          <h1>Sebrae <span>Minas</span></h1>
+          <p>Educação Empreendedora - Cases de Sucesso</p>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <div id="db-status-badge" class="db-status-badge local" title="Status de conexão com o banco de dados">
+          <i data-lucide="database"></i>
+          <span>Modo Local</span>
+        </div>
+        <div class="export-dropdown-container" style="display: flex; align-items: center; gap: 8px;">
+          <select id="export-select-type" class="btn btn-secondary" style="font-size: 0.88rem; font-weight: 600; padding: 0 12px; height: 38px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-glass); cursor: pointer; outline: none; background: var(--bg-glass-solid); color: var(--text-primary);">
+            <option value="all">Exportar Todos</option>
+            <option value="professor">Apenas Professor</option>
+            <option value="estudante">Apenas Estudante</option>
+          </select>
+          <button id="btn-export-csv" class="btn btn-primary" title="Exportar Planilha (CSV)" style="font-size: 0.88rem; font-weight: 600; padding: 8px 16px; height: 38px; display: flex; align-items: center; gap: 8px; border-radius: var(--border-radius-sm); border: none;">
+            <i data-lucide="download" style="width: 16px; height: 16px;"></i>
+            <span>Exportar</span>
+          </button>
+        </div>
+        <button id="btn-logout" class="btn btn-icon" title="Sair do Painel" style="margin-right: 4px;">
+          <i data-lucide="log-out"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Content Workspace -->
+    <main class="content-area">
+      
+      <!-- Left Sidebar (Filters and Stats) -->
+      <aside class="sidebar">
+        
+        <!-- Button to Register Case -->
+        <button id="btn-open-register" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 14px; font-weight: 600; border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: center; gap: 10px; flex-shrink: 0; box-shadow: 0 4px 14px rgba(0, 84, 166, 0.15); margin-bottom: 4px;">
+          <i data-lucide="plus" style="width: 20px; height: 20px;"></i>
+          <span>Cadastrar Novo Case</span>
+        </button>
+        
+        <!-- Search and Filters Panel -->
+        <div class="panel glass-panel">
+          <div class="panel-header">
+            <div class="panel-header-title">
+              <i data-lucide="sliders-horizontal"></i>
+              <h2>Filtros e Busca</h2>
+            </div>
+            <i data-lucide="chevron-down" class="panel-toggle-icon"></i>
+          </div>
+          
+          <div class="panel-body">
+            <!-- Search City -->
+            <div class="form-group">
+              <label for="search-city">Município</label>
+              <div class="input-with-icon">
+                <i data-lucide="search"></i>
+                <input type="text" id="search-city" placeholder="Buscar município..." autocomplete="off">
+              </div>
+              <ul id="search-suggestions" class="autocomplete-list"></ul>
+            </div>
+            
+            <!-- Regional Filter -->
+            <div class="form-group">
+              <label for="filter-regional">Regional SEBRAE</label>
+              <div class="select-wrapper">
+                <select id="filter-regional">
+                  <option value="All">Todas as Regionais</option>
+                  <option value="CentroOeste">Centro-Oeste</option>
+                  <option value="Centro">Centro</option>
+                  <option value="Noroeste">Noroeste</option>
+                  <option value="Triângulo">Triângulo</option>
+                  <option value="Norte">Norte</option>
+                  <option value="Rio Doce">Rio Doce</option>
+                  <option value="Sul">Sul</option>
+                  <option value="Zona da Mata">Zona da Mata</option>
+                  <option value="Jequitinhonha/Mucuri">Jequitinhonha/Mucuri</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- Tipo de Case Filter -->
+            <div class="form-group">
+              <label for="filter-type">Tipo de Case</label>
+              <div class="select-wrapper">
+                <select id="filter-type">
+                  <option value="All">Todos os Tipos</option>
+                  <option value="professor">Cases de Professor</option>
+                  <option value="estudante">Cases de Estudante</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Statistics Panel -->
+        <div class="panel glass-panel stats-panel">
+          <div class="panel-header">
+            <div class="panel-header-title">
+              <i data-lucide="bar-chart-3"></i>
+              <h2>Indicadores Rápidos</h2>
+            </div>
+            <i data-lucide="chevron-down" class="panel-toggle-icon"></i>
+          </div>
+          <div class="panel-body">
+            <div class="stat-main">
+              <span id="stat-total-cases" class="stat-number">0</span>
+              <span class="stat-label">Cases Cadastrados (Total)</span>
+            </div>
+            
+            <!-- Sub-stats para Professor vs Estudante -->
+            <div class="stats-type-grid">
+              <div class="stat-type-box prof-box">
+                <span id="stat-professor-count" class="count-num-prof">0</span>
+                <span class="count-label">Professor</span>
+              </div>
+              <div class="stat-type-box est-box">
+                <span id="stat-estudante-count" class="count-num-est">0</span>
+                <span class="count-label">Estudante</span>
+              </div>
+            </div>
+            
+            <div class="stat-divider"></div>
+            
+            <div class="stats-list-container">
+              <h3>Distribuição por Regional</h3>
+              <ul id="stats-regional-list" class="stats-regional-list">
+                <!-- Dynamically filled -->
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legend Panel -->
+        <div class="panel glass-panel legend-panel">
+          <div class="panel-header">
+            <div class="panel-header-title">
+              <i data-lucide="layers"></i>
+              <h2>Legenda de Cores</h2>
+            </div>
+            <i data-lucide="chevron-down" class="panel-toggle-icon"></i>
+          </div>
+          <div class="panel-body">
+            <div class="legend-grid">
+              <div class="legend-item"><span class="color-dot bg-centro-oeste"></span> Centro-Oeste</div>
+              <div class="legend-item"><span class="color-dot bg-centro"></span> Centro</div>
+              <div class="legend-item"><span class="color-dot bg-noroeste"></span> Noroeste</div>
+              <div class="legend-item"><span class="color-dot bg-triangulo"></span> Triângulo</div>
+              <div class="legend-item"><span class="color-dot bg-norte"></span> Norte</div>
+              <div class="legend-item"><span class="color-dot bg-rio-doce"></span> Rio Doce</div>
+              <div class="legend-item"><span class="color-dot bg-sul"></span> Sul</div>
+              <div class="legend-item"><span class="color-dot bg-zona-mata"></span> Zona da Mata</div>
+              <div class="legend-item"><span class="color-dot bg-jequitinhonha-mucuri"></span> Jequitinhonha/Mucuri</div>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- Map Container -->
+      <section class="map-section glass-panel">
+        <div id="map"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- SLIDE-IN PANEL FOR REGISTERING CASE -->
+  <div id="register-panel" class="overlay-panel">
+    <div class="panel-content glass-panel animate-slide">
+      <div class="panel-content-header">
+        <h2><i data-lucide="plus-circle"></i> Cadastrar Novo Case<span id="register-type-label" style="color: var(--sebrae-blue); font-weight: 700; margin-left: 6px;"></span></h2>
+        <button id="btn-close-register" class="btn-close">&times;</button>
+      </div>
+      
+      <form id="register-form" class="panel-content-body">
+        
+        <!-- Seção 1: Informações Gerais do Case -->
+        <fieldset>
+          <legend><i data-lucide="book-open"></i> Informações Gerais do Case</legend>
+          <div class="form-group">
+            <label for="form-titulo">Título / Nome do Case *</label>
+            <input type="text" id="form-titulo" placeholder="Ex: Horta Orgânica Comunitária ou Reciclagem IoT" required>
+          </div>
+          <div class="form-group">
+            <label for="form-descricao">Descrição / Resumo Geral do Case *</label>
+            <textarea id="form-descricao" placeholder="Descreva o escopo geral do projeto de educação empreendedora no município..." required style="min-height: 85px; resize: vertical;"></textarea>
+          </div>
+        </fieldset>
+
+        <!-- Seção 2: Dados de Localização -->
+        <fieldset>
+          <legend><i data-lucide="map-pin"></i> Localização</legend>
+          <div class="form-row">
+            <div class="form-group flex-2">
+              <label for="form-municipio">Município *</label>
+              <input type="text" id="form-municipio" placeholder="Ex: Belo Horizonte" required autocomplete="off">
+              <ul id="form-municipio-suggestions" class="autocomplete-list"></ul>
+            </div>
+            <div class="form-group flex-1">
+              <label for="form-regional">Regional SEBRAE *</label>
+              <select id="form-regional" required>
+                <option value="" disabled selected>Selecione...</option>
+                <option value="CentroOeste">Centro-Oeste</option>
+                <option value="Centro">Centro</option>
+                <option value="Noroeste">Noroeste</option>
+                <option value="Triângulo">Triângulo</option>
+                <option value="Norte">Norte</option>
+                <option value="Rio Doce">Rio Doce</option>
+                <option value="Sul">Sul</option>
+                <option value="Zona da Mata">Zona da Mata</option>
+                <option value="Jequitinhonha/Mucuri">Jequitinhonha/Mucuri</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="form-mr">Microregião (MR) *</label>
+              <input type="text" id="form-mr" placeholder="Ex: MR Belo Horizonte" required>
+            </div>
+            <div class="form-group flex-1">
+              <label for="form-escola">Nome da Escola / Instituição de Ensino *</label>
+              <input type="text" id="form-escola" placeholder="Ex: Escola Estadual Sebrae" required>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Seção 2: Dados do Técnico Responsável -->
+        <fieldset>
+          <legend><i data-lucide="user"></i> Técnico Responsável</legend>
+          <div class="form-group">
+            <label for="form-tecnico-nome">Nome Completo *</label>
+            <input type="text" id="form-tecnico-nome" placeholder="Ex: João da Silva" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="form-tecnico-email">E-mail *</label>
+              <input type="email" id="form-tecnico-email" placeholder="Ex: joao@sebraemg.com.br" required>
+            </div>
+            <div class="form-group flex-1">
+              <label for="form-tecnico-contato">Telefone / WhatsApp *</label>
+              <input type="text" id="form-tecnico-contato" placeholder="Ex: (31) 99999-9999" required>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Seção 3: Dados do Estudante (Condicional para Tipo: Estudante) -->
+        <fieldset id="student-details-fieldset" style="display: none;">
+          <legend><i data-lucide="user-check"></i> Dados de Contato do Estudante</legend>
+          <div class="form-group">
+            <label for="form-estudante-nome">Nome Completo do Estudante</label>
+            <input type="text" id="form-estudante-nome" placeholder="Ex: Lucas Silva">
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="form-estudante-email">E-mail do Estudante</label>
+              <input type="email" id="form-estudante-email" placeholder="Ex: lucas@escola.com">
+            </div>
+            <div class="form-group flex-1">
+              <label for="form-estudante-contato">Telefone / WhatsApp do Estudante</label>
+              <input type="text" id="form-estudante-contato" placeholder="Ex: (31) 97777-7777">
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Seção 4: Indicadores Gerais do Município -->
+        <fieldset>
+          <legend><i data-lucide="check-square"></i> Indicadores do Município</legend>
+          
+          <!-- Cooperativa de Crédito -->
+          <div class="indicator-row">
+            <div class="indicator-toggle">
+              <label>Ações com Cooperativa de Crédito?</label>
+              <label class="switch">
+                <input type="checkbox" id="has-coop">
+                <span class="slider round"></span>
+              </label>
+            </div>
+            <div id="coop-fields" class="conditional-fields indicator-textarea">
+              <label for="form-coop-summary">Resumo das Ações com a Cooperativa *</label>
+              <textarea id="form-coop-summary" placeholder="Descreva as ações desenvolvidas com a cooperativa..."></textarea>
+            </div>
+          </div>
+          
+          <!-- Educação Empreendedora >70% -->
+          <div class="indicator-row flex-col">
+            <div class="indicator-toggle">
+              <label>Educação Empreendedora implementada em mais de 70% do município?</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="edu-70" value="sim">
+                  <span>Sim</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="edu-70" value="nao" checked>
+                  <span>Não</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lei de Educação Empreendedora -->
+          <div class="indicator-row">
+            <div class="indicator-toggle">
+              <label>Possui Lei de Educação Empreendedora no Município?</label>
+              <label class="switch">
+                <input type="checkbox" id="has-law">
+                <span class="slider round"></span>
+              </label>
+            </div>
+            <div id="law-fields" class="conditional-fields indicator-textarea">
+              <label for="form-law-summary">Resumo da Lei de Educação Empreendedora *</label>
+              <textarea id="form-law-summary" placeholder="Descreva os pontos principais da lei municipal..."></textarea>
+            </div>
+          </div>
+
+          <!-- Comitê Conjunto -->
+          <div class="indicator-row">
+            <div class="indicator-toggle">
+              <label>Tem Comitê ou Ações em conjunto (Secretaria, Superintendência e SEBRAE)?</label>
+              <label class="switch">
+                <input type="checkbox" id="has-committee">
+                <span class="slider round"></span>
+              </label>
+            </div>
+            <div id="committee-fields" class="conditional-fields indicator-textarea">
+              <label for="form-committee-summary">Resumo das Ações do Comitê *</label>
+              <textarea id="form-committee-summary" placeholder="Explane como funciona o comitê conjunto..."></textarea>
+            </div>
+          </div>
+
+          <!-- Parcerias IES -->
+          <div class="indicator-row">
+            <div class="indicator-toggle">
+              <label>Tem Parceria com Instituições de Ensino Superior (IES) em conjunto com o SEBRAE?</label>
+              <label class="switch">
+                <input type="checkbox" id="has-ies">
+                <span class="slider round"></span>
+              </label>
+            </div>
+            <div id="ies-fields" class="conditional-fields indicator-textarea">
+              <label for="form-ies-summary">Resumo da Parceria IES *</label>
+              <textarea id="form-ies-summary" placeholder="Quais faculdades apoiam e quais ações são feitas..."></textarea>
+            </div>
+          </div>
+
+          <!-- JEPP Implantado -->
+          <div class="form-group m-top-15">
+            <label for="form-jepp-status">JEPP Implantado no Município? *</label>
+            <select id="form-jepp-status" required>
+              <option value="" disabled selected>Selecione o status...</option>
+              <option value="Sim">Sim (Totalmente Implantado)</option>
+              <option value="Nao">Não Implantado</option>
+              <option value="Parcial">Parcial (Em Implantação)</option>
+            </select>
+          </div>
+
+        </fieldset>
+
+        <!-- Ações do Formulário -->
+        <div class="form-actions">
+          <button type="button" id="btn-cancel-register" class="btn btn-secondary">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Case no Mapa</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL FOR DETAILED VIEW ("VER MAIS") -->
+  <div id="details-modal" class="modal-wrapper">
+    <div class="modal-content glass-panel animate-zoom">
+      
+      <!-- Header -->
+      <div class="modal-header">
+        <div class="modal-title-area">
+          <span id="details-regional-badge" class="badge">Centro</span>
+          <h2 id="details-titulo" style="font-size: 1.8rem; font-weight: 800; color: var(--accent-color); margin: 6px 0 2px 0; line-height: 1.25;">Nome do Case de Exemplo</h2>
+          <div id="details-escola" style="font-size: 1.1rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Nome da Escola de Exemplo</div>
+          <p id="details-location-text"><i data-lucide="map-pin"></i> Belo Horizonte - MR Belo Horizonte</p>
+        </div>
+        <button id="btn-close-details" class="btn-close">&times;</button>
+      </div>
+
+      <!-- Scrollable Body -->
+      <div class="modal-body">
+        
+        <!-- Descrição Geral do Case -->
+        <div id="details-descricao-box" class="detail-box glass-box" style="margin-bottom: 16px; padding: 20px;">
+          <p id="details-descricao" class="summary-text" style="font-size: 1.15rem; line-height: 1.6; color: var(--text-primary); white-space: pre-line; margin: 0;"></p>
+        </div>
+        
+        <div class="details-grid">
+          
+          <!-- Coluna da Esquerda (Técnico e Estudantes) -->
+          <div class="details-col flex-2">
+            
+            <!-- Box Técnico Responsável -->
+            <div class="detail-box glass-box">
+              <h3><i data-lucide="user"></i> Técnico Responsável</h3>
+              <div class="tech-profile">
+                <div class="tech-avatar">
+                  <i data-lucide="user-check"></i>
+                </div>
+                <div class="tech-info">
+                  <h4 id="details-tecnico-nome">João Técnico</h4>
+                  <p id="details-tecnico-email"><i data-lucide="mail"></i> joao@sebrae.com.br</p>
+                  <p id="details-tecnico-contato"><i data-lucide="phone"></i> (31) 99999-9999</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Box Case de Estudantes / Dados do Estudante -->
+            <div id="details-student-box" class="detail-box glass-box" style="display: none; padding: 20px;">
+              <div class="box-header-row" style="margin-bottom: 12px; border-bottom: 1px solid var(--border-glass); padding-bottom: 8px;">
+                <h3 style="margin: 0; color: #10b981; display: flex; align-items: center; gap: 8px;"><i data-lucide="user-check" style="width: 20px; height: 20px;"></i> Dados de Contato do Estudante</h3>
+              </div>
+              <div class="box-content" style="display: flex; flex-direction: column; gap: 10px;">
+                <p style="margin: 0; font-size: 1rem; color: var(--text-primary);"><strong>Nome:</strong> <span id="details-student-nome">Lucas Silva</span></p>
+                <p id="details-student-email-container" style="margin: 0; font-size: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 6px;"><i data-lucide="mail" style="width: 16px; height: 16px; color: var(--text-muted);"></i> <span id="details-student-email">lucas@escola.com</span></p>
+                <p id="details-student-contato-container" style="margin: 0; font-size: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 6px;"><i data-lucide="phone" style="width: 16px; height: 16px; color: var(--text-muted);"></i> <span id="details-student-contato">(31) 97777-7777</span></p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Coluna da Direita (Indicadores e Parcerias) -->
+          <div class="details-col flex-3">
+            
+            <!-- Grid de Indicadores Rápidos -->
+            <div class="indicators-grid-4">
+              
+              <!-- JEPP -->
+              <div class="indicator-card glass-box">
+                <div class="card-icon"><i data-lucide="award"></i></div>
+                <div class="card-info">
+                  <label>Status JEPP</label>
+                  <span id="details-jepp" class="badge">Sim</span>
+                </div>
+              </div>
+
+              <!-- Coop de Crédito -->
+              <div class="indicator-card glass-box">
+                <div class="card-icon"><i data-lucide="landmark"></i></div>
+                <div class="card-info">
+                  <label>Coop. de Crédito</label>
+                  <span id="details-coop-status" class="badge">Sim</span>
+                </div>
+              </div>
+
+              <!-- EE >70% -->
+              <div class="indicator-card glass-box">
+                <div class="card-icon"><i data-lucide="percent"></i></div>
+                <div class="card-info">
+                  <label>EE > 70% Município</label>
+                  <span id="details-edu-70" class="badge">Sim</span>
+                </div>
+              </div>
+
+              <!-- Lei de EE -->
+              <div class="indicator-card glass-box">
+                <div class="card-icon"><i data-lucide="file-text"></i></div>
+                <div class="card-info">
+                  <label>Lei de EE</label>
+                  <span id="details-law-status" class="badge">Sim</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Box Cooperativa Detalhado -->
+            <div id="details-coop-box" class="detail-box glass-box">
+              <h3><i data-lucide="handshake"></i> Parcerias com Cooperativas de Crédito</h3>
+              <p id="details-coop-summary" class="summary-text">Resumo das ações cooperadas...</p>
+            </div>
+
+            <!-- Box Lei Educação Empreendedora Detalhado -->
+            <div id="details-law-box" class="detail-box glass-box">
+              <h3><i data-lucide="file-check"></i> Lei Municipal de Educação Empreendedora</h3>
+              <p id="details-law-summary" class="summary-text">Resumo da lei municipal...</p>
+            </div>
+
+            <!-- Box Comitê e Ações em Conjunto Detalhado -->
+            <div id="details-committee-box" class="detail-box glass-box">
+              <div class="box-header-row">
+                <h3><i data-lucide="users"></i> Comitê e Ações Conjuntas</h3>
+                <span id="details-committee-badge" class="indicator-badge status-sim">Sim</span>
+              </div>
+              <p id="details-committee-summary" class="summary-text">Resumo do comitê...</p>
+            </div>
+
+            <!-- Box Parceria com IES Detalhado -->
+            <div id="details-ies-box" class="detail-box glass-box">
+              <div class="box-header-row">
+                <h3><i data-lucide="school"></i> Parceria com IES (Ensino Superior)</h3>
+                <span id="details-ies-badge" class="indicator-badge status-sim">Sim</span>
+              </div>
+              <p id="details-ies-summary" class="summary-text">Resumo da parceria IES...</p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal de Seleção de Tipo de Case -->
+  <div id="case-type-modal" class="modal-wrapper" style="display: none;">
+    <div class="modal-content glass-panel animate-zoom" style="max-width: 600px; padding: 25px;">
+      <div class="modal-header" style="border-bottom: 1px solid var(--border-glass); padding-bottom: 15px; margin-bottom: 20px;">
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--accent-color); margin: 0;">Selecione o Tipo de Case</h2>
+        <button id="btn-close-type-modal" class="btn-close">&times;</button>
+      </div>
+      <div class="select-type-grid" style="display: flex; gap: 20px; margin-top: 10px;">
+        <div id="select-type-professor" class="type-card card-professor" style="flex: 1; padding: 20px; border: 1px solid var(--border-glass); border-radius: var(--border-radius-sm); text-align: center; cursor: pointer; transition: all var(--transition-fast); background: rgba(255, 255, 255, 0.02);">
+          <div class="type-icon-wrapper" style="width: 60px; height: 60px; background: rgba(0, 84, 166, 0.1); color: var(--sebrae-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; font-size: 1.8rem; border: 1px solid rgba(0, 84, 166, 0.2);">
+            <i data-lucide="graduation-cap" style="width: 32px; height: 32px;"></i>
+          </div>
+          <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Case de Professor</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; margin: 0;">Metodologias aplicadas por docentes e desenvolvimento escolar.</p>
+        </div>
+        <div id="select-type-estudante" class="type-card card-estudante" style="flex: 1; padding: 20px; border: 1px solid var(--border-glass); border-radius: var(--border-radius-sm); text-align: center; cursor: pointer; transition: all var(--transition-fast); background: rgba(255, 255, 255, 0.02);">
+          <div class="type-icon-wrapper" style="width: 60px; height: 60px; background: rgba(16, 185, 129, 0.1); color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; font-size: 1.8rem; border: 1px solid rgba(16, 185, 129, 0.2);">
+            <i data-lucide="user-check" style="width: 32px; height: 32px;"></i>
+          </div>
+          <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Case de Estudante</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; margin: 0;">Projetos empreendedores criados e liderados pelos alunos.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script de Municípios -->
+  <script src="municipalities.js"></script>
+  
+  <!-- Supabase JS Client (Local) -->
+  <script src="lib/supabase.js"></script>
+  
+  <!-- Local Config Key Loader -->
+  <script src="config.js"></script>
+  
+  <!-- Script Principal -->
+  <script src="app.js?v=4"></script>
+</body>
+</html>
