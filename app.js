@@ -4,12 +4,8 @@
 // Se quiser usar banco de dados na nuvem (Supabase) para múltiplos usuários:
 // Preencha as duas constantes abaixo com os dados do seu projeto Supabase.
 // Se deixadas vazias, a plataforma usará automaticamente o LocalStorage do navegador.
-// Read Supabase credentials from local config.js if available, otherwise default to empty strings
-const SUPABASE_URL = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_URL) || ""; 
-const SUPABASE_KEY = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_KEY) || ""; 
-
-// Cliente Supabase global
-let supabaseClient = null;
+// O backend gerencia a conexão e esconde as chaves do Supabase.
+// O cliente JavaScript se comunica de forma segura apenas com a API local (/api/cases).
 let isCloudMode = false;
 
 // ==========================================================================
@@ -725,64 +721,69 @@ if (document.readyState !== "loading") {
 }
 
 async function initData() {
-  if (SUPABASE_URL && SUPABASE_KEY && typeof supabase !== "undefined") {
-    isCloudMode = true;
-    updateDbStatus("connecting");
-    
+  updateDbStatus("connecting");
+  
+  try {
+    const res = await fetch("/api/cases");
+    let data;
     try {
-      supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      data = await res.json();
+    } catch (e) {
+      data = null;
+    }
+    
+    if (!res.ok) {
+      const serverErr = data && data.error ? data.error : `HTTP ${res.status}`;
+      throw new Error(serverErr);
+    }
+    
+    isCloudMode = true;
+    
+    if (Array.isArray(data) && data.length > 0) {
+      cases = data.map(mapDatabaseToApp);
+    } else {
+      // If Supabase table is completely empty, insert seeds
+      console.log("Banco de dados na nuvem vazio. Enviando cases semente...");
       
-      // Fetch cases from Supabase
-      const { data, error } = await supabaseClient
-        .from('cases')
-        .select('*');
-        
-      if (error) throw error;
+      // Resolve coordinates for seed cases before inserting
+      const casesToInsert = SEED_CASES.map(item => {
+        const coords = getCaseCoordinates(item);
+        return {
+          ...item,
+          lat: coords.lat,
+          lng: coords.lng
+        };
+      });
       
-      if (data && data.length > 0) {
-        cases = data.map(mapDatabaseToApp);
-      } else {
-        // If Supabase table is completely empty, insert seeds
-        console.log("Banco de dados na nuvem vazio. Enviando cases semente...");
-        
-        // Resolve coordinates for seed cases before inserting
-        const casesToInsert = SEED_CASES.map(item => {
-          const coords = getCaseCoordinates(item);
-          return {
-            ...item,
-            lat: coords.lat,
-            lng: coords.lng
-          };
-        });
-        
-        const dbCasesToInsert = casesToInsert.map(mapAppToDatabase);
-        
-        const { error: insertError } = await supabaseClient
-          .from('cases')
-          .insert(dbCasesToInsert);
-          
-        if (insertError) throw insertError;
-        cases = casesToInsert;
+      const dbCasesToInsert = casesToInsert.map(mapAppToDatabase);
+      
+      const insertRes = await fetch("/api/cases", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dbCasesToInsert)
+      });
+      
+      if (!insertRes.ok) {
+        throw new Error(`Falha ao inserir sementes: HTTP ${insertRes.status}`);
       }
       
-      updateDbStatus("online");
-      return;
-    } catch (e) {
-      console.error("Falha ao conectar com o Supabase. Usando LocalStorage de backup.", e);
-      const errMsg = e.message || e.details || e.hint || String(e);
-      showToast(`Erro na Nuvem: ${errMsg.substring(0, 45)}...`);
-      
-      isCloudMode = false;
-      updateDbStatus("local", errMsg);
-      loadLocalStorageFallback();
-      return;
+      cases = casesToInsert;
     }
+    
+    updateDbStatus("online");
+    return;
+  } catch (e) {
+    console.error("Falha ao conectar com o Supabase. Usando LocalStorage de backup.", e);
+    const errMsg = e.message || String(e);
+    showToast(`Erro na Nuvem: ${errMsg.substring(0, 45)}...`);
+    
+    isCloudMode = false;
+    updateDbStatus("local", errMsg);
+    loadLocalStorageFallback();
+    return;
   }
-  
-  // Fallback directly if credentials not filled or library not found
-  isCloudMode = false;
-  updateDbStatus("local", typeof supabase === "undefined" ? "Biblioteca Supabase (supabase.js) não foi carregada no index.html." : "");
-  loadLocalStorageFallback();
 }
 
 function loadLocalStorageFallback() {
@@ -1680,14 +1681,26 @@ async function handleFormSubmit(e) {
   };
 
   // Add to state and persist
-  if (isCloudMode && supabaseClient) {
+  if (isCloudMode) {
     try {
       const dbCase = mapAppToDatabase(newCase);
-      const { error } = await supabaseClient
-        .from('cases')
-        .insert([dbCase]);
-        
-      if (error) throw error;
+      const res = await fetch("/api/cases", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dbCase)
+      });
+      
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      
+      const data = await res.json();
+      if (data && data.error) {
+        throw new Error(data.error);
+      }
+      
       cases.push(newCase);
     } catch (e) {
       console.error("Erro ao salvar case no Supabase:", e);

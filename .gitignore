@@ -1,5 +1,6 @@
 # Ignorar credenciais locais de banco de dados
 config.js
+.env
 
 # Ignorar arquivos temporários do sistema
 .DS_Store
