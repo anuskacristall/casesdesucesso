@@ -13,10 +13,20 @@ ssl_context = ssl._create_unverified_context()
 
 # Load environment variables from .env if present
 def load_env():
+    # Check standard root path
     env_path = pathlib.Path(__file__).parent / ".env"
+    # Check Render's default secrets directory path
+    secrets_path = pathlib.Path("/etc/secrets/.env")
+    
+    target_path = None
     if env_path.exists():
-        print("Carregando credenciais do arquivo .env...")
-        with open(env_path, "r", encoding="utf-8") as f:
+        target_path = env_path
+    elif secrets_path.exists():
+        target_path = secrets_path
+        
+    if target_path:
+        print(f"Carregando credenciais do arquivo {target_path}...")
+        with open(target_path, "r", encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if not line or line.startswith("#"):
