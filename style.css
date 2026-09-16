@@ -283,9 +283,11 @@ body.light-theme .logo-text h1 span {
   border: 1px solid transparent;
 }
 
-.db-status-badge i {
+.db-status-badge i,
+.db-status-badge svg {
   width: 14px;
   height: 14px;
+  flex-shrink: 0;
 }
 
 .db-status-badge.local {
@@ -353,10 +355,13 @@ body.light-theme .logo-text h1 span {
   gap: 10px;
 }
 
-.panel-header-title i {
+.panel-header-title i,
+.panel-header-title svg {
   width: 20px;
   height: 20px;
   color: var(--accent-color);
+  stroke: var(--accent-color);
+  flex-shrink: 0;
 }
 
 .panel-header h2 {
@@ -969,8 +974,10 @@ body.light-theme .popup-summary {
   color: var(--text-primary);
 }
 
-.panel-content-header h2 i {
+.panel-content-header h2 i,
+.panel-content-header h2 svg {
   color: var(--accent-color);
+  stroke: var(--accent-color);
   width: 22px;
   height: 22px;
 }
@@ -1010,9 +1017,11 @@ body.light-theme legend {
   color: var(--sebrae-blue);
 }
 
-legend i {
+legend i,
+legend svg {
   width: 18px;
   height: 18px;
+  stroke: currentColor;
 }
 
 .form-row {
@@ -1279,10 +1288,12 @@ input:checked + .slider:before {
   gap: 6px;
 }
 
-#details-location-text i {
+#details-location-text i,
+#details-location-text svg {
   width: 14px;
   height: 14px;
   color: var(--accent-color);
+  stroke: var(--accent-color);
 }
 
 .modal-body {
@@ -1325,9 +1336,11 @@ body.light-theme .detail-box h3 {
   color: var(--sebrae-blue);
 }
 
-.detail-box h3 i {
+.detail-box h3 i,
+.detail-box h3 svg {
   width: 16px;
   height: 16px;
+  stroke: currentColor;
 }
 
 .box-header-row {
@@ -1365,9 +1378,11 @@ body.light-theme .tech-avatar {
   color: var(--sebrae-blue);
 }
 
-.tech-avatar i {
+.tech-avatar i,
+.tech-avatar svg {
   width: 24px;
   height: 24px;
+  stroke: currentColor;
 }
 
 .tech-info {
@@ -1390,10 +1405,12 @@ body.light-theme .tech-avatar {
   gap: 6px;
 }
 
-.tech-info p i {
+.tech-info p i,
+.tech-info p svg {
   width: 14px;
   height: 14px;
   color: var(--text-muted);
+  stroke: var(--text-muted);
 }
 
 /* Indicators grid */
@@ -1426,9 +1443,11 @@ body.light-theme .card-icon {
   background: rgba(0, 0, 0, 0.04);
 }
 
-.card-icon i {
+.card-icon i,
+.card-icon svg {
   width: 18px;
   height: 18px;
+  stroke: currentColor;
 }
 
 .card-info {

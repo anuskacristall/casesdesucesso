@@ -714,11 +714,110 @@ function mapAppToDatabase(appItem) {
 // INITIALIZATION
 // ==========================================================================
 
+// ==========================================================================
+// API & NETWORK HELPERS
+// ==========================================================================
+
+function getApiUrl(path) {
+  if (window.location.protocol === "file:") {
+    return `http://localhost:8001${path}`;
+  }
+  return path;
+}
+
+// ==========================================================================
+// TELEPHONE MASK & VALIDATION (DDD ENTRE PARÊNTESES: (XX) XXXXX-XXXX)
+// ==========================================================================
+
+function formatPhoneNumber(value) {
+  if (!value) return "";
+  const digits = String(value).replace(/\D/g, "").slice(0, 11);
+  if (digits.length === 0) return "";
+  if (digits.length <= 2) return `(${digits}`;
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
+}
+
+function isValidPhone(value) {
+  if (!value) return false;
+  const digits = String(value).replace(/\D/g, "");
+  // Telefone no Brasil: 10 dígitos (fixo) ou 11 dígitos (móvel) com DDD
+  if (digits.length < 10 || digits.length > 11) return false;
+  const ddd = parseInt(digits.slice(0, 2), 10);
+  if (isNaN(ddd) || ddd < 11 || ddd > 99) return false;
+  // Celular com 11 dígitos começa com 9 após o DDD
+  if (digits.length === 11 && digits.charAt(2) !== '9') return false;
+  return true;
+}
+
+function setupPhoneInputs() {
+  const phoneInputIds = [
+    "municipality-contact-phone",
+    "form-tecnico-contato",
+    "form-professor-contato",
+    "form-estudante-contato"
+  ];
+
+  phoneInputIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.setAttribute("maxlength", "15"); // Formato: (XX) XXXXX-XXXX
+    el.setAttribute("placeholder", "(31) 98888-7777");
+
+    el.addEventListener("input", () => {
+      el.value = formatPhoneNumber(el.value);
+    });
+
+    el.addEventListener("blur", () => {
+      const val = el.value.trim();
+      if (val && !isValidPhone(val)) {
+        el.style.borderColor = "var(--danger, #ef4444)";
+        el.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
+      } else {
+        el.style.borderColor = "";
+        el.style.boxShadow = "";
+      }
+    });
+  });
+}
+
+// ==========================================================================
+// CÓDIGO SEQUENCIAL DE 4 DÍGITOS INICIANDO EM 0001 (#0001, #0002...)
+// ==========================================================================
+
+function generateNextRequestCode() {
+  let highest = 0;
+  try {
+    const localMun = JSON.parse(localStorage.getItem("sebrae_pending_municipalities") || "[]");
+    const localCases = JSON.parse(localStorage.getItem("sebrae_success_cases") || "[]");
+    
+    [...localMun, ...localCases, ...(cases || [])].forEach(item => {
+      const code = item.request_code || item.requestCode || "";
+      const match = String(code).match(/#(\d+)/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (!isNaN(num) && num < 10000 && num > highest) {
+          highest = num;
+        }
+      }
+    });
+  } catch (e) {
+    console.warn("Aviso ao calcular próximo código de solicitação:", e);
+  }
+  const next = highest + 1;
+  return `#${String(next).padStart(4, "0")}`;
+}
+
 async function init() {
   // Initialize Lucide Icons
   if (typeof lucide !== "undefined") {
     lucide.createIcons();
   }
+  
+  // Set up phone masks and validation
+  setupPhoneInputs();
   
   // Load data
   await initData();
@@ -772,44 +871,41 @@ async function initData() {
         return;
       }
     } catch (err) {
-      console.warn("Conexão direta com o Supabase falhou, tentando proxy /api/cases...", err);
+      console.warn("Conexão direta com o Supabase falhou, tentando backend proxy...", err);
     }
   }
 
-  // 2. Fallback to local server proxy /api/cases
-  try {
-    const res = await fetch("/api/cases");
-    let data;
+  // 2. Next attempt via local/remote server proxy (which handles Supabase Cloud SSL bypass)
+  const proxyEndpoints = [
+    getApiUrl("/api/cases"),
+    "http://localhost:8001/api/cases",
+    "/api/cases"
+  ];
+
+  for (const endpoint of proxyEndpoints) {
     try {
-      data = await res.json();
+      const res = await fetch(endpoint);
+      if (res.ok) {
+        const data = await res.json();
+        isCloudMode = true;
+        if (Array.isArray(data) && data.length > 0) {
+          cases = data.map(mapDatabaseToApp);
+        } else {
+          cases = [...SEED_CASES];
+        }
+        updateDbStatus("online");
+        return;
+      }
     } catch (e) {
-      data = null;
+      // Try next endpoint
     }
-    
-    if (!res.ok) {
-      const serverErr = data && data.error ? data.error : `HTTP ${res.status}`;
-      throw new Error(serverErr);
-    }
-    
-    isCloudMode = true;
-    
-    if (Array.isArray(data) && data.length > 0) {
-      cases = data.map(mapDatabaseToApp);
-    } else {
-      cases = [...SEED_CASES];
-    }
-    
-    updateDbStatus("online");
-    return;
-  } catch (e) {
-    console.warn("Falha ao conectar com o Supabase. Usando LocalStorage de backup.", e);
-    const errMsg = e.message || String(e);
-    
-    isCloudMode = false;
-    updateDbStatus("local", errMsg);
-    loadLocalStorageFallback();
-    return;
   }
+
+  // 3. Fallback to LocalStorage
+  isCloudMode = false;
+  updateDbStatus("local", "Operando em modo local offline");
+  loadLocalStorageFallback();
+  return;
 }
 
 function loadLocalStorageFallback() {
@@ -866,7 +962,7 @@ function updateDbStatus(status, errorMsg = "") {
   
   // Refresh Lucide icons in the badge
   if (typeof lucide !== "undefined") {
-    lucide.createIcons({ node: badge });
+    lucide.createIcons({ root: badge });
   }
 }
 
@@ -919,7 +1015,7 @@ function initMap() {
           class: 'lucide-icon-popup'
         },
         nameAttr: 'data-lucide',
-        node: container
+        root: container
       });
     }
   });
@@ -1103,7 +1199,7 @@ function createQuickLookCard(item) {
         class: 'lucide-icon-popup'
       },
       nameAttr: 'data-lucide',
-      node: container
+      root: container
     });
     
     // Bind click to the details modal trigger
@@ -1373,7 +1469,7 @@ function openDetailsModal(id) {
 
   // Open Modal
   document.getElementById("details-modal").classList.add("active");
-  lucide.createIcons({ node: document.getElementById("details-modal") });
+  lucide.createIcons({ root: document.getElementById("details-modal") });
 }
 
 function closeDetailsModal() {
@@ -1387,7 +1483,7 @@ function closeDetailsModal() {
 function openCaseTypeModal() {
   document.getElementById("case-type-modal").classList.add("active");
   document.getElementById("case-type-modal").style.display = "flex";
-  lucide.createIcons({ node: document.getElementById("case-type-modal") });
+  lucide.createIcons({ root: document.getElementById("case-type-modal") });
 }
 
 function closeCaseTypeModal() {
@@ -1473,7 +1569,7 @@ function openMunicipalityModal() {
     if (form) form.reset();
     modal.classList.add("active");
     modal.style.display = "flex";
-    lucide.createIcons({ node: modal });
+    lucide.createIcons({ root: modal });
   }
 }
 
@@ -1492,7 +1588,7 @@ function openConfirmCodeModal(code) {
     if (codeEl) codeEl.innerText = code;
     modal.classList.add("active");
     modal.style.display = "flex";
-    lucide.createIcons({ node: modal });
+    lucide.createIcons({ root: modal });
   }
 }
 
@@ -1535,17 +1631,29 @@ async function handleMunicipalitySubmit(e) {
   const escSebEl = document.querySelector('input[name="municipality-escola-sebrae"]:checked');
   const hasEscolaSebrae = escSebEl ? escSebEl.value === "sim" : false;
 
-  const randomCode = "#" + Math.floor(100000 + Math.random() * 900000);
+  // Validação de telefone com DDD entre parênteses
+  if (!isValidPhone(contactPhone)) {
+    showToast("Por favor, preencha o Telefone/WhatsApp válido com DDD: (XX) XXXXX-XXXX");
+    const phoneInput = document.getElementById("municipality-contact-phone");
+    if (phoneInput) {
+      phoneInput.focus();
+      phoneInput.style.borderColor = "var(--danger, #ef4444)";
+      phoneInput.style.boxShadow = "0 0 0 2px rgba(239, 68, 68, 0.2)";
+    }
+    return;
+  }
+
+  const requestCode = generateNextRequestCode();
 
   const newMunicipality = {
     id: "mun-" + Date.now(),
-    request_code: randomCode,
+    request_code: requestCode,
     nome: name,
     regional,
     mr,
     responsavel_nome: contactName,
     responsavel_email: contactEmail,
-    responsavel_telefone: contactPhone,
+    responsavel_telefone: formatPhoneNumber(contactPhone),
     status_jepp: jeppStatus,
     municipio_ee_70: edu70,
     cooperativa_possui: hasCoop,
@@ -1566,8 +1674,9 @@ async function handleMunicipalitySubmit(e) {
     console.error("Erro ao salvar no localStorage:", err);
   }
 
+  // Envia via backend local/remoto e tenta direto no Supabase
   try {
-    await fetch("/api/municipalities", {
+    await fetch(getApiUrl("/api/municipalities"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newMunicipality)
@@ -1576,9 +1685,26 @@ async function handleMunicipalitySubmit(e) {
     // Ignored in static / file mode
   }
 
+  const supabaseUrl = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_URL) || "";
+  const supabaseKey = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_KEY) || "";
+  if (supabaseUrl && supabaseKey) {
+    try {
+      await fetch(`${supabaseUrl}/rest/v1/municipalities`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": supabaseKey,
+          "Authorization": `Bearer ${supabaseKey}`,
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify(newMunicipality)
+      });
+    } catch (sbErr) {}
+  }
+
   closeMunicipalityModal();
-  openConfirmCodeModal(randomCode);
-  showToast(`Solicitação de cadastro de ${name} enviada com sucesso! Protocolo: ${randomCode}`);
+  openConfirmCodeModal(requestCode);
+  showToast(`Solicitação de cadastro de ${name} enviada com sucesso! Protocolo: ${requestCode}`);
   document.getElementById("municipality-form").reset();
 }
 
@@ -1911,18 +2037,53 @@ async function handleFormSubmit(e) {
   
   const jeppStatus = document.getElementById("form-jepp-status").value;
 
+  // Validação de Telefones com DDD entre parênteses
+  if (tecnicoContato && !isValidPhone(tecnicoContato)) {
+    showToast("Telefone do técnico inválido. Use o formato com DDD: (XX) XXXXX-XXXX");
+    const el = document.getElementById("form-tecnico-contato");
+    if (el) { el.focus(); el.style.borderColor = "var(--danger, #ef4444)"; }
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = origText;
+    return;
+  }
+
+  if (currentRegisterType === 'professor') {
+    if (!isValidPhone(professorTelefone)) {
+      showToast("Telefone do professor inválido. Use o formato com DDD: (XX) XXXXX-XXXX");
+      const el = document.getElementById("form-professor-contato");
+      if (el) { el.focus(); el.style.borderColor = "var(--danger, #ef4444)"; }
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = origText;
+      return;
+    }
+  }
+
+  if (currentRegisterType === 'estudante') {
+    if (estudanteTelefone && !isValidPhone(estudanteTelefone)) {
+      showToast("Telefone do estudante inválido. Use o formato com DDD: (XX) XXXXX-XXXX");
+      const el = document.getElementById("form-estudante-contato");
+      if (el) { el.focus(); el.style.borderColor = "var(--danger, #ef4444)"; }
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = origText;
+      return;
+    }
+  }
+
   // Show a loading feedback on the submit button
   const submitBtn = e.target.querySelector('button[type="submit"]');
   const origText = submitBtn.innerHTML;
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<i data-lucide="loader" class="animate-spin"></i> Salvando...';
-  lucide.createIcons({ node: submitBtn });
+  lucide.createIcons({ root: submitBtn });
 
   // Look up coordinates (dynamic Nominatim / static fallback)
   const coordsObj = await window.getMunicipalityCoordinates(municipio, regional);
   
+  const requestCode = generateNextRequestCode();
+
   const newCase = {
     id: "case-" + Date.now(),
+    request_code: requestCode,
     municipio: coordsObj.name, // standardize name if matched in db
     regional,
     mr,
@@ -1931,16 +2092,16 @@ async function handleFormSubmit(e) {
     descricao,
     tecnicoNome,
     tecnicoEmail,
-    tecnicoContato,
+    tecnicoContato: formatPhoneNumber(tecnicoContato),
     
     // Type and contact info
     tipoCase: currentRegisterType,
     professorNome,
     professorEmail,
-    professorTelefone,
+    professorTelefone: formatPhoneNumber(professorTelefone),
     estudanteNome,
     estudanteEmail,
-    estudanteTelefone,
+    estudanteTelefone: formatPhoneNumber(estudanteTelefone),
     
     // Legacy support fields
     hasStudentCase: currentRegisterType === 'estudante',
@@ -1981,7 +2142,7 @@ async function handleFormSubmit(e) {
           body: JSON.stringify(dbCase)
         });
       } else {
-        res = await fetch("/api/cases", {
+        res = await fetch(getApiUrl("/api/cases"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -2009,7 +2170,7 @@ async function handleFormSubmit(e) {
   // Reset button state
   submitBtn.disabled = false;
   submitBtn.innerHTML = origText;
-  lucide.createIcons({ node: submitBtn });
+  lucide.createIcons({ root: submitBtn });
 
   // Close panel and notify dashboard
   closeRegisterPanel();
@@ -2028,7 +2189,7 @@ function showToast(message) {
   toast.innerHTML = `<i data-lucide="check-circle" style="color: var(--success); width: 18px; height: 18px;"></i> <span>${message}</span>`;
   
   document.body.appendChild(toast);
-  lucide.createIcons({ node: toast });
+  lucide.createIcons({ root: toast });
   
   // Add CSS dynamically for toast
   Object.assign(toast.style, {
@@ -2087,7 +2248,7 @@ function handleLogin(e) {
     errorMsg.classList.remove("active");
     loginBtn.disabled = true;
     loginBtn.innerHTML = '<i data-lucide="loader" class="animate-spin" style="width: 18px; height: 18px;"></i> Acessando Admin...';
-    lucide.createIcons({ node: loginBtn });
+    lucide.createIcons({ root: loginBtn });
     
     setTimeout(() => {
       localStorage.setItem("sebrae_admin_authenticated", "true");
@@ -2102,7 +2263,7 @@ function handleLogin(e) {
     errorMsg.classList.remove("active");
     loginBtn.disabled = true;
     loginBtn.innerHTML = '<i data-lucide="loader" class="animate-spin" style="width: 18px; height: 18px;"></i> Entrando...';
-    lucide.createIcons({ node: loginBtn });
+    lucide.createIcons({ root: loginBtn });
     
     setTimeout(() => {
       localStorage.setItem("sebrae_authenticated", "true");

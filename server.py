@@ -64,7 +64,7 @@ REQUEST_CODE_COUNTER = 0
 def get_next_code():
     global REQUEST_CODE_COUNTER
     REQUEST_CODE_COUNTER += 1
-    return f"#{REQUEST_CODE_COUNTER:06d}"
+    return f"#{REQUEST_CODE_COUNTER:04d}"
 
 # Credenciais padrão simuladas
 USER_DEFAULT_EMAIL = os.getenv('USER_DEFAULT_EMAIL', 'user@example.com')

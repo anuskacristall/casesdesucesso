@@ -11,6 +11,13 @@ let currentStatusFilter = 'all'; // 'all' | 'pending' | 'approved' | 'rejected'
 let adminSearchQuery = '';
 let connectionMode = 'local'; // 'cloud' | 'server' | 'local'
 
+function getApiUrl(path) {
+  if (window.location.protocol === "file:") {
+    return `http://localhost:8001${path}`;
+  }
+  return path;
+}
+
 // Status formatting helper
 const STATUS_CONFIG = {
   pending: { label: 'Pendente', class: 'pending' },
@@ -62,7 +69,7 @@ async function handleAdminLoginSubmit(e) {
   // Attempt server backend authentication
   let isAuthenticated = false;
   try {
-    const res = await fetch("/api/login/admin", {
+    const res = await fetch(getApiUrl("/api/login/admin"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password })
@@ -84,7 +91,7 @@ async function handleAdminLoginSubmit(e) {
   if (isAuthenticated) {
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i data-lucide="loader" class="animate-spin"></i> Acessando...';
-    if (typeof lucide !== "undefined") lucide.createIcons({ node: submitBtn });
+    if (typeof lucide !== "undefined") lucide.createIcons();
 
     setTimeout(() => {
       localStorage.setItem("sebrae_admin_authenticated", "true");
@@ -136,29 +143,38 @@ async function refreshAdminData() {
         success = true;
       }
     } catch (err) {
-      console.warn("Supabase direto indisponível, tentando servidor local...", err);
+      console.warn("Supabase direto indisponível, tentando proxy local/remoto...", err);
     }
   }
 
-  // 2. Server Python API (/api/municipalities, /api/cases)
+  // 2. Server Python API (supports port 8001 and relative /api, connecting directly to Supabase)
   if (!success) {
-    try {
-      const [muniRes, casesRes] = await Promise.all([
-        fetch("/api/municipalities"),
-        fetch("/api/cases")
-      ]);
+    const endpoints = [
+      { mun: getApiUrl("/api/municipalities"), cases: getApiUrl("/api/cases") },
+      { mun: "http://localhost:8001/api/municipalities", cases: "http://localhost:8001/api/cases" },
+      { mun: "/api/municipalities", cases: "/api/cases" }
+    ];
 
-      if (muniRes.ok && casesRes.ok) {
-        const munData = await muniRes.json();
-        const casesData = await casesRes.json();
-        loadedMunicipalities = Array.isArray(munData) ? munData : [];
-        loadedCases = Array.isArray(casesData) ? casesData : [];
-        connectionMode = "server";
-        updateAdminConnectionBadge("server");
-        success = true;
+    for (const ep of endpoints) {
+      try {
+        const [muniRes, casesRes] = await Promise.all([
+          fetch(ep.mun),
+          fetch(ep.cases)
+        ]);
+
+        if (muniRes.ok && casesRes.ok) {
+          const munData = await muniRes.json();
+          const casesData = await casesRes.json();
+          loadedMunicipalities = Array.isArray(munData) ? munData : [];
+          loadedCases = Array.isArray(casesData) ? casesData : [];
+          connectionMode = "cloud"; // conectado ao Supabase via proxy
+          updateAdminConnectionBadge("cloud");
+          success = true;
+          break;
+        }
+      } catch (err) {
+        // Tenta o próximo
       }
-    } catch (err) {
-      console.warn("Servidor /api/ indisponível, usando LocalStorage...", err);
     }
   }
 
@@ -212,14 +228,10 @@ function updateAdminConnectionBadge(mode) {
   const text = document.getElementById("admin-db-status-text");
   if (!badge || !text) return;
 
-  if (mode === "cloud") {
+  if (mode === "cloud" || mode === "server") {
     badge.className = "db-status-badge cloud-online";
-    text.textContent = "Supabase Nuvem";
+    text.textContent = "Modo Nuvem (Supabase)";
     badge.title = "Conectado ao Supabase na Nuvem";
-  } else if (mode === "server") {
-    badge.className = "db-status-badge cloud-online";
-    text.textContent = "Servidor Local";
-    badge.title = "Conectado via Python API Server";
   } else if (mode === "connecting") {
     badge.className = "db-status-badge cloud-connecting";
     text.textContent = "Conectando...";
@@ -229,7 +241,7 @@ function updateAdminConnectionBadge(mode) {
     badge.title = "Operando com armazenamento LocalStorage";
   }
 
-  if (typeof lucide !== "undefined") lucide.createIcons({ node: badge });
+  if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
 // ============================================================================
@@ -337,7 +349,7 @@ function renderMunicipalitiesTable() {
         </td>
       </tr>
     `;
-    if (typeof lucide !== "undefined") lucide.createIcons({ node: tbody });
+    if (typeof lucide !== "undefined") lucide.createIcons();
     return;
   }
 
@@ -396,7 +408,7 @@ function renderMunicipalitiesTable() {
     `;
   }).join("");
 
-  if (typeof lucide !== "undefined") lucide.createIcons({ node: tbody });
+  if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
 // ============================================================================
@@ -442,7 +454,7 @@ function renderCasesTable() {
         </td>
       </tr>
     `;
-    if (typeof lucide !== "undefined") lucide.createIcons({ node: tbody });
+    if (typeof lucide !== "undefined") lucide.createIcons();
     return;
   }
 
@@ -491,7 +503,7 @@ function renderCasesTable() {
     `;
   }).join("");
 
-  if (typeof lucide !== "undefined") lucide.createIcons({ node: tbody });
+  if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
 // ============================================================================
@@ -534,7 +546,7 @@ async function updateMunicipalityStatus(id, newStatus, successMsg) {
   // 2. Try Server backend PATCH
   const action = newStatus === "approved" ? "approve" : "reject";
   try {
-    await fetch(`/api/municipalities/${action}/${encodeURIComponent(id)}`, { method: "PATCH" });
+    await fetch(getApiUrl(`/api/municipalities/${action}/${encodeURIComponent(id)}`), { method: "PATCH" });
   } catch (err) {
     // 3. Try Supabase REST Direct PATCH
     const supabaseUrl = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_URL) || "";
@@ -591,7 +603,7 @@ async function updateCaseStatus(id, newStatus, successMsg) {
   // 2. Try Server backend PATCH
   const action = newStatus === "approved" ? "approve" : "reject";
   try {
-    await fetch(`/api/cases/${action}/${encodeURIComponent(id)}`, { method: "PATCH" });
+    await fetch(getApiUrl(`/api/cases/${action}/${encodeURIComponent(id)}`), { method: "PATCH" });
   } catch (err) {
     // 3. Try Supabase REST Direct PATCH
     const supabaseUrl = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_URL) || "";
@@ -729,7 +741,7 @@ function openMunicipalityDetails(id) {
   ` : "";
 
   modal.classList.add("active");
-  if (typeof lucide !== "undefined") lucide.createIcons({ node: modal });
+  if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
 function closeMunicipalityDetailsModal() {
@@ -813,7 +825,7 @@ function openCaseDetails(id) {
   ` : "";
 
   modal.classList.add("active");
-  if (typeof lucide !== "undefined") lucide.createIcons({ node: modal });
+  if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
 function closeCaseDetailsModal() {
