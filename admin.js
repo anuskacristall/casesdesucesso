@@ -124,20 +124,36 @@ async function refreshAdminData() {
   // 1. Direct Supabase Cloud REST
   if (supabaseUrl && supabaseKey) {
     try {
-      const [muniRes, casesRes] = await Promise.all([
-        fetch(`${supabaseUrl}/rest/v1/municipalities?select=*&order=id.desc`, {
-          headers: { "apikey": supabaseKey, "Authorization": `Bearer ${supabaseKey}` }
-        }),
-        fetch(`${supabaseUrl}/rest/v1/cases?select=*&order=id.desc`, {
-          headers: { "apikey": supabaseKey, "Authorization": `Bearer ${supabaseKey}` }
-        })
-      ]);
+      let munData = [];
+      let casesData = [];
+      let casesOk = false;
 
-      if (muniRes.ok && casesRes.ok) {
-        const munData = await muniRes.json();
-        const casesData = await casesRes.json();
-        loadedMunicipalities = Array.isArray(munData) ? munData : [];
+      try {
+        const cRes = await fetch(`${supabaseUrl}/rest/v1/cases?select=*&order=id.desc`, {
+          headers: { "apikey": supabaseKey, "Authorization": `Bearer ${supabaseKey}` }
+        });
+        if (cRes.ok) {
+          casesData = await cRes.json();
+          casesOk = true;
+        }
+      } catch (e) {}
+
+      try {
+        const mRes = await fetch(`${supabaseUrl}/rest/v1/municipalities?select=*&order=id.desc`, {
+          headers: { "apikey": supabaseKey, "Authorization": `Bearer ${supabaseKey}` }
+        });
+        if (mRes.ok) {
+          munData = await mRes.json();
+        }
+      } catch (e) {}
+
+      if (casesOk) {
         loadedCases = Array.isArray(casesData) ? casesData : [];
+        loadedMunicipalities = Array.isArray(munData) ? munData : [];
+        loadedCases.forEach((c, idx) => {
+          if (!c.status) c.status = "approved";
+          if (!c.request_code) c.request_code = `#${10000 * (idx + 1)}`;
+        });
         connectionMode = "cloud";
         updateAdminConnectionBadge("cloud");
         success = true;
@@ -157,23 +173,28 @@ async function refreshAdminData() {
 
     for (const ep of endpoints) {
       try {
-        const [muniRes, casesRes] = await Promise.all([
-          fetch(ep.mun),
-          fetch(ep.cases)
-        ]);
-
-        if (muniRes.ok && casesRes.ok) {
-          const munData = await muniRes.json();
+        const casesRes = await fetch(ep.cases);
+        if (casesRes.ok) {
           const casesData = await casesRes.json();
-          loadedMunicipalities = Array.isArray(munData) ? munData : [];
+          let munData = [];
+          try {
+            const muniRes = await fetch(ep.mun);
+            if (muniRes.ok) munData = await muniRes.json();
+          } catch (e) {}
+
           loadedCases = Array.isArray(casesData) ? casesData : [];
+          loadedMunicipalities = Array.isArray(munData) ? munData : [];
+          loadedCases.forEach((c, idx) => {
+            if (!c.status) c.status = "approved";
+            if (!c.request_code) c.request_code = `#${10000 * (idx + 1)}`;
+          });
           connectionMode = "cloud"; // conectado ao Supabase via proxy
           updateAdminConnectionBadge("cloud");
           success = true;
           break;
         }
       } catch (err) {
-        // Tenta o próximo
+        // Tenta o próximo endpoint
       }
     }
   }
@@ -202,7 +223,11 @@ function loadLocalStorageAdminData() {
 
   try {
     const localCases = JSON.parse(localStorage.getItem("sebrae_success_cases") || "[]");
-    loadedCases = Array.isArray(localCases) ? localCases : [];
+    loadedCases = Array.isArray(localCases) ? localCases.map((c, idx) => ({
+      ...c,
+      status: c.status || "approved",
+      request_code: c.request_code || `#${10000 * (idx + 1)}`
+    })) : [];
   } catch (e) {
     loadedCases = [];
   }
@@ -507,17 +532,124 @@ function renderCasesTable() {
 }
 
 // ============================================================================
-// 7. APPROVAL & REJECTION ACTIONS
+// 7. APPROVAL & REJECTION ACTIONS (MODAL ELEGANTE & TOAST)
 // ============================================================================
 
-async function approveMunicipality(id) {
-  if (!confirm("Deseja realmente APROVAR esta solicitação de município?")) return;
-  await updateMunicipalityStatus(id, "approved", "Município aprovado com sucesso!");
+function showConfirmModal({ title, message, type = 'approve', confirmText, onConfirm }) {
+  const modal = document.getElementById("modal-confirm-dialog");
+  if (!modal) {
+    if (confirm(message)) {
+      if (typeof onConfirm === "function") onConfirm();
+    }
+    return;
+  }
+
+  const iconWrap = document.getElementById("confirm-dialog-icon-wrap");
+  const icon = document.getElementById("confirm-dialog-icon");
+  const titleEl = document.getElementById("confirm-dialog-title");
+  const msgEl = document.getElementById("confirm-dialog-message");
+  const cancelBtn = document.getElementById("btn-confirm-dialog-cancel");
+  const actionBtn = document.getElementById("btn-confirm-dialog-action");
+
+  if (titleEl) titleEl.textContent = title || "Confirmação";
+  if (msgEl) msgEl.textContent = message || "Deseja realmente confirmar esta ação?";
+
+  if (type === 'approve') {
+    if (iconWrap) {
+      iconWrap.style.background = "#dcfce7";
+      iconWrap.style.color = "#15803d";
+    }
+    if (icon) icon.setAttribute("data-lucide", "check-circle");
+    if (actionBtn) {
+      actionBtn.style.background = "#15803d";
+      actionBtn.textContent = confirmText || "Sim, Aprovar";
+    }
+  } else {
+    if (iconWrap) {
+      iconWrap.style.background = "#fee2e2";
+      iconWrap.style.color = "#b91c1c";
+    }
+    if (icon) icon.setAttribute("data-lucide", "alert-triangle");
+    if (actionBtn) {
+      actionBtn.style.background = "#b91c1c";
+      actionBtn.textContent = confirmText || "Sim, Rejeitar";
+    }
+  }
+
+  modal.classList.add("active");
+  if (typeof lucide !== "undefined") lucide.createIcons();
+
+  const closeDialog = () => {
+    modal.classList.remove("active");
+    if (cancelBtn) cancelBtn.onclick = null;
+    if (actionBtn) actionBtn.onclick = null;
+  };
+
+  if (cancelBtn) cancelBtn.onclick = closeDialog;
+  if (actionBtn) actionBtn.onclick = () => {
+    closeDialog();
+    if (typeof onConfirm === "function") onConfirm();
+  };
 }
 
-async function rejectMunicipality(id) {
-  if (!confirm("Deseja realmente REJEITAR esta solicitação de município?")) return;
-  await updateMunicipalityStatus(id, "rejected", "Solicitação de município rejeitada.");
+function showAdminToast(message, type = "success") {
+  const container = document.getElementById("admin-toast-container");
+  const toast = document.createElement("div");
+  const isSuccess = type === "success";
+  toast.style.cssText = `
+    background: #ffffff;
+    color: #0f172a;
+    border-left: 4px solid ${isSuccess ? '#15803d' : '#b91c1c'};
+    border-radius: 8px;
+    padding: 14px 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    pointer-events: auto;
+    animation: fadeIn 0.2s ease;
+    min-width: 280px;
+    max-width: 440px;
+  `;
+  const iconName = isSuccess ? "check-circle-2" : "alert-circle";
+  const iconColor = isSuccess ? "#15803d" : "#b91c1c";
+  toast.innerHTML = `<i data-lucide="${iconName}" style="width: 20px; height: 20px; color: ${iconColor}; flex-shrink:0;"></i> <span>${escapeHtml(message)}</span>`;
+
+  if (container) {
+    container.appendChild(toast);
+  } else {
+    document.body.appendChild(toast);
+  }
+  if (typeof lucide !== "undefined") lucide.createIcons();
+
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(10px)";
+    toast.style.transition = "all 0.3s ease";
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+function approveMunicipality(id) {
+  showConfirmModal({
+    title: "Aprovar Município",
+    message: "Deseja aprovar a solicitação deste município para o SEBRAE Minas?",
+    type: "approve",
+    confirmText: "Sim, Aprovar Município",
+    onConfirm: () => updateMunicipalityStatus(id, "approved", "Município aprovado com sucesso!")
+  });
+}
+
+function rejectMunicipality(id) {
+  showConfirmModal({
+    title: "Rejeitar Município",
+    message: "Deseja realmente rejeitar a solicitação de cadastro deste município?",
+    type: "reject",
+    confirmText: "Sim, Rejeitar",
+    onConfirm: () => updateMunicipalityStatus(id, "rejected", "Solicitação de município rejeitada.")
+  });
 }
 
 async function updateMunicipalityStatus(id, newStatus, successMsg) {
@@ -571,17 +703,27 @@ async function updateMunicipalityStatus(id, newStatus, successMsg) {
   closeMunicipalityDetailsModal();
   updateKPIs();
   renderCurrentAdminTab();
-  alert(successMsg);
+  showAdminToast(successMsg, newStatus === "approved" ? "success" : "error");
 }
 
-async function approveCase(id) {
-  if (!confirm("Deseja realmente APROVAR este case de sucesso?")) return;
-  await updateCaseStatus(id, "approved", "Case de sucesso aprovado!");
+function approveCase(id) {
+  showConfirmModal({
+    title: "Aprovar Case de Sucesso",
+    message: "Deseja aprovar este case de sucesso para publicação no mapa da rede?",
+    type: "approve",
+    confirmText: "Sim, Aprovar Case",
+    onConfirm: () => updateCaseStatus(id, "approved", "Case de sucesso aprovado e publicado!")
+  });
 }
 
-async function rejectCase(id) {
-  if (!confirm("Deseja realmente REJEITAR este case de sucesso?")) return;
-  await updateCaseStatus(id, "rejected", "Case de sucesso rejeitado.");
+function rejectCase(id) {
+  showConfirmModal({
+    title: "Rejeitar Case de Sucesso",
+    message: "Deseja rejeitar este case de sucesso da moderação?",
+    type: "reject",
+    confirmText: "Sim, Rejeitar Case",
+    onConfirm: () => updateCaseStatus(id, "rejected", "Case de sucesso rejeitado.")
+  });
 }
 
 async function updateCaseStatus(id, newStatus, successMsg) {
@@ -628,7 +770,23 @@ async function updateCaseStatus(id, newStatus, successMsg) {
   closeCaseDetailsModal();
   updateKPIs();
   renderCurrentAdminTab();
-  alert(successMsg);
+  showAdminToast(successMsg, newStatus === "approved" ? "success" : "error");
+}
+
+function getIndicatorBadge(val) {
+  if (typeof val === "boolean") {
+    return val
+      ? `<span class="indicator-tag sim">Sim</span>`
+      : `<span class="indicator-tag nao">Não</span>`;
+  }
+  const s = String(val || "").trim().toLowerCase();
+  if (s === "sim") {
+    return `<span class="indicator-tag sim">Sim</span>`;
+  }
+  if (s === "parcial") {
+    return `<span class="indicator-tag parcial">Parcial</span>`;
+  }
+  return `<span class="indicator-tag nao">Não</span>`;
 }
 
 // ============================================================================
@@ -697,35 +855,35 @@ function openMunicipalityDetails(id) {
       <div class="indicators-summary-list">
         <div class="indicator-check-row">
           <span>Programa JEPP</span>
-          <span class="indicator-tag ${item.status_jepp === 'Sim' ? 'sim' : 'nao'}">${escapeHtml(item.status_jepp || 'Não')}</span>
+          ${getIndicatorBadge(item.status_jepp)}
         </div>
         <div class="indicator-check-row">
           <span>EE em &gt; 70% da Rede</span>
-          <span class="indicator-tag ${item.municipio_ee_70 === 'sim' ? 'sim' : 'nao'}">${item.municipio_ee_70 === 'sim' ? 'Sim' : 'Não'}</span>
+          ${getIndicatorBadge(item.municipio_ee_70)}
         </div>
         <div class="indicator-check-row">
           <span>Cooperativa Escolar/Crédito</span>
-          <span class="indicator-tag ${item.cooperativa_possui ? 'sim' : 'nao'}">${item.cooperativa_possui ? 'Sim' : 'Não'}</span>
+          ${getIndicatorBadge(item.cooperativa_possui)}
         </div>
         <div class="indicator-check-row">
           <span>Lei Municipal de EE</span>
-          <span class="indicator-tag ${item.lei_possui ? 'sim' : 'nao'}">${item.lei_possui ? 'Sim' : 'Não'}</span>
+          ${getIndicatorBadge(item.lei_possui)}
         </div>
         <div class="indicator-check-row">
           <span>Comitê Gestor Municipal</span>
-          <span class="indicator-tag ${item.comite_possui ? 'sim' : 'nao'}">${item.comite_possui ? 'Sim' : 'Não'}</span>
+          ${getIndicatorBadge(item.comite_possui)}
         </div>
         <div class="indicator-check-row">
           <span>Parceria com IES</span>
-          <span class="indicator-tag ${item.ies_possui ? 'sim' : 'nao'}">${item.ies_possui ? 'Sim' : 'Não'}</span>
+          ${getIndicatorBadge(item.ies_possui)}
         </div>
         <div class="indicator-check-row">
           <span>Empresa Simulada</span>
-          <span class="indicator-tag ${item.empresa_simulada ? 'sim' : 'nao'}">${item.empresa_simulada ? 'Sim' : 'Não'}</span>
+          ${getIndicatorBadge(item.empresa_simulada)}
         </div>
         <div class="indicator-check-row">
           <span>Sistema de Ensino / Escola Sebrae</span>
-          <span class="indicator-tag ${item.escola_sebrae ? 'sim' : 'nao'}">${item.escola_sebrae ? 'Sim' : 'Não'}</span>
+          ${getIndicatorBadge(item.escola_sebrae)}
         </div>
       </div>
     </div>

@@ -667,7 +667,9 @@ function mapDatabaseToApp(dbItem) {
     committeeSummary: dbItem.comite_resumo || "",
     hasIes: dbItem.ies_possui || false,
     iesSummary: dbItem.ies_resumo || "",
-    jeppStatus: dbItem.status_jepp || "Não"
+    jeppStatus: dbItem.status_jepp || "Não",
+    status: dbItem.status || "approved",
+    request_code: dbItem.request_code || ""
   };
 }
 
@@ -784,7 +786,7 @@ function setupPhoneInputs() {
 }
 
 // ==========================================================================
-// CÓDIGO SEQUENCIAL DE 4 DÍGITOS INICIANDO EM 0001 (#0001, #0002...)
+// CÓDIGO SEQUENCIAL DE 5 DÍGITOS DE 10000 EM 10000 (#10000, #20000...)
 // ==========================================================================
 
 function generateNextRequestCode() {
@@ -795,10 +797,10 @@ function generateNextRequestCode() {
     
     [...localMun, ...localCases, ...(cases || [])].forEach(item => {
       const code = item.request_code || item.requestCode || "";
-      const match = String(code).match(/#(\d+)/);
+      const match = String(code).match(/#?(\d+)/);
       if (match) {
         const num = parseInt(match[1], 10);
-        if (!isNaN(num) && num < 10000 && num > highest) {
+        if (!isNaN(num) && num > highest) {
           highest = num;
         }
       }
@@ -806,8 +808,8 @@ function generateNextRequestCode() {
   } catch (e) {
     console.warn("Aviso ao calcular próximo código de solicitação:", e);
   }
-  const next = highest + 1;
-  return `#${String(next).padStart(4, "0")}`;
+  const next = highest >= 10000 ? Math.floor(highest / 10000 + 1) * 10000 : 10000;
+  return `#${next}`;
 }
 
 async function init() {

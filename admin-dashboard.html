@@ -23,13 +23,17 @@
 
   <!-- Admin Dedicated Styles -->
   <style>
-    body.light-theme {
+    html, body, body.light-theme {
       background-color: #f1f5f9;
       color: #0f172a;
       font-family: var(--font-main, 'Outfit', sans-serif);
       margin: 0;
       padding: 0;
-      min-height: 100vh;
+      height: auto !important;
+      min-height: 100vh !important;
+      width: 100% !important;
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
     }
 
     /* Admin Navigation Header */
@@ -712,13 +716,17 @@
 
     .indicator-tag {
       font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 0.75rem;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .indicator-tag.sim { background: #dcfce7; color: #15803d; }
-    .indicator-tag.nao { background: #f1f5f9; color: #64748b; }
+    .indicator-tag.sim { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .indicator-tag.parcial { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+    .indicator-tag.nao { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
 
     .admin-modal-footer {
       padding: 16px 24px;
@@ -1209,6 +1217,26 @@
       </div>
     </div>
   </div>
+
+  <!-- ========================================================================
+       5. MODAL: DIÁLOGO DE CONFIRMAÇÃO ELEGANTE (APROVAR / REJEITAR)
+       ======================================================================== -->
+  <div id="modal-confirm-dialog" class="admin-modal-backdrop">
+    <div class="admin-modal-card" style="max-width: 440px; text-align: center; padding: 28px 24px; border-radius: 18px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+      <div id="confirm-dialog-icon-wrap" style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; background: #e0f2fe; color: #0284c7;">
+        <i data-lucide="help-circle" id="confirm-dialog-icon" style="width: 30px; height: 30px; stroke-width: 2.2;"></i>
+      </div>
+      <h3 id="confirm-dialog-title" style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin: 0 0 8px 0;">Confirmação</h3>
+      <p id="confirm-dialog-message" style="font-size: 0.92rem; color: #64748b; line-height: 1.5; margin: 0 0 24px 0;">Deseja realmente confirmar esta ação?</p>
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <button type="button" id="btn-confirm-dialog-cancel" class="btn btn-secondary" style="padding: 10px 20px; font-size: 0.9rem; font-weight: 600; border-radius: 8px;">Cancelar</button>
+        <button type="button" id="btn-confirm-dialog-action" class="btn btn-primary" style="padding: 10px 22px; font-size: 0.9rem; font-weight: 700; border-radius: 8px;">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container para Notificações -->
+  <div id="admin-toast-container" style="position: fixed; bottom: 24px; right: 24px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; pointer-events: none;"></div>
 
   <!-- Supabase Credentials & App Config -->
   <script src="config.js"></script>
