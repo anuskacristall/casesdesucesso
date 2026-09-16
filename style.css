@@ -472,6 +472,12 @@ img.gray-map-tiles {
   transform: translateY(-1px);
 }
 
+.btn-primary i,
+.btn-primary svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
 /* Header Register Button Sizing */
 #btn-open-register {
   font-size: 1.15rem;
@@ -558,12 +564,6 @@ body.light-theme .btn-icon:hover {
 body.light-theme .btn-close:hover {
   background-color: rgba(0, 0, 0, 0.05);
 }
-
-/* Theme Switcher Toggle styling */
-.sun-icon { display: none; }
-.moon-icon { display: block; }
-body.light-theme .sun-icon { display: block; }
-body.light-theme .moon-icon { display: none; }
 
 /* ==========================================================================
    FORM INPUTS & AUTOCOMPLETE
@@ -1118,14 +1118,22 @@ input:checked + .slider:before {
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  gap: 28px;
 }
 
 .indicator-toggle label {
-  font-size: 1.05rem;
+  font-size: 0.98rem;
+  font-weight: 500;
+  line-height: 1.45;
   color: var(--text-primary);
   text-transform: none;
   letter-spacing: normal;
-  max-width: 85%;
+  flex: 1;
+  padding-right: 16px;
+}
+
+.indicator-toggle .radio-group {
+  flex-shrink: 0;
 }
 
 .indicator-textarea {
@@ -1868,6 +1876,17 @@ body.dark-theme .marker-cluster-custom {
   background: #ffffff;
 }
 
+.municipality-form-body .form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+@media (max-width: 680px) {
+  .municipality-form-body .form-row {
+    grid-template-columns: 1fr;
+  }
+}
 
 .type-card-highlight {
   flex: 1;
