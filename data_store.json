@@ -1,5 +1,5 @@
 {
-  "next_code": 240000,
+  "next_code": 40000,
   "cases_status": {
     "case-100": "approved",
     "seed-1": "approved",
@@ -24,7 +24,8 @@
     "case-1784213991897": "approved",
     "seed-2": "approved",
     "seed-10": "approved",
-    "seed-21": "approved"
+    "seed-21": "approved",
+    "case-1": "approved"
   },
   "case_codes": {
     "seed-1": "#10000",
@@ -52,5 +53,33 @@
     "seed-21": "#230000"
   },
   "extra_cases": [],
-  "municipalities": []
+  "municipalities": [
+    {
+      "id": "mun-1789569692644",
+      "request_code": "#370000",
+      "nome": "ffsz",
+      "regional": "CentroOeste",
+      "mr": "sg",
+      "responsavel_nome": "sfgxs",
+      "responsavel_email": "fshxsh@aefda.com",
+      "responsavel_telefone": "(14) 98888-1356",
+      "status_jepp": "Sim",
+      "municipio_ee_70": "nao",
+      "cooperativa_possui": true,
+      "lei_possui": true,
+      "comite_possui": true,
+      "ies_possui": true,
+      "empresa_simulada": true,
+      "escola_sebrae": false,
+      "status": "rejected",
+      "created_at": "2026-09-16T14:41:32.644Z"
+    }
+  ],
+  "cases_overrides": {},
+  "deleted_cases": [
+    "test-case-720195"
+  ],
+  "deleted_municipalities": [
+    "test-mun-5dcd6f"
+  ]
 }

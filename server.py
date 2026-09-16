@@ -100,7 +100,7 @@ class SecureBackendHandler(SimpleHTTPRequestHandler):
             self.send_header("Pragma", "no-cache")
             self.send_header("Expires", "0")
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS, HEAD")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS, HEAD")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, apikey, Prefer")
         self.send_header("Access-Control-Allow-Private-Network", "true")
         super().end_headers()
@@ -159,6 +159,8 @@ class SecureBackendHandler(SimpleHTTPRequestHandler):
         needs_save = False
         cases_status = store.setdefault("cases_status", {})
         case_codes = store.setdefault("case_codes", {})
+        deleted_cases = set(store.get("deleted_cases", []))
+        cases_overrides = store.get("cases_overrides", {})
 
         for idx, c in enumerate(data):
             cid = str(c.get("id"))
@@ -185,6 +187,15 @@ class SecureBackendHandler(SimpleHTTPRequestHandler):
                 if ec_id in case_codes:
                     ec["request_code"] = case_codes[ec_id]
                 data.append(ec)
+
+        # Filter out deleted cases
+        data = [c for c in data if str(c.get("id")) not in deleted_cases]
+
+        # Apply any edited overrides
+        for c in data:
+            cid = str(c.get("id"))
+            if cid in cases_overrides:
+                c.update(cases_overrides[cid])
 
         if needs_save:
             save_data_store(store)
@@ -325,11 +336,137 @@ class SecureBackendHandler(SimpleHTTPRequestHandler):
         self.send_response(status_code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS, HEAD")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS, HEAD")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, apikey, Prefer")
         self.send_header("Access-Control-Allow-Private-Network", "true")
         self.end_headers()
         self.wfile.write(json.dumps(data).encode("utf-8"))
+
+
+    def handle_delete_case(self, case_id):
+        store = load_data_store()
+        cid = str(case_id)
+        deleted = store.setdefault("deleted_cases", [])
+        if cid not in deleted:
+            deleted.append(cid)
+        store["extra_cases"] = [c for c in store.get("extra_cases", []) if str(c.get("id")) != cid]
+        if cid in store.get("cases_status", {}):
+            del store["cases_status"][cid]
+        if cid in store.get("case_codes", {}):
+            del store["case_codes"][cid]
+        if cid in store.get("cases_overrides", {}):
+            del store["cases_overrides"][cid]
+        save_data_store(store)
+
+        if SUPABASE_URL and SUPABASE_KEY:
+            try:
+                url = f"{SUPABASE_URL}/rest/v1/cases?id=eq.{case_id}"
+                headers = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"}
+                req = urllib.request.Request(url, headers=headers, method='DELETE')
+                open_remote(req)
+            except Exception as e:
+                print(f"Supabase delete case error: {e}")
+
+        self.send_json_response(200, {"id": case_id, "deleted": True})
+
+    def handle_edit_case(self, case_id, updated_data):
+        store = load_data_store()
+        cid = str(case_id)
+        overrides = store.setdefault("cases_overrides", {})
+        if cid not in overrides:
+            overrides[cid] = {}
+        overrides[cid].update(updated_data)
+
+        for c in store.get("extra_cases", []):
+            if str(c.get("id")) == cid:
+                c.update(updated_data)
+
+        save_data_store(store)
+
+        if SUPABASE_URL and SUPABASE_KEY:
+            try:
+                url = f"{SUPABASE_URL}/rest/v1/cases?id=eq.{case_id}"
+                headers = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}", "Content-Type": "application/json"}
+                req = urllib.request.Request(url, data=json.dumps(updated_data).encode('utf-8'), headers=headers, method='PATCH')
+                open_remote(req)
+            except Exception as e:
+                print(f"Supabase edit case error: {e}")
+
+        self.send_json_response(200, {"id": case_id, "updated": True, "data": updated_data})
+
+    def handle_delete_municipality(self, mun_id):
+        store = load_data_store()
+        mid = str(mun_id)
+        store["municipalities"] = [m for m in store.get("municipalities", []) if str(m.get("id")) != mid]
+        deleted = store.setdefault("deleted_municipalities", [])
+        if mid not in deleted:
+            deleted.append(mid)
+        save_data_store(store)
+
+        if SUPABASE_URL and SUPABASE_KEY:
+            try:
+                url = f"{SUPABASE_URL}/rest/v1/municipalities?id=eq.{mun_id}"
+                headers = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"}
+                req = urllib.request.Request(url, headers=headers, method='DELETE')
+                open_remote(req)
+            except Exception as e:
+                print(f"Supabase delete municipality error: {e}")
+
+        self.send_json_response(200, {"id": mun_id, "deleted": True})
+
+    def handle_edit_municipality(self, mun_id, updated_data):
+        store = load_data_store()
+        mid = str(mun_id)
+        target = None
+        for m in store.get("municipalities", []):
+            if str(m.get("id")) == mid:
+                m.update(updated_data)
+                target = m
+                break
+        save_data_store(store)
+
+        if SUPABASE_URL and SUPABASE_KEY:
+            try:
+                url = f"{SUPABASE_URL}/rest/v1/municipalities?id=eq.{mun_id}"
+                headers = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}", "Content-Type": "application/json"}
+                req = urllib.request.Request(url, data=json.dumps(updated_data).encode('utf-8'), headers=headers, method='PATCH')
+                open_remote(req)
+            except Exception as e:
+                print(f"Supabase edit municipality error: {e}")
+
+        self.send_json_response(200, target or {"id": mun_id, "updated": True, "data": updated_data})
+
+
+    def do_DELETE(self):
+        parts = self.path.strip('/').split('/')
+        if len(parts) >= 3 and parts[0] == 'api':
+            resource, identifier = parts[1], parts[2]
+            if resource == 'cases':
+                self.handle_delete_case(identifier)
+                return
+            if resource == 'municipalities':
+                self.handle_delete_municipality(identifier)
+                return
+        self.send_error(404, "Endpoint DELETE não encontrado")
+
+    def do_PUT(self):
+        parts = self.path.strip('/').split('/')
+        if len(parts) >= 3 and parts[0] == 'api':
+            resource, identifier = parts[1], parts[2]
+            try:
+                content_length = int(self.headers.get('Content-Length', 0))
+                updated_data = json.loads(self.rfile.read(content_length))
+            except Exception as e:
+                self.send_json_response(400, {"error": f"JSON inválido: {e}"})
+                return
+
+            if resource == 'cases':
+                self.handle_edit_case(identifier, updated_data)
+                return
+            if resource == 'municipalities':
+                self.handle_edit_municipality(identifier, updated_data)
+                return
+        self.send_error(404, "Endpoint PUT não encontrado")
 
     def do_PATCH(self):
         parts = self.path.strip('/').split('/')

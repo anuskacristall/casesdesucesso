@@ -500,6 +500,71 @@
       color: #0284c7;
     }
 
+    .mini-badge.jepp-sim {
+      background: #dbeafe;
+      color: #0054a6;
+      border: 1px solid #bfdbfe;
+      font-weight: 700;
+    }
+
+    .mini-badge.jepp-parcial {
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fde68a;
+      font-weight: 700;
+    }
+
+    .mini-badge.sim {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+      font-weight: 600;
+    }
+
+    .btn-action.btn-edit {
+      background: #f8fafc;
+      color: #0284c7;
+      border: 1px solid #cbd5e1;
+    }
+
+    .btn-action.btn-edit:hover {
+      background: #e0f2fe;
+      border-color: #7dd3fc;
+      color: #0369a1;
+    }
+
+    .btn-action.btn-delete {
+      background: #fff1f2;
+      color: #e11d48;
+      border: 1px solid #fecdd3;
+    }
+
+    .btn-action.btn-delete:hover {
+      background: #ffe4e6;
+      border-color: #fda4af;
+      color: #be123c;
+    }
+
+    .form-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 9px 12px;
+      font-size: 0.88rem;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #0f172a;
+      outline: none;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .form-input:focus {
+      background: #ffffff;
+      border-color: #0054a6;
+      box-shadow: 0 0 0 3px rgba(0, 84, 166, 0.12);
+    }
+
     /* Row Action Buttons */
     .row-actions {
       display: flex;
@@ -1215,6 +1280,223 @@
           <!-- Rendered dynamically -->
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       5. MODAL: EDIÇÃO DE MUNICÍPIO
+       ======================================================================== -->
+  <div id="modal-edit-municipality" class="admin-modal-backdrop">
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <h3>
+          <i data-lucide="edit-3" style="width: 20px; height: 20px;"></i>
+          <span>Editar Município</span>
+        </h3>
+        <button type="button" class="admin-modal-close" onclick="closeEditMunicipalityModal()">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+
+      <form id="form-edit-municipality" onsubmit="handleSaveMunicipalityEdit(event)">
+        <input type="hidden" id="edit-mun-id" />
+        <div class="admin-modal-body">
+          <div class="modal-section-title">Dados Gerais</div>
+          <div class="modal-grid-2">
+            <div class="form-group">
+              <label for="edit-mun-nome">Nome do Município</label>
+              <input type="text" id="edit-mun-nome" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label for="edit-mun-regional">Regional</label>
+              <input type="text" id="edit-mun-regional" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label for="edit-mun-mr">Microrregião (MR)</label>
+              <input type="text" id="edit-mun-mr" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label for="edit-mun-status">Status de Moderação</label>
+              <select id="edit-mun-status" class="form-input">
+                <option value="pending">Pendente</option>
+                <option value="approved">Aprovado</option>
+                <option value="rejected">Rejeitado</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="modal-section-title">Responsável pelo Cadastro</div>
+          <div class="modal-grid-2">
+            <div class="form-group">
+              <label for="edit-mun-resp-nome">Nome do Responsável</label>
+              <input type="text" id="edit-mun-resp-nome" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label for="edit-mun-resp-email">E-mail Corporativo</label>
+              <input type="email" id="edit-mun-resp-email" class="form-input" />
+            </div>
+            <div class="form-group" style="grid-column: span 2;">
+              <label for="edit-mun-resp-tel">Telefone / WhatsApp</label>
+              <input type="text" id="edit-mun-resp-tel" class="form-input" />
+            </div>
+          </div>
+
+          <div class="modal-section-title">Indicadores de Educação Empreendedora</div>
+          <div class="indicators-summary-list">
+            <div class="indicator-check-row">
+              <label for="edit-mun-jepp" style="margin:0; font-weight:600; color:#334155;">Programa JEPP</label>
+              <select id="edit-mun-jepp" class="form-input" style="width: auto; padding: 4px 8px;">
+                <option value="Sim">Sim</option>
+                <option value="Parcial">Parcial</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+            <div class="indicator-check-row">
+              <label for="edit-mun-ee70" style="margin:0; font-weight:600; color:#334155;">EE em &gt; 70% da Rede</label>
+              <select id="edit-mun-ee70" class="form-input" style="width: auto; padding: 4px 8px;">
+                <option value="sim">Sim</option>
+                <option value="nao">Não</option>
+              </select>
+            </div>
+            <div class="indicator-check-row">
+              <label for="edit-mun-cooperativa" style="margin:0; font-weight:600; color:#334155;">Cooperativa Escolar</label>
+              <select id="edit-mun-cooperativa" class="form-input" style="width: auto; padding: 4px 8px;">
+                <option value="sim">Sim</option>
+                <option value="nao">Não</option>
+              </select>
+            </div>
+            <div class="indicator-check-row">
+              <label for="edit-mun-lei" style="margin:0; font-weight:600; color:#334155;">Lei Municipal de EE</label>
+              <select id="edit-mun-lei" class="form-input" style="width: auto; padding: 4px 8px;">
+                <option value="sim">Sim</option>
+                <option value="nao">Não</option>
+              </select>
+            </div>
+            <div class="indicator-check-row">
+              <label for="edit-mun-comite" style="margin:0; font-weight:600; color:#334155;">Comitê Gestor</label>
+              <select id="edit-mun-comite" class="form-input" style="width: auto; padding: 4px 8px;">
+                <option value="sim">Sim</option>
+                <option value="nao">Não</option>
+              </select>
+            </div>
+            <div class="indicator-check-row">
+              <label for="edit-mun-ies" style="margin:0; font-weight:600; color:#334155;">Parceria com IES</label>
+              <select id="edit-mun-ies" class="form-input" style="width: auto; padding: 4px 8px;">
+                <option value="sim">Sim</option>
+                <option value="nao">Não</option>
+              </select>
+            </div>
+            <div class="indicator-check-row">
+              <label for="edit-mun-emp-sim" style="margin:0; font-weight:600; color:#334155;">Empresa Simulada</label>
+              <select id="edit-mun-emp-sim" class="form-input" style="width: auto; padding: 4px 8px;">
+                <option value="sim">Sim</option>
+                <option value="nao">Não</option>
+              </select>
+            </div>
+            <div class="indicator-check-row">
+              <label for="edit-mun-esc-seb" style="margin:0; font-weight:600; color:#334155;">Escola Sebrae</label>
+              <select id="edit-mun-esc-seb" class="form-input" style="width: auto; padding: 4px 8px;">
+                <option value="sim">Sim</option>
+                <option value="nao">Não</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeEditMunicipalityModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" style="background:#0054a6; color:#fff; display:inline-flex; align-items:center; gap:6px; padding: 9px 18px; border-radius:8px; font-weight:600; cursor:pointer; border:none;">
+            <i data-lucide="save" style="width: 16px; height: 16px;"></i>
+            <span>Salvar Alterações</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       6. MODAL: EDIÇÃO DE CASE DE SUCESSO
+       ======================================================================== -->
+  <div id="modal-edit-case" class="admin-modal-backdrop">
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <h3>
+          <i data-lucide="edit-3" style="width: 20px; height: 20px;"></i>
+          <span>Editar Case de Sucesso</span>
+        </h3>
+        <button type="button" class="admin-modal-close" onclick="closeEditCaseModal()">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+
+      <form id="form-edit-case" onsubmit="handleSaveCaseEdit(event)">
+        <input type="hidden" id="edit-case-id" />
+        <div class="admin-modal-body">
+          <div class="modal-section-title">Dados do Case</div>
+          <div class="modal-grid-2">
+            <div class="form-group" style="grid-column: span 2;">
+              <label for="edit-case-titulo">Título do Projeto</label>
+              <input type="text" id="edit-case-titulo" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label for="edit-case-modalidade">Modalidade</label>
+              <select id="edit-case-modalidade" class="form-input">
+                <option value="professor">Professor</option>
+                <option value="estudante">Estudante</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="edit-case-status">Status de Moderação</label>
+              <select id="edit-case-status" class="form-input">
+                <option value="pending">Pendente</option>
+                <option value="approved">Aprovado</option>
+                <option value="rejected">Rejeitado</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="edit-case-municipio">Município</label>
+              <input type="text" id="edit-case-municipio" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label for="edit-case-regional">Regional</label>
+              <input type="text" id="edit-case-regional" class="form-input" />
+            </div>
+            <div class="form-group" style="grid-column: span 2;">
+              <label for="edit-case-escola">Escola / Instituição</label>
+              <input type="text" id="edit-case-escola" class="form-input" />
+            </div>
+          </div>
+
+          <div class="modal-section-title">Descrição Geral do Case</div>
+          <div class="form-group">
+            <textarea id="edit-case-descricao" rows="4" class="form-input" style="resize: vertical; font-family: inherit;"></textarea>
+          </div>
+
+          <div class="modal-section-title">Autor / Responsável</div>
+          <div class="modal-grid-2">
+            <div class="form-group">
+              <label for="edit-case-autor-nome">Nome do Autor</label>
+              <input type="text" id="edit-case-autor-nome" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label for="edit-case-autor-email">E-mail Corporativo</label>
+              <input type="email" id="edit-case-autor-email" class="form-input" />
+            </div>
+            <div class="form-group" style="grid-column: span 2;">
+              <label for="edit-case-autor-tel">Telefone / Contato</label>
+              <input type="text" id="edit-case-autor-tel" class="form-input" />
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeEditCaseModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" style="background:#0054a6; color:#fff; display:inline-flex; align-items:center; gap:6px; padding: 9px 18px; border-radius:8px; font-weight:600; cursor:pointer; border:none;">
+            <i data-lucide="save" style="width: 16px; height: 16px;"></i>
+            <span>Salvar Alterações</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 

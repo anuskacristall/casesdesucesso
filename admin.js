@@ -388,11 +388,29 @@ function renderMunicipalitiesTable() {
       ? `<strong>${escapeHtml(item.responsavel_nome || item.solicitante_nome || item.tecnico_nome)}</strong><br><small style="color:#64748b;">${escapeHtml(item.responsavel_email || item.solicitante_email || item.tecnico_email || "")} ${(item.responsavel_telefone || item.solicitante_telefone || item.tecnico_telefone) ? `• ${escapeHtml(item.responsavel_telefone || item.solicitante_telefone || item.tecnico_telefone)}` : ""}</small>`
       : `<span style="color:#94a3b8;">Não informado</span>`;
 
-    // Indicators mini badges
-    const jeppBadge = `<span class="mini-badge ${item.status_jepp === 'Sim' ? 'active' : ''}">JEPP: ${escapeHtml(item.status_jepp || 'Não')}</span>`;
-    const ee70Badge = item.municipio_ee_70 === 'sim' ? `<span class="mini-badge active" title="EE > 70%">EE &gt; 70%</span>` : '';
-    const empSimBadge = item.empresa_simulada ? `<span class="mini-badge active" title="Empresa Simulada">Emp. Simulada</span>` : '';
-    const escSebBadge = item.escola_sebrae ? `<span class="mini-badge active" title="Sistema de Ensino / Escola Sebrae">Escola Sebrae</span>` : '';
+    // Indicators: JEPP (Sim=azul, Parcial=amarelo, Não=só no detalhamento)
+    let jeppBadge = "";
+    const jeppVal = String(item.status_jepp || "").trim().toLowerCase();
+    if (jeppVal === "sim") {
+      jeppBadge = `<span class="mini-badge jepp-sim" title="Programa JEPP: Sim">JEPP: Sim</span>`;
+    } else if (jeppVal === "parcial") {
+      jeppBadge = `<span class="mini-badge jepp-parcial" title="Programa JEPP: Parcial">JEPP: Parcial</span>`;
+    }
+
+    // Todos os indicadores selecionados como SIM citados
+    const isValSim = (v) => v === true || String(v || "").trim().toLowerCase() === "sim";
+    const indBadges = [];
+    if (isValSim(item.municipio_ee_70)) indBadges.push(`<span class="mini-badge sim" title="EE em > 70% da Rede">EE &gt; 70%</span>`);
+    if (isValSim(item.cooperativa_possui)) indBadges.push(`<span class="mini-badge sim" title="Cooperativa Escolar/Crédito">Cooperativa</span>`);
+    if (isValSim(item.lei_possui)) indBadges.push(`<span class="mini-badge sim" title="Lei Municipal de EE">Lei Municipal</span>`);
+    if (isValSim(item.comite_possui)) indBadges.push(`<span class="mini-badge sim" title="Comitê Gestor Municipal">Comitê Gestor</span>`);
+    if (isValSim(item.ies_possui)) indBadges.push(`<span class="mini-badge sim" title="Parceria com IES">Parceria IES</span>`);
+    if (isValSim(item.empresa_simulada)) indBadges.push(`<span class="mini-badge sim" title="Empresa Simulada">Emp. Simulada</span>`);
+    if (isValSim(item.escola_sebrae)) indBadges.push(`<span class="mini-badge sim" title="Sistema de Ensino / Escola Sebrae">Escola Sebrae</span>`);
+
+    const indicatorsHtml = (jeppBadge || indBadges.length > 0)
+      ? `${jeppBadge}${indBadges.join("")}`
+      : `<span style="color:#94a3b8; font-size:0.75rem;">Nenhum ativo</span>`;
 
     const actions = `
       <div class="row-actions" style="justify-content: flex-end;">
@@ -406,7 +424,15 @@ function renderMunicipalitiesTable() {
             <span>Rejeitar</span>
           </button>
         ` : ""}
-        <button class="btn-action btn-details" onclick="openMunicipalityDetails('${escapeHtml(item.id)}')">
+        <button class="btn-action btn-edit" onclick="openEditMunicipalityModal('${escapeHtml(item.id)}')" title="Editar Município">
+          <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i>
+          <span>Editar</span>
+        </button>
+        <button class="btn-action btn-delete" onclick="deleteMunicipality('${escapeHtml(item.id)}')" title="Excluir Município">
+          <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+          <span>Excluir</span>
+        </button>
+        <button class="btn-action btn-details" onclick="openMunicipalityDetails('${escapeHtml(item.id)}')" title="Ver Detalhes">
           <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
           <span>Detalhes</span>
         </button>
@@ -421,10 +447,7 @@ function renderMunicipalitiesTable() {
         <td>${contact}</td>
         <td>
           <div class="table-indicator-badges">
-            ${jeppBadge}
-            ${ee70Badge}
-            ${empSimBadge}
-            ${escSebBadge}
+            ${indicatorsHtml}
           </div>
         </td>
         <td><span class="badge-status ${statusCfg.class}">${statusCfg.label}</span></td>
@@ -508,7 +531,15 @@ function renderCasesTable() {
             <span>Rejeitar</span>
           </button>
         ` : ""}
-        <button class="btn-action btn-details" onclick="openCaseDetails('${escapeHtml(item.id)}')">
+        <button class="btn-action btn-edit" onclick="openEditCaseModal('${escapeHtml(item.id)}')" title="Editar Case">
+          <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i>
+          <span>Editar</span>
+        </button>
+        <button class="btn-action btn-delete" onclick="deleteCase('${escapeHtml(item.id)}')" title="Excluir Case">
+          <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+          <span>Excluir</span>
+        </button>
+        <button class="btn-action btn-details" onclick="openCaseDetails('${escapeHtml(item.id)}')" title="Ver Detalhes">
           <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
           <span>Detalhes</span>
         </button>
@@ -563,6 +594,16 @@ function showConfirmModal({ title, message, type = 'approve', confirmText, onCon
     if (actionBtn) {
       actionBtn.style.background = "#15803d";
       actionBtn.textContent = confirmText || "Sim, Aprovar";
+    }
+  } else if (type === 'delete') {
+    if (iconWrap) {
+      iconWrap.style.background = "#fee2e2";
+      iconWrap.style.color = "#b91c1c";
+    }
+    if (icon) icon.setAttribute("data-lucide", "trash-2");
+    if (actionBtn) {
+      actionBtn.style.background = "#b91c1c";
+      actionBtn.textContent = confirmText || "Sim, Excluir";
     }
   } else {
     if (iconWrap) {
@@ -889,14 +930,22 @@ function openMunicipalityDetails(id) {
     </div>
   `;
 
-  actions.innerHTML = status === "pending" ? `
-    <button class="btn-action btn-reject" onclick="rejectMunicipality('${escapeHtml(item.id)}')" style="padding: 8px 16px; font-size: 0.9rem;">
-      <i data-lucide="x"></i> Rejeitar
+  actions.innerHTML = `
+    ${status === "pending" ? `
+      <button class="btn-action btn-reject" onclick="rejectMunicipality('${escapeHtml(item.id)}')" style="padding: 8px 16px; font-size: 0.9rem;">
+        <i data-lucide="x"></i> Rejeitar
+      </button>
+      <button class="btn-action btn-approve" onclick="approveMunicipality('${escapeHtml(item.id)}')" style="padding: 8px 16px; font-size: 0.9rem;">
+        <i data-lucide="check"></i> Aprovar Município
+      </button>
+    ` : ""}
+    <button class="btn-action btn-edit" onclick="openEditMunicipalityModal('${escapeHtml(item.id)}')" style="padding: 8px 16px; font-size: 0.9rem;">
+      <i data-lucide="edit-3"></i> Editar
     </button>
-    <button class="btn-action btn-approve" onclick="approveMunicipality('${escapeHtml(item.id)}')" style="padding: 8px 16px; font-size: 0.9rem;">
-      <i data-lucide="check"></i> Aprovar Município
+    <button class="btn-action btn-delete" onclick="deleteMunicipality('${escapeHtml(item.id)}')" style="padding: 8px 16px; font-size: 0.9rem;">
+      <i data-lucide="trash-2"></i> Excluir
     </button>
-  ` : "";
+  `;
 
   modal.classList.add("active");
   if (typeof lucide !== "undefined") lucide.createIcons();
@@ -973,14 +1022,22 @@ function openCaseDetails(id) {
     </div>
   `;
 
-  actions.innerHTML = status === "pending" ? `
-    <button class="btn-action btn-reject" onclick="rejectCase('${escapeHtml(item.id)}')" style="padding: 8px 16px; font-size: 0.9rem;">
-      <i data-lucide="x"></i> Rejeitar
+  actions.innerHTML = `
+    ${status === "pending" ? `
+      <button class="btn-action btn-reject" onclick="rejectCase('${escapeHtml(item.id)}')" style="padding: 8px 16px; font-size: 0.9rem;">
+        <i data-lucide="x"></i> Rejeitar
+      </button>
+      <button class="btn-action btn-approve" onclick="approveCase('${escapeHtml(item.id)}')" style="padding: 8px 16px; font-size: 0.9rem;">
+        <i data-lucide="check"></i> Aprovar Case
+      </button>
+    ` : ""}
+    <button class="btn-action btn-edit" onclick="openEditCaseModal('${escapeHtml(item.id)}')" style="padding: 8px 16px; font-size: 0.9rem;">
+      <i data-lucide="edit-3"></i> Editar
     </button>
-    <button class="btn-action btn-approve" onclick="approveCase('${escapeHtml(item.id)}')" style="padding: 8px 16px; font-size: 0.9rem;">
-      <i data-lucide="check"></i> Aprovar Case
+    <button class="btn-action btn-delete" onclick="deleteCase('${escapeHtml(item.id)}')" style="padding: 8px 16px; font-size: 0.9rem;">
+      <i data-lucide="trash-2"></i> Excluir
     </button>
-  ` : "";
+  `;
 
   modal.classList.add("active");
   if (typeof lucide !== "undefined") lucide.createIcons();
@@ -991,8 +1048,354 @@ function closeCaseDetailsModal() {
   if (modal) modal.classList.remove("active");
 }
 
+
 // ============================================================================
-// 9. INITIALIZATION & EVENT LISTENERS
+// 9. EXCLUSÃO E EDIÇÃO DE MUNICÍPIOS E CASES
+// ============================================================================
+
+function deleteMunicipality(id) {
+  const item = loadedMunicipalities.find((m) => String(m.id) === String(id));
+  const munName = item ? (item.nome || item.municipio || "este município") : "este município";
+
+  showConfirmModal({
+    title: "Excluir Município",
+    message: `Deseja realmente excluir o cadastro do município ${munName}? Esta ação removerá o registro do sistema.`,
+    type: "delete",
+    confirmText: "Sim, Excluir Município",
+    onConfirm: async () => {
+      // 1. Remove from local state
+      loadedMunicipalities = loadedMunicipalities.filter((m) => String(m.id) !== String(id));
+
+      // 2. Remove from LocalStorage
+      try {
+        const localMun = JSON.parse(localStorage.getItem("sebrae_pending_municipalities") || "[]");
+        localStorage.setItem("sebrae_pending_municipalities", JSON.stringify(localMun.filter((m) => String(m.id) !== String(id))));
+        const appMun = JSON.parse(localStorage.getItem("sebrae_approved_municipalities") || "[]");
+        localStorage.setItem("sebrae_approved_municipalities", JSON.stringify(appMun.filter((m) => String(m.id) !== String(id))));
+      } catch (e) {
+        console.error("Erro localStorage deleteMunicipality:", e);
+      }
+
+      // 3. Try server DELETE
+      try {
+        await fetch(getApiUrl(`/api/municipalities/${encodeURIComponent(id)}`), { method: "DELETE" });
+      } catch (err) {
+        console.warn("Falha no DELETE servidor:", err);
+      }
+
+      // 4. Try Supabase DELETE
+      const supabaseUrl = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_URL) || "";
+      const supabaseKey = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_KEY) || "";
+      if (supabaseUrl && supabaseKey) {
+        try {
+          await fetch(`${supabaseUrl}/rest/v1/municipalities?id=eq.${encodeURIComponent(id)}`, {
+            method: "DELETE",
+            headers: { "apikey": supabaseKey, "Authorization": `Bearer ${supabaseKey}` }
+          });
+        } catch (sbErr) {
+          console.warn("Falha no DELETE Supabase:", sbErr);
+        }
+      }
+
+      closeMunicipalityDetailsModal();
+      updateKPIs();
+      renderCurrentAdminTab();
+      showAdminToast("Município excluído com sucesso!", "success");
+    }
+  });
+}
+
+function deleteCase(id) {
+  const item = loadedCases.find((c) => String(c.id) === String(id));
+  const title = item ? (item.titulo_projeto || item.titulo || "este case") : "este case";
+
+  showConfirmModal({
+    title: "Excluir Case de Sucesso",
+    message: `Deseja realmente excluir "${title}"? Se o case já estava aprovado, ele deixará de ser exibido no mapa da rede.`,
+    type: "delete",
+    confirmText: "Sim, Excluir Case",
+    onConfirm: async () => {
+      // 1. Remove from local state
+      loadedCases = loadedCases.filter((c) => String(c.id) !== String(id));
+
+      // 2. Remove from LocalStorage
+      try {
+        const localCases = JSON.parse(localStorage.getItem("sebrae_success_cases") || "[]");
+        localStorage.setItem("sebrae_success_cases", JSON.stringify(localCases.filter((c) => String(c.id) !== String(id))));
+      } catch (e) {
+        console.error("Erro localStorage deleteCase:", e);
+      }
+
+      // 3. Try server DELETE
+      try {
+        await fetch(getApiUrl(`/api/cases/${encodeURIComponent(id)}`), { method: "DELETE" });
+      } catch (err) {
+        console.warn("Falha no DELETE servidor:", err);
+      }
+
+      // 4. Try Supabase DELETE
+      const supabaseUrl = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_URL) || "";
+      const supabaseKey = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_KEY) || "";
+      if (supabaseUrl && supabaseKey) {
+        try {
+          await fetch(`${supabaseUrl}/rest/v1/cases?id=eq.${encodeURIComponent(id)}`, {
+            method: "DELETE",
+            headers: { "apikey": supabaseKey, "Authorization": `Bearer ${supabaseKey}` }
+          });
+        } catch (sbErr) {
+          console.warn("Falha no DELETE Supabase:", sbErr);
+        }
+      }
+
+      closeCaseDetailsModal();
+      updateKPIs();
+      renderCurrentAdminTab();
+      showAdminToast("Case excluído com sucesso!", "success");
+    }
+  });
+}
+
+// Modal Editar Município
+function openEditMunicipalityModal(id) {
+  const item = loadedMunicipalities.find((m) => String(m.id) === String(id));
+  if (!item) return;
+
+  document.getElementById("edit-mun-id").value = item.id;
+  document.getElementById("edit-mun-nome").value = item.nome || item.municipio || "";
+  document.getElementById("edit-mun-regional").value = item.regional || "";
+  document.getElementById("edit-mun-mr").value = item.mr || "";
+  document.getElementById("edit-mun-status").value = item.status || "pending";
+
+  document.getElementById("edit-mun-resp-nome").value = item.responsavel_nome || item.solicitante_nome || item.tecnico_nome || "";
+  document.getElementById("edit-mun-resp-email").value = item.responsavel_email || item.solicitante_email || item.tecnico_email || "";
+  document.getElementById("edit-mun-resp-tel").value = item.responsavel_telefone || item.solicitante_telefone || item.tecnico_telefone || "";
+
+  // Indicators
+  document.getElementById("edit-mun-jepp").value = item.status_jepp || "Não";
+  document.getElementById("edit-mun-ee70").value = (item.municipio_ee_70 === 'sim' || item.municipio_ee_70 === true) ? "sim" : "nao";
+  document.getElementById("edit-mun-cooperativa").value = (item.cooperativa_possui === 'sim' || item.cooperativa_possui === true) ? "sim" : "nao";
+  document.getElementById("edit-mun-lei").value = (item.lei_possui === 'sim' || item.lei_possui === true) ? "sim" : "nao";
+  document.getElementById("edit-mun-comite").value = (item.comite_possui === 'sim' || item.comite_possui === true) ? "sim" : "nao";
+  document.getElementById("edit-mun-ies").value = (item.ies_possui === 'sim' || item.ies_possui === true) ? "sim" : "nao";
+  document.getElementById("edit-mun-emp-sim").value = (item.empresa_simulada === 'sim' || item.empresa_simulada === true) ? "sim" : "nao";
+  document.getElementById("edit-mun-esc-seb").value = (item.escola_sebrae === 'sim' || item.escola_sebrae === true) ? "sim" : "nao";
+
+  const modal = document.getElementById("modal-edit-municipality");
+  if (modal) modal.classList.add("active");
+  if (typeof lucide !== "undefined") lucide.createIcons();
+}
+
+function closeEditMunicipalityModal() {
+  const modal = document.getElementById("modal-edit-municipality");
+  if (modal) modal.classList.remove("active");
+}
+
+async function handleSaveMunicipalityEdit(e) {
+  e.preventDefault();
+  const id = document.getElementById("edit-mun-id").value;
+  const item = loadedMunicipalities.find((m) => String(m.id) === String(id));
+  if (!item) return;
+
+  const updatedFields = {
+    nome: document.getElementById("edit-mun-nome").value.trim(),
+    municipio: document.getElementById("edit-mun-nome").value.trim(),
+    regional: document.getElementById("edit-mun-regional").value.trim(),
+    mr: document.getElementById("edit-mun-mr").value.trim(),
+    status: document.getElementById("edit-mun-status").value,
+    responsavel_nome: document.getElementById("edit-mun-resp-nome").value.trim(),
+    responsavel_email: document.getElementById("edit-mun-resp-email").value.trim(),
+    responsavel_telefone: document.getElementById("edit-mun-resp-tel").value.trim(),
+    status_jepp: document.getElementById("edit-mun-jepp").value,
+    municipio_ee_70: document.getElementById("edit-mun-ee70").value,
+    cooperativa_possui: document.getElementById("edit-mun-cooperativa").value === "sim",
+    lei_possui: document.getElementById("edit-mun-lei").value === "sim",
+    comite_possui: document.getElementById("edit-mun-comite").value === "sim",
+    ies_possui: document.getElementById("edit-mun-ies").value === "sim",
+    empresa_simulada: document.getElementById("edit-mun-emp-sim").value === "sim",
+    escola_sebrae: document.getElementById("edit-mun-esc-seb").value === "sim"
+  };
+
+  Object.assign(item, updatedFields);
+
+  // 1. Update localStorage
+  try {
+    const localMun = JSON.parse(localStorage.getItem("sebrae_pending_municipalities") || "[]");
+    const idx = localMun.findIndex((m) => String(m.id) === String(id));
+    if (idx !== -1) {
+      Object.assign(localMun[idx], updatedFields);
+      localStorage.setItem("sebrae_pending_municipalities", JSON.stringify(localMun));
+    }
+    const appMun = JSON.parse(localStorage.getItem("sebrae_approved_municipalities") || "[]");
+    const appIdx = appMun.findIndex((m) => String(m.id) === String(id));
+    if (appIdx !== -1) {
+      Object.assign(appMun[appIdx], updatedFields);
+      localStorage.setItem("sebrae_approved_municipalities", JSON.stringify(appMun));
+    } else if (updatedFields.status === "approved") {
+      appMun.push(item);
+      localStorage.setItem("sebrae_approved_municipalities", JSON.stringify(appMun));
+    }
+  } catch (err) {
+    console.error("Erro localStorage handleSaveMunicipalityEdit:", err);
+  }
+
+  // 2. Try server PUT
+  try {
+    await fetch(getApiUrl(`/api/municipalities/${encodeURIComponent(id)}`), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedFields)
+    });
+  } catch (err) {
+    console.warn("Falha no PUT servidor:", err);
+  }
+
+  // 3. Try Supabase PATCH
+  const supabaseUrl = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_URL) || "";
+  const supabaseKey = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_KEY) || "";
+  if (supabaseUrl && supabaseKey) {
+    try {
+      await fetch(`${supabaseUrl}/rest/v1/municipalities?id=eq.${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        headers: { "apikey": supabaseKey, "Authorization": `Bearer ${supabaseKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify(updatedFields)
+      });
+    } catch (sbErr) {
+      console.warn("Falha no PATCH Supabase:", sbErr);
+    }
+  }
+
+  closeEditMunicipalityModal();
+  updateKPIs();
+  renderCurrentAdminTab();
+  showAdminToast("Alterações do município salvas com sucesso!", "success");
+}
+
+// Modal Editar Case
+function openEditCaseModal(id) {
+  const item = loadedCases.find((c) => String(c.id) === String(id));
+  if (!item) return;
+
+  const isEstudante = item.tipo_case === 'estudante' || item.tipoCase === 'estudante' || item.estudante_possui;
+
+  document.getElementById("edit-case-id").value = item.id;
+  document.getElementById("edit-case-titulo").value = item.titulo_projeto || item.titulo || "";
+  document.getElementById("edit-case-modalidade").value = isEstudante ? "estudante" : "professor";
+  document.getElementById("edit-case-status").value = item.status || "pending";
+  document.getElementById("edit-case-municipio").value = item.municipio || "";
+  document.getElementById("edit-case-regional").value = item.regional || "";
+  document.getElementById("edit-case-escola").value = item.escola_instituicao || item.escola || "";
+  document.getElementById("edit-case-descricao").value = item.descricao_geral || item.descricao || "";
+
+  const authorName = isEstudante ? (item.estudante_nome || item.estudanteNome) : (item.professor_nome || item.professorNome);
+  const authorEmail = isEstudante ? (item.estudante_email || item.estudanteEmail) : (item.professor_email || item.professorEmail);
+  const authorTel = isEstudante ? (item.estudante_telefone || item.estudanteTelefone || item.estudante_contato) : (item.professor_telefone || item.professorTelefone);
+
+  document.getElementById("edit-case-autor-nome").value = authorName || item.tecnico_nome || item.tecnicoNome || "";
+  document.getElementById("edit-case-autor-email").value = authorEmail || item.tecnico_email || item.tecnicoEmail || "";
+  document.getElementById("edit-case-autor-tel").value = authorTel || item.tecnico_telefone || item.tecnicoContato || "";
+
+  const modal = document.getElementById("modal-edit-case");
+  if (modal) modal.classList.add("active");
+  if (typeof lucide !== "undefined") lucide.createIcons();
+}
+
+function closeEditCaseModal() {
+  const modal = document.getElementById("modal-edit-case");
+  if (modal) modal.classList.remove("active");
+}
+
+async function handleSaveCaseEdit(e) {
+  e.preventDefault();
+  const id = document.getElementById("edit-case-id").value;
+  const item = loadedCases.find((c) => String(c.id) === String(id));
+  if (!item) return;
+
+  const modalidade = document.getElementById("edit-case-modalidade").value;
+  const isEstudante = modalidade === "estudante";
+
+  const updatedFields = {
+    titulo_projeto: document.getElementById("edit-case-titulo").value.trim(),
+    titulo: document.getElementById("edit-case-titulo").value.trim(),
+    tipo_case: modalidade,
+    tipoCase: modalidade,
+    estudante_possui: isEstudante,
+    status: document.getElementById("edit-case-status").value,
+    municipio: document.getElementById("edit-case-municipio").value.trim(),
+    regional: document.getElementById("edit-case-regional").value.trim(),
+    escola_instituicao: document.getElementById("edit-case-escola").value.trim(),
+    escola: document.getElementById("edit-case-escola").value.trim(),
+    descricao_geral: document.getElementById("edit-case-descricao").value.trim(),
+    descricao: document.getElementById("edit-case-descricao").value.trim()
+  };
+
+  const autorNome = document.getElementById("edit-case-autor-nome").value.trim();
+  const autorEmail = document.getElementById("edit-case-autor-email").value.trim();
+  const autorTel = document.getElementById("edit-case-autor-tel").value.trim();
+
+  if (isEstudante) {
+    updatedFields.estudante_nome = autorNome;
+    updatedFields.estudanteNome = autorNome;
+    updatedFields.estudante_email = autorEmail;
+    updatedFields.estudanteEmail = autorEmail;
+    updatedFields.estudante_telefone = autorTel;
+    updatedFields.estudanteTelefone = autorTel;
+  } else {
+    updatedFields.professor_nome = autorNome;
+    updatedFields.professorNome = autorNome;
+    updatedFields.professor_email = autorEmail;
+    updatedFields.professorEmail = autorEmail;
+    updatedFields.professor_telefone = autorTel;
+    updatedFields.professorTelefone = autorTel;
+  }
+
+  Object.assign(item, updatedFields);
+
+  // 1. Update localStorage
+  try {
+    const localCases = JSON.parse(localStorage.getItem("sebrae_success_cases") || "[]");
+    const idx = localCases.findIndex((c) => String(c.id) === String(id));
+    if (idx !== -1) {
+      Object.assign(localCases[idx], updatedFields);
+      localStorage.setItem("sebrae_success_cases", JSON.stringify(localCases));
+    }
+  } catch (err) {
+    console.error("Erro localStorage handleSaveCaseEdit:", err);
+  }
+
+  // 2. Try server PUT
+  try {
+    await fetch(getApiUrl(`/api/cases/${encodeURIComponent(id)}`), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedFields)
+    });
+  } catch (err) {
+    console.warn("Falha no PUT servidor:", err);
+  }
+
+  // 3. Try Supabase PATCH
+  const supabaseUrl = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_URL) || "";
+  const supabaseKey = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_KEY) || "";
+  if (supabaseUrl && supabaseKey) {
+    try {
+      await fetch(`${supabaseUrl}/rest/v1/cases?id=eq.${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        headers: { "apikey": supabaseKey, "Authorization": `Bearer ${supabaseKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify(updatedFields)
+      });
+    } catch (sbErr) {
+      console.warn("Falha no PATCH Supabase:", sbErr);
+    }
+  }
+
+  closeEditCaseModal();
+  updateKPIs();
+  renderCurrentAdminTab();
+  showAdminToast("Alterações do case salvas com sucesso!", "success");
+}
+
+// ============================================================================
+// 10. INITIALIZATION & EVENT LISTENERS
 // ============================================================================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -1010,6 +1413,8 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("click", (e) => {
     if (e.target.id === "modal-municipality-details") closeMunicipalityDetailsModal();
     if (e.target.id === "modal-case-details") closeCaseDetailsModal();
+    if (e.target.id === "modal-edit-municipality") closeEditMunicipalityModal();
+    if (e.target.id === "modal-edit-case") closeEditCaseModal();
   });
 
   checkAdminAuth();
