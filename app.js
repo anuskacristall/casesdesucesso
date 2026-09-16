@@ -1469,6 +1469,12 @@ function closeRegisterPanel() {
 function openMunicipalityModal() {
   const modal = document.getElementById("municipality-modal");
   if (modal) {
+    const form = document.getElementById("municipality-form");
+    if (form) form.reset();
+    toggleConditionalFields("municipality-has-coop", "municipality-coop-fields");
+    toggleConditionalFields("municipality-has-law", "municipality-law-fields");
+    toggleConditionalFields("municipality-has-committee", "municipality-committee-fields");
+    toggleConditionalFields("municipality-has-ies", "municipality-ies-fields");
     modal.classList.add("active");
     modal.style.display = "flex";
     lucide.createIcons({ node: modal });
@@ -1502,13 +1508,74 @@ function closeConfirmCodeModal() {
   }
 }
 
-function handleMunicipalitySubmit(e) {
+async function handleMunicipalitySubmit(e) {
   e.preventDefault();
   const name = document.getElementById("municipality-name").value.trim();
+  const regional = document.getElementById("municipality-regional").value;
+  const mr = document.getElementById("municipality-mr").value.trim();
+  const contactName = document.getElementById("municipality-contact-name").value.trim();
+  const contactRole = document.getElementById("municipality-contact-role").value.trim();
+  const contactEmail = document.getElementById("municipality-contact-email").value.trim();
+  const contactPhone = document.getElementById("municipality-contact-phone").value.trim();
+  const jeppStatus = document.getElementById("municipality-jepp-status").value;
+  const edu70El = document.querySelector('input[name="municipality-edu-70"]:checked');
+  const edu70 = edu70El ? edu70El.value : "nao";
+  const hasCoop = document.getElementById("municipality-has-coop").checked;
+  const coopSummary = document.getElementById("municipality-coop-summary").value.trim();
+  const hasLaw = document.getElementById("municipality-has-law").checked;
+  const lawSummary = document.getElementById("municipality-law-summary").value.trim();
+  const hasCommittee = document.getElementById("municipality-has-committee").checked;
+  const committeeSummary = document.getElementById("municipality-committee-summary").value.trim();
+  const hasIes = document.getElementById("municipality-has-ies").checked;
+  const iesSummary = document.getElementById("municipality-ies-summary").value.trim();
+
   const randomCode = "#" + Math.floor(100000 + Math.random() * 900000);
+
+  const newMunicipality = {
+    id: "mun-" + Date.now(),
+    request_code: randomCode,
+    nome: name,
+    regional,
+    mr,
+    responsavel_nome: contactName,
+    responsavel_cargo: contactRole,
+    responsavel_email: contactEmail,
+    responsavel_telefone: contactPhone,
+    status_jepp: jeppStatus,
+    municipio_ee_70: edu70,
+    cooperativa_possui: hasCoop,
+    cooperativa_resumo: hasCoop ? coopSummary : "",
+    lei_possui: hasLaw,
+    lei_resumo: hasLaw ? lawSummary : "",
+    comite_possui: hasCommittee,
+    comite_resumo: hasCommittee ? committeeSummary : "",
+    ies_possui: hasIes,
+    ies_resumo: hasIes ? iesSummary : "",
+    status: "pending",
+    created_at: new Date().toISOString()
+  };
+
+  try {
+    const existing = JSON.parse(localStorage.getItem("sebrae_pending_municipalities") || "[]");
+    existing.push(newMunicipality);
+    localStorage.setItem("sebrae_pending_municipalities", JSON.stringify(existing));
+  } catch (err) {
+    console.error("Erro ao salvar no localStorage:", err);
+  }
+
+  try {
+    await fetch("/api/municipalities", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newMunicipality)
+    });
+  } catch (err) {
+    // Ignored in static / file mode
+  }
+
   closeMunicipalityModal();
   openConfirmCodeModal(randomCode);
-  showToast(`Solicitação de cadastro de ${name} enviada com sucesso! Código: ${randomCode}`);
+  showToast(`Solicitação de cadastro de ${name} enviada com sucesso! Protocolo: ${randomCode}`);
   document.getElementById("municipality-form").reset();
 }
 
@@ -1624,6 +1691,53 @@ function setupAutocomplete() {
       formList.style.display = "none";
     }
   });
+
+  // Autocomplete on Municipality Modal Form
+  const munInput = document.getElementById("municipality-name");
+  const munList = document.getElementById("municipality-suggestions");
+  if (munInput && munList) {
+    munInput.addEventListener("input", () => {
+      const val = munInput.value.trim().toLowerCase();
+      munList.innerHTML = "";
+      if (!val) {
+        munList.style.display = "none";
+        return;
+      }
+      
+      const matches = Object.keys(window.MUNICIPALITIES_DATABASE).filter(key => 
+        key.includes(val) || window.MUNICIPALITIES_DATABASE[key].name.toLowerCase().includes(val)
+      );
+      
+      if (matches.length > 0) {
+        munList.style.display = "block";
+        matches.slice(0, 5).forEach(key => {
+          const item = window.MUNICIPALITIES_DATABASE[key];
+          const li = document.createElement("li");
+          li.innerText = item.name;
+          li.addEventListener("click", () => {
+            munInput.value = item.name;
+            munList.style.display = "none";
+            
+            // Auto-select regional and suggested MR
+            const regionalSelect = document.getElementById("municipality-regional");
+            if (regionalSelect) regionalSelect.value = item.regional;
+            
+            const mrInput = document.getElementById("municipality-mr");
+            if (mrInput) mrInput.value = `MR ${item.name}`;
+          });
+          munList.appendChild(li);
+        });
+      } else {
+        munList.style.display = "none";
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      if (e.target !== munInput) {
+        munList.style.display = "none";
+      }
+    });
+  }
 }
 
 // ==========================================================================
@@ -1688,6 +1802,9 @@ function bindEvents() {
   const btnFinishCode = document.getElementById("btn-finish-code-modal");
   if (btnFinishCode) btnFinishCode.addEventListener("click", closeConfirmCodeModal);
 
+  const btnCancelMun = document.getElementById("btn-cancel-municipality");
+  if (btnCancelMun) btnCancelMun.addEventListener("click", closeMunicipalityModal);
+
   // Close modal/panel on click outer wrapper
   document.getElementById("details-modal").addEventListener("click", (e) => {
     if (e.target.id === "details-modal") closeDetailsModal();
@@ -1711,7 +1828,7 @@ function bindEvents() {
     });
   }
 
-  // Form switches bindings
+  // Form switches bindings (Case Registration)
   document.getElementById("has-coop").addEventListener("change", () => {
     toggleConditionalFields("has-coop", "coop-fields");
   });
@@ -1724,6 +1841,19 @@ function bindEvents() {
   document.getElementById("has-ies").addEventListener("change", () => {
     toggleConditionalFields("has-ies", "ies-fields");
   });
+
+  // Form switches bindings (Municipality Registration)
+  const munCoop = document.getElementById("municipality-has-coop");
+  if (munCoop) munCoop.addEventListener("change", () => toggleConditionalFields("municipality-has-coop", "municipality-coop-fields"));
+
+  const munLaw = document.getElementById("municipality-has-law");
+  if (munLaw) munLaw.addEventListener("change", () => toggleConditionalFields("municipality-has-law", "municipality-law-fields"));
+
+  const munCom = document.getElementById("municipality-has-committee");
+  if (munCom) munCom.addEventListener("change", () => toggleConditionalFields("municipality-has-committee", "municipality-committee-fields"));
+
+  const munIes = document.getElementById("municipality-has-ies");
+  if (munIes) munIes.addEventListener("change", () => toggleConditionalFields("municipality-has-ies", "municipality-ies-fields"));
 
   // Set up Autocomplete search/form
   setupAutocomplete();

@@ -1868,17 +1868,6 @@ body.dark-theme .marker-cluster-custom {
   background: #ffffff;
 }
 
-.municipality-form-body .form-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
-@media (max-width: 680px) {
-  .municipality-form-body .form-row {
-    grid-template-columns: 1fr;
-  }
-}
 
 .type-card-highlight {
   flex: 1;
@@ -1952,60 +1941,124 @@ body.dark-theme .marker-cluster-custom {
 .municipality-modal-content {
   width: 820px;
   max-width: 95%;
-  max-height: 90vh;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-glass-solid) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+body.light-theme .municipality-modal-content {
+  background: #ffffff !important;
+  border: 1px solid #dbe3ec !important;
+}
+
+#municipality-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 24px 16px 24px;
+  border-bottom: 1px solid var(--border-glass);
 }
 
 .municipality-form-body {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  text-align: left;
-  gap: 14px;
-  padding: 22px;
+  align-items: stretch !important;
+  text-align: left !important;
+  gap: 20px;
+  padding: 24px;
   overflow-y: auto;
-  max-height: calc(90vh - 90px);
+  max-height: calc(92vh - 100px);
 }
 
-#municipality-form fieldset {
-  min-width: 0;
+.municipality-form-body .form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   border: 1px solid var(--border-glass);
   border-radius: var(--border-radius-md);
-  padding: 16px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
 }
 
-#municipality-form legend {
+body.light-theme .municipality-form-body .form-section {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.municipality-form-body legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--sebrae-blue);
   padding: 0 8px;
-  color: var(--accent-color);
-  font-weight: 800;
-  font-size: 0.85rem;
+  margin-bottom: 6px;
 }
 
-#municipality-form input,
-#municipality-form select,
-#municipality-form textarea {
+.municipality-form-body .form-row {
+  display: flex;
+  gap: 14px;
   width: 100%;
-  min-height: 40px;
-  padding: 10px 12px;
-  border: 1px solid var(--input-border);
-  border-radius: var(--border-radius-sm);
-  background: var(--input-bg);
-  color: var(--text-primary);
-  font: inherit;
 }
 
-#municipality-form .form-group {
+@media (max-width: 640px) {
+  .municipality-form-body .form-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+.municipality-form-body .form-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-bottom: 12px;
+  width: 100%;
 }
 
-#municipality-form label {
-  color: var(--text-secondary);
-  font-size: 0.72rem;
+.municipality-form-body label {
+  font-size: 0.78rem;
   font-weight: 700;
+  color: var(--text-secondary);
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
+
+.municipality-form-body input,
+.municipality-form-body select,
+.municipality-form-body textarea {
+  width: 100%;
+  font-family: var(--font-main);
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--text-primary);
+  padding: 10px 14px;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+body.light-theme .municipality-form-body input,
+body.light-theme .municipality-form-body select,
+body.light-theme .municipality-form-body textarea {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+.municipality-form-body input:focus,
+.municipality-form-body select:focus,
+.municipality-form-body textarea:focus {
+  border-color: var(--sebrae-blue);
+  box-shadow: 0 0 0 3px rgba(0, 84, 166, 0.15);
+}
+
 
 .confirm-code-body {
   display: flex;
