@@ -1471,10 +1471,6 @@ function openMunicipalityModal() {
   if (modal) {
     const form = document.getElementById("municipality-form");
     if (form) form.reset();
-    toggleConditionalFields("municipality-has-coop", "municipality-coop-fields");
-    toggleConditionalFields("municipality-has-law", "municipality-law-fields");
-    toggleConditionalFields("municipality-has-committee", "municipality-committee-fields");
-    toggleConditionalFields("municipality-has-ies", "municipality-ies-fields");
     modal.classList.add("active");
     modal.style.display = "flex";
     lucide.createIcons({ node: modal });
@@ -1514,20 +1510,30 @@ async function handleMunicipalitySubmit(e) {
   const regional = document.getElementById("municipality-regional").value;
   const mr = document.getElementById("municipality-mr").value.trim();
   const contactName = document.getElementById("municipality-contact-name").value.trim();
-  const contactRole = document.getElementById("municipality-contact-role").value.trim();
   const contactEmail = document.getElementById("municipality-contact-email").value.trim();
   const contactPhone = document.getElementById("municipality-contact-phone").value.trim();
   const jeppStatus = document.getElementById("municipality-jepp-status").value;
+  
   const edu70El = document.querySelector('input[name="municipality-edu-70"]:checked');
   const edu70 = edu70El ? edu70El.value : "nao";
-  const hasCoop = document.getElementById("municipality-has-coop").checked;
-  const coopSummary = document.getElementById("municipality-coop-summary").value.trim();
-  const hasLaw = document.getElementById("municipality-has-law").checked;
-  const lawSummary = document.getElementById("municipality-law-summary").value.trim();
-  const hasCommittee = document.getElementById("municipality-has-committee").checked;
-  const committeeSummary = document.getElementById("municipality-committee-summary").value.trim();
-  const hasIes = document.getElementById("municipality-has-ies").checked;
-  const iesSummary = document.getElementById("municipality-ies-summary").value.trim();
+  
+  const coopEl = document.querySelector('input[name="municipality-coop"]:checked');
+  const hasCoop = coopEl ? coopEl.value === "sim" : false;
+  
+  const lawEl = document.querySelector('input[name="municipality-law"]:checked');
+  const hasLaw = lawEl ? lawEl.value === "sim" : false;
+  
+  const comEl = document.querySelector('input[name="municipality-committee"]:checked');
+  const hasCommittee = comEl ? comEl.value === "sim" : false;
+  
+  const iesEl = document.querySelector('input[name="municipality-ies"]:checked');
+  const hasIes = iesEl ? iesEl.value === "sim" : false;
+  
+  const empSimEl = document.querySelector('input[name="municipality-empresa-simulada"]:checked');
+  const hasEmpresaSimulada = empSimEl ? empSimEl.value === "sim" : false;
+  
+  const escSebEl = document.querySelector('input[name="municipality-escola-sebrae"]:checked');
+  const hasEscolaSebrae = escSebEl ? escSebEl.value === "sim" : false;
 
   const randomCode = "#" + Math.floor(100000 + Math.random() * 900000);
 
@@ -1538,19 +1544,16 @@ async function handleMunicipalitySubmit(e) {
     regional,
     mr,
     responsavel_nome: contactName,
-    responsavel_cargo: contactRole,
     responsavel_email: contactEmail,
     responsavel_telefone: contactPhone,
     status_jepp: jeppStatus,
     municipio_ee_70: edu70,
     cooperativa_possui: hasCoop,
-    cooperativa_resumo: hasCoop ? coopSummary : "",
     lei_possui: hasLaw,
-    lei_resumo: hasLaw ? lawSummary : "",
     comite_possui: hasCommittee,
-    comite_resumo: hasCommittee ? committeeSummary : "",
     ies_possui: hasIes,
-    ies_resumo: hasIes ? iesSummary : "",
+    empresa_simulada: hasEmpresaSimulada,
+    escola_sebrae: hasEscolaSebrae,
     status: "pending",
     created_at: new Date().toISOString()
   };
@@ -1841,19 +1844,6 @@ function bindEvents() {
   document.getElementById("has-ies").addEventListener("change", () => {
     toggleConditionalFields("has-ies", "ies-fields");
   });
-
-  // Form switches bindings (Municipality Registration)
-  const munCoop = document.getElementById("municipality-has-coop");
-  if (munCoop) munCoop.addEventListener("change", () => toggleConditionalFields("municipality-has-coop", "municipality-coop-fields"));
-
-  const munLaw = document.getElementById("municipality-has-law");
-  if (munLaw) munLaw.addEventListener("change", () => toggleConditionalFields("municipality-has-law", "municipality-law-fields"));
-
-  const munCom = document.getElementById("municipality-has-committee");
-  if (munCom) munCom.addEventListener("change", () => toggleConditionalFields("municipality-has-committee", "municipality-committee-fields"));
-
-  const munIes = document.getElementById("municipality-has-ies");
-  if (munIes) munIes.addEventListener("change", () => toggleConditionalFields("municipality-has-ies", "municipality-ies-fields"));
 
   // Set up Autocomplete search/form
   setupAutocomplete();

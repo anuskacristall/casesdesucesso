@@ -732,19 +732,13 @@
           </div>
         </fieldset>
 
-        <!-- Seção 2: Responsável pelo Município / Solicitante -->
+        <!-- Seção 2: Responsável pelo Cadastro -->
         <fieldset class="form-section">
-          <legend><i data-lucide="user"></i> Responsável pelo Cadastro / Solicitante</legend>
+          <legend><i data-lucide="user"></i> Responsável pelo Cadastro</legend>
           
-          <div class="form-row">
-            <div class="form-group flex-2">
-              <label for="municipality-contact-name">Nome do Responsável *</label>
-              <input type="text" id="municipality-contact-name" required placeholder="Ex: Carlos Mendonça">
-            </div>
-            <div class="form-group flex-1">
-              <label for="municipality-contact-role">Cargo / Secretaria *</label>
-              <input type="text" id="municipality-contact-role" required placeholder="Ex: Secretário de Educação">
-            </div>
+          <div class="form-group">
+            <label for="municipality-contact-name">Nome Completo do Responsável *</label>
+            <input type="text" id="municipality-contact-name" required placeholder="Ex: Carlos Mendonça">
           </div>
 
           <div class="form-row">
@@ -775,7 +769,7 @@
           </div>
 
           <!-- EE > 70% -->
-          <div class="indicator-row flex-col">
+          <div class="indicator-row">
             <div class="indicator-toggle">
               <label>Educação Empreendedora implementada em mais de 70% do município?</label>
               <div class="radio-group">
@@ -795,14 +789,16 @@
           <div class="indicator-row">
             <div class="indicator-toggle">
               <label>Ações com Cooperativa de Crédito?</label>
-              <label class="switch">
-                <input type="checkbox" id="municipality-has-coop">
-                <span class="slider round"></span>
-              </label>
-            </div>
-            <div id="municipality-coop-fields" class="conditional-fields indicator-textarea">
-              <label for="municipality-coop-summary">Resumo das Ações com a Cooperativa *</label>
-              <textarea id="municipality-coop-summary" placeholder="Descreva as ações desenvolvidas com a cooperativa..."></textarea>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="municipality-coop" value="sim">
+                  <span>Sim</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="municipality-coop" value="nao" checked>
+                  <span>Não</span>
+                </label>
+              </div>
             </div>
           </div>
 
@@ -810,14 +806,16 @@
           <div class="indicator-row">
             <div class="indicator-toggle">
               <label>Possui Lei de Educação Empreendedora no Município?</label>
-              <label class="switch">
-                <input type="checkbox" id="municipality-has-law">
-                <span class="slider round"></span>
-              </label>
-            </div>
-            <div id="municipality-law-fields" class="conditional-fields indicator-textarea">
-              <label for="municipality-law-summary">Resumo da Lei de Educação Empreendedora *</label>
-              <textarea id="municipality-law-summary" placeholder="Descreva o número e os pontos principais da lei municipal..."></textarea>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="municipality-law" value="sim">
+                  <span>Sim</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="municipality-law" value="nao" checked>
+                  <span>Não</span>
+                </label>
+              </div>
             </div>
           </div>
 
@@ -825,14 +823,16 @@
           <div class="indicator-row">
             <div class="indicator-toggle">
               <label>Tem Comitê ou Ações em conjunto (Secretaria, Superintendência e SEBRAE)?</label>
-              <label class="switch">
-                <input type="checkbox" id="municipality-has-committee">
-                <span class="slider round"></span>
-              </label>
-            </div>
-            <div id="municipality-committee-fields" class="conditional-fields indicator-textarea">
-              <label for="municipality-committee-summary">Resumo das Ações do Comitê *</label>
-              <textarea id="municipality-committee-summary" placeholder="Explane como funciona o comitê conjunto..."></textarea>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="municipality-committee" value="sim">
+                  <span>Sim</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="municipality-committee" value="nao" checked>
+                  <span>Não</span>
+                </label>
+              </div>
             </div>
           </div>
 
@@ -840,14 +840,50 @@
           <div class="indicator-row">
             <div class="indicator-toggle">
               <label>Tem Parceria com Instituições de Ensino Superior (IES) em conjunto com o SEBRAE?</label>
-              <label class="switch">
-                <input type="checkbox" id="municipality-has-ies">
-                <span class="slider round"></span>
-              </label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="municipality-ies" value="sim">
+                  <span>Sim</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="municipality-ies" value="nao" checked>
+                  <span>Não</span>
+                </label>
+              </div>
             </div>
-            <div id="municipality-ies-fields" class="conditional-fields indicator-textarea">
-              <label for="municipality-ies-summary">Resumo da Parceria IES *</label>
-              <textarea id="municipality-ies-summary" placeholder="Quais faculdades apoiam e quais ações são feitas..."></textarea>
+          </div>
+
+          <!-- Empresa Simulada -->
+          <div class="indicator-row">
+            <div class="indicator-toggle">
+              <label>Possui Empresa Simulada no Município?</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="municipality-empresa-simulada" value="sim">
+                  <span>Sim</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="municipality-empresa-simulada" value="nao" checked>
+                  <span>Não</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sistema de Ensino | Escola do Sebrae -->
+          <div class="indicator-row">
+            <div class="indicator-toggle">
+              <label>Possui Sistema de Ensino | Escola do Sebrae no Município?</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="municipality-escola-sebrae" value="sim">
+                  <span>Sim</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="municipality-escola-sebrae" value="nao" checked>
+                  <span>Não</span>
+                </label>
+              </div>
             </div>
           </div>
 
@@ -873,6 +909,6 @@
   <script src="config.js"></script>
 
   <!-- Script Principal -->
-  <script src="app.js?v=22"></script>
+  <script src="app.js?v=23"></script>
 </body>
 </html>
