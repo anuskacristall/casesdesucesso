@@ -3,47 +3,1178 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin – Mapa de Cases</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>SEBRAE MG | Painel do Administrador & Moderação</title>
+
+  <!-- Google Fonts - Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons (Local + CDN fallback) -->
+  <script src="lib/lucide.min.js"></script>
+  <script>
+    if (typeof lucide === 'undefined') {
+      document.write('<script src="https://unpkg.com/lucide@latest"><\/script>');
+    }
+  </script>
+
+  <!-- Base App Styles -->
+  <link rel="stylesheet" href="style.css?v=11">
+
+  <!-- Admin Dedicated Styles -->
   <style>
-    body { background: linear-gradient(135deg, hsl(190,30%,12%), hsl(260,20%,8%)); font-family: 'Inter', sans-serif; color:#eee; }
-    .container { max-width: 960px; margin: 2rem auto; }
-    h1 { text-align:center; margin-bottom:1.5rem; }
-    .section { background:rgba(255,255,255,0.06); padding:1rem; border-radius:8px; margin-bottom:1.5rem; }
-    .item { border-bottom:1px solid rgba(255,255,255,0.1); padding:0.5rem 0; display:flex; justify-content:space-between; align-items:center; }
-    .item:last-child { border:none; }
-    button { padding:0.4rem 0.8rem; border:none; border-radius:4px; cursor:pointer; }
-    .approve { background:hsl(120,50%,40%); color:#fff; }
-    .reject { background:hsl(0,50%,40%); color:#fff; margin-left:0.5rem; }
-    .error { color:#ff6b6b; margin-top:0.5rem; }
-    .table-wrap { overflow-x:auto; }
-    table { width:100%; border-collapse:collapse; }
-    th, td { padding:0.75rem 0.5rem; border-bottom:1px solid rgba(255,255,255,0.1); text-align:left; }
-    th { color:#9ed8ff; font-size:0.8rem; text-transform:uppercase; }
-    .details { background:#2563eb; color:#fff; margin-left:0.5rem; }
-    dialog { max-width:620px; width:90%; border:0; border-radius:10px; background:#1d2930; color:#eee; padding:1.25rem; }
-    dialog::backdrop { background:rgba(0,0,0,.7); }
+    body.light-theme {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      font-family: var(--font-main, 'Outfit', sans-serif);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    /* Admin Navigation Header */
+    .admin-header {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    }
+
+    .admin-header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .admin-header-logo {
+      height: 38px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .admin-header-divider {
+      width: 1px;
+      height: 32px;
+      background: #e2e8f0;
+    }
+
+    .admin-header-titles h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #0054a6;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .admin-header-titles h1 span {
+      background: #e0f2fe;
+      color: #0284c7;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .admin-header-titles p {
+      font-size: 0.82rem;
+      color: #64748b;
+      margin: 2px 0 0 0;
+    }
+
+    .admin-header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-admin-nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: var(--border-radius-sm, 8px);
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .btn-nav-map {
+      background: #f8fafc;
+      color: #0054a6;
+      border-color: #cbd5e1;
+    }
+
+    .btn-nav-map:hover {
+      background: #e0f2fe;
+      border-color: #93c5fd;
+    }
+
+    .btn-nav-logout {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .btn-nav-logout:hover {
+      background: #fecaca;
+    }
+
+    /* Main Container */
+    .admin-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 28px 24px 60px;
+    }
+
+    /* KPI Summary Cards Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 18px 20px;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.04);
+    }
+
+    .kpi-icon-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .kpi-icon-wrap.blue { background: #e0f2fe; color: #0284c7; }
+    .kpi-icon-wrap.amber { background: #fef3c7; color: #d97706; }
+    .kpi-icon-wrap.green { background: #dcfce7; color: #15803d; }
+    .kpi-icon-wrap.red { background: #fee2e2; color: #b91c1c; }
+
+    .kpi-info h3 {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0;
+      line-height: 1.1;
+    }
+
+    .kpi-info p {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #64748b;
+      margin: 4px 0 0 0;
+    }
+
+    /* Admin Navigation Tabs */
+    .admin-tabs-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 2px solid #e2e8f0;
+      margin-bottom: 20px;
+      padding-bottom: 2px;
+    }
+
+    .admin-tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      border: none;
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      border-radius: 8px 8px 0 0;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .admin-tab-btn:hover {
+      color: #0054a6;
+      background: rgba(0, 84, 166, 0.04);
+    }
+
+    .admin-tab-btn.active {
+      color: #0054a6;
+      font-weight: 700;
+    }
+
+    .admin-tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: #0054a6;
+      border-radius: 3px 3px 0 0;
+    }
+
+    .admin-tab-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      background: #e2e8f0;
+      color: #475569;
+    }
+
+    .admin-tab-btn.active .admin-tab-badge {
+      background: #0054a6;
+      color: #ffffff;
+    }
+
+    /* Toolbar: Filters, Search & Actions */
+    .admin-toolbar {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    }
+
+    .status-filters {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .status-pill {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid transparent;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .status-pill:hover {
+      background: #e2e8f0;
+    }
+
+    .status-pill.active {
+      background: #0054a6;
+      color: #ffffff;
+    }
+
+    .search-and-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-grow: 1;
+      justify-content: flex-end;
+    }
+
+    .admin-search-box {
+      position: relative;
+      min-width: 260px;
+      max-width: 360px;
+      flex-grow: 1;
+    }
+
+    .admin-search-box i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: #94a3b8;
+    }
+
+    .admin-search-box input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 12px 8px 36px;
+      font-size: 0.88rem;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #0f172a;
+      outline: none;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .admin-search-box input:focus {
+      background: #ffffff;
+      border-color: #0054a6;
+      box-shadow: 0 0 0 3px rgba(0, 84, 166, 0.12);
+    }
+
+    .btn-refresh {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .btn-refresh:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    /* Content Cards & Tables */
+    .admin-table-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+    }
+
+    .admin-table-wrap {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    table.admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    table.admin-table th {
+      background: #f8fafc;
+      color: #475569;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 12px 16px;
+      border-bottom: 1px solid #e2e8f0;
+      white-space: nowrap;
+    }
+
+    table.admin-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.88rem;
+      color: #1e293b;
+      vertical-align: middle;
+    }
+
+    table.admin-table tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .protocol-code {
+      font-family: monospace;
+      font-weight: 700;
+      color: #0054a6;
+      background: #e0f2fe;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      display: inline-block;
+    }
+
+    /* Status Badges */
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+
+    .badge-status.pending {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .badge-status.approved {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .badge-status.rejected {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    /* Mini Indicators Pill on Tables */
+    .table-indicator-badges {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .mini-badge {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .mini-badge.active {
+      background: #e0f2fe;
+      color: #0284c7;
+    }
+
+    /* Row Action Buttons */
+    .row-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .btn-action {
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-action.btn-approve {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .btn-action.btn-approve:hover {
+      background: #bbf7d0;
+    }
+
+    .btn-action.btn-reject {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .btn-action.btn-reject:hover {
+      background: #fecaca;
+    }
+
+    .btn-action.btn-details {
+      background: #f1f5f9;
+      color: #0054a6;
+      border: 1px solid #cbd5e1;
+    }
+
+    .btn-action.btn-details:hover {
+      background: #e0f2fe;
+      border-color: #93c5fd;
+    }
+
+    /* Empty and Loading States */
+    .admin-state-box {
+      text-align: center;
+      padding: 48px 24px;
+      color: #64748b;
+    }
+
+    .admin-state-box i {
+      width: 42px;
+      height: 42px;
+      margin-bottom: 12px;
+      color: #94a3b8;
+    }
+
+    .admin-state-box h4 {
+      font-size: 1.1rem;
+      color: #334155;
+      margin: 0 0 6px 0;
+    }
+
+    .admin-state-box p {
+      font-size: 0.88rem;
+      margin: 0;
+    }
+
+    /* Modal Backdrop & Details Card */
+    .admin-modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .admin-modal-backdrop.active {
+      display: flex;
+    }
+
+    .admin-modal-card {
+      background: #ffffff;
+      border-radius: 16px;
+      max-width: 680px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      animation: zoomIn 0.2s ease;
+    }
+
+    .admin-modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f8fafc;
+    }
+
+    .admin-modal-header h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: #0054a6;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .admin-modal-close {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #64748b;
+      padding: 4px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .admin-modal-close:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .admin-modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .modal-section-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+      color: #64748b;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 4px;
+    }
+
+    .modal-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .detail-label {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: #64748b;
+    }
+
+    .detail-value {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .indicators-summary-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .indicator-check-row {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+    }
+
+    .indicator-check-row span:first-child {
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .indicator-tag {
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+    }
+
+    .indicator-tag.sim { background: #dcfce7; color: #15803d; }
+    .indicator-tag.nao { background: #f1f5f9; color: #64748b; }
+
+    .admin-modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #e2e8f0;
+      background: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .admin-modal-footer-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.96); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* Admin Dedicated Login View */
+    #admin-login-view {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #0054A6 0%, #002B54 100%);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .admin-login-box {
+      background: #ffffff;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 440px;
+      padding: 36px 32px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      animation: zoomIn 0.3s ease;
+    }
+
+    .admin-login-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .admin-login-header img {
+      height: 48px;
+      margin-bottom: 12px;
+    }
+
+    .admin-login-header h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #0054A6;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .admin-login-header p {
+      font-size: 0.88rem;
+      color: #64748b;
+      margin: 4px 0 0 0;
+    }
+
+    .admin-login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .admin-login-form .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .admin-login-form label {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .admin-login-form .input-with-icon {
+      position: relative;
+    }
+
+    .admin-login-form .input-with-icon i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: #94a3b8;
+    }
+
+    .admin-login-form input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 14px 12px 42px;
+      font-size: 0.95rem;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .admin-login-form input:focus {
+      border-color: #0054A6;
+      box-shadow: 0 0 0 3px rgba(0, 84, 166, 0.15);
+    }
+
+    .admin-login-error {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: #fee2e2;
+      border: 1px solid #fca5a5;
+      border-radius: 8px;
+      color: #b91c1c;
+      font-size: 0.84rem;
+      font-weight: 600;
+    }
+
+    .admin-login-error.active {
+      display: flex;
+    }
+
+    .btn-admin-submit {
+      background: #0054A6;
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s ease;
+      margin-top: 4px;
+    }
+
+    .btn-admin-submit:hover {
+      background: #003f80;
+    }
+
+    .admin-login-footer {
+      text-align: center;
+      margin-top: 20px;
+      border-top: 1px solid #f1f5f9;
+      padding-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .admin-login-footer a {
+      color: #0054A6;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .admin-login-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .admin-demo-info {
+      font-size: 0.78rem;
+      color: #64748b;
+      background: #f8fafc;
+      padding: 8px;
+      border-radius: 6px;
+    }
   </style>
 </head>
-<body>
-  <div class="container">
-    <h1>Painel Admin</h1>
-    <div id="errorMsg" class="error"></div>
-    <section class="section" id="municipalitiesSection">
-      <h2>Municípios Pendentes</h2>
-      <div id="municipalitiesList">Carregando...</div>
-    </section>
-    <section class="section" id="casesSection">
-      <h2>Solicitações de Cases</h2>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>ID</th><th>Case</th><th>Município</th><th>Status</th><th>Ações</th></tr></thead>
-          <tbody id="casesList"><tr><td colspan="5">Carregando...</td></tr></tbody>
-        </table>
+<body class="light-theme">
+
+  <!-- ========================================================================
+       1. ADMIN AUTHENTICATION GATE VIEW
+       ======================================================================== -->
+  <div id="admin-login-view" style="display: flex;">
+    <div class="admin-login-box">
+      <div class="admin-login-header">
+        <img src="logo-sebrae.png" alt="Sebrae Minas" />
+        <h2>
+          <i data-lucide="shield-check" style="width: 22px; height: 22px;"></i>
+          <span>Portal do Administrador</span>
+        </h2>
+        <p>Painel de Moderação e Gestão do Mapa</p>
       </div>
-    </section>
+
+      <form id="admin-login-form" class="admin-login-form">
+        <div class="form-group">
+          <label for="admin-email">E-mail Corporativo</label>
+          <div class="input-with-icon">
+            <i data-lucide="mail"></i>
+            <input type="email" id="admin-email" placeholder="admin@sebraemg.com.br" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="admin-password">Senha de Administrador</label>
+          <div class="input-with-icon">
+            <i data-lucide="lock"></i>
+            <input type="password" id="admin-password" placeholder="••••••••" required />
+          </div>
+        </div>
+
+        <div id="admin-login-error" class="admin-login-error">
+          <i data-lucide="alert-circle" style="width: 18px; height: 18px; flex-shrink: 0;"></i>
+          <span id="admin-login-error-text">E-mail ou senha de administrador incorretos.</span>
+        </div>
+
+        <button type="submit" id="btn-admin-login-submit" class="btn-admin-submit">
+          <i data-lucide="log-in" style="width: 18px; height: 18px;"></i>
+          <span>Acessar Painel Admin</span>
+        </button>
+      </form>
+
+      <div class="admin-login-footer">
+        <div class="admin-demo-info">
+          Acesso Demo: <strong>admin@sebraemg.com.br</strong> | <strong>admin123</strong>
+        </div>
+        <a href="index.html">
+          <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+          <span>Voltar ao Mapa Público</span>
+        </a>
+      </div>
+    </div>
   </div>
-  <dialog id="caseDetailsDialog"><button onclick="document.getElementById('caseDetailsDialog').close()">Fechar</button><h2 id="caseDetailsTitle"></h2><div id="caseDetailsBody"></div></dialog>
-  <script src="admin.js"></script>
+
+  <!-- ========================================================================
+       2. ADMIN MAIN DASHBOARD VIEW
+       ======================================================================== -->
+  <div id="admin-dashboard-view" style="display: none;">
+    <!-- Navigation Header -->
+    <header class="admin-header">
+      <div class="admin-header-left">
+        <img src="logo-sebrae.png" alt="Sebrae Minas" class="admin-header-logo" />
+        <div class="admin-header-divider"></div>
+        <div class="admin-header-titles">
+          <h1>
+            Sebrae Minas
+            <span>Painel do Administrador</span>
+          </h1>
+          <p>Módulo de Moderação e Validação de Solicitações</p>
+        </div>
+      </div>
+
+      <div class="admin-header-right">
+        <!-- DB Status Badge -->
+        <div id="admin-db-status-badge" class="db-status-badge local" title="Status de conexão">
+          <i data-lucide="database" style="width: 14px; height: 14px;"></i>
+          <span id="admin-db-status-text">Conectando...</span>
+        </div>
+
+        <!-- Back to Map Button -->
+        <a href="index.html" class="btn-admin-nav btn-nav-map" title="Ver Mapa Geral">
+          <i data-lucide="map" style="width: 16px; height: 16px;"></i>
+          <span>Ver Mapa</span>
+        </a>
+
+        <!-- Logout Button -->
+        <button id="btn-admin-logout" class="btn-admin-nav btn-nav-logout" title="Encerrar Sessão">
+          <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
+          <span>Sair</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="admin-container">
+
+      <!-- KPI Summary Cards -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap amber">
+            <i data-lucide="map-pin" style="width: 24px; height: 24px;"></i>
+          </div>
+          <div class="kpi-info">
+            <h3 id="kpi-mun-pending">0</h3>
+            <p>Municípios Pendentes</p>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap blue">
+            <i data-lucide="book-open" style="width: 24px; height: 24px;"></i>
+          </div>
+          <div class="kpi-info">
+            <h3 id="kpi-cases-pending">0</h3>
+            <p>Cases Pendentes</p>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap green">
+            <i data-lucide="check-circle-2" style="width: 24px; height: 24px;"></i>
+          </div>
+          <div class="kpi-info">
+            <h3 id="kpi-total-approved">0</h3>
+            <p>Total Aprovados</p>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap red">
+            <i data-lucide="x-circle" style="width: 24px; height: 24px;"></i>
+          </div>
+          <div class="kpi-info">
+            <h3 id="kpi-total-rejected">0</h3>
+            <p>Total Rejeitados</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tabs Navigation -->
+      <div class="admin-tabs-bar">
+        <button id="tab-btn-municipalities" class="admin-tab-btn active" onclick="switchAdminTab('municipalities')">
+          <i data-lucide="building-2" style="width: 18px; height: 18px;"></i>
+          <span>Municípios Solicitados</span>
+          <span id="tab-counter-municipalities" class="admin-tab-badge">0</span>
+        </button>
+
+        <button id="tab-btn-cases" class="admin-tab-btn" onclick="switchAdminTab('cases')">
+          <i data-lucide="award" style="width: 18px; height: 18px;"></i>
+          <span>Cases Submetidos</span>
+          <span id="tab-counter-cases" class="admin-tab-badge">0</span>
+        </button>
+      </div>
+
+      <!-- Filter and Search Toolbar -->
+      <div class="admin-toolbar">
+        <div class="status-filters">
+          <button class="status-pill active" data-status="all" onclick="filterByStatus('all')">Todos</button>
+          <button class="status-pill" data-status="pending" onclick="filterByStatus('pending')">Pendentes</button>
+          <button class="status-pill" data-status="approved" onclick="filterByStatus('approved')">Aprovados</button>
+          <button class="status-pill" data-status="rejected" onclick="filterByStatus('rejected')">Rejeitados</button>
+        </div>
+
+        <div class="search-and-actions">
+          <div class="admin-search-box">
+            <i data-lucide="search"></i>
+            <input type="text" id="admin-search-input" placeholder="Buscar por protocolo, nome ou cidade..." oninput="handleAdminSearch()" />
+          </div>
+
+          <button class="btn-refresh" onclick="refreshAdminData()" title="Recarregar Dados">
+            <i data-lucide="rotate-cw" style="width: 16px; height: 16px;"></i>
+            <span>Atualizar</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab Content 1: Municipalities -->
+      <section id="admin-tab-content-municipalities" class="admin-table-card">
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Protocolo</th>
+                <th>Município</th>
+                <th>Regional / MR</th>
+                <th>Responsável</th>
+                <th>JEPP & Indicadores</th>
+                <th>Status</th>
+                <th style="text-align: right;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="admin-municipalities-tbody">
+              <tr>
+                <td colspan="7">
+                  <div class="admin-state-box">
+                    <i data-lucide="loader" class="animate-spin"></i>
+                    <h4>Carregando solicitações...</h4>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Tab Content 2: Cases -->
+      <section id="admin-tab-content-cases" class="admin-table-card" style="display: none;">
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Protocolo</th>
+                <th>Título do Case</th>
+                <th>Modalidade</th>
+                <th>Município / Escola</th>
+                <th>Autor / Responsável</th>
+                <th>Status</th>
+                <th style="text-align: right;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="admin-cases-tbody">
+              <tr>
+                <td colspan="7">
+                  <div class="admin-state-box">
+                    <i data-lucide="loader" class="animate-spin"></i>
+                    <h4>Carregando cases...</h4>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ========================================================================
+       3. MODAL: DETALHES DO MUNICÍPIO
+       ======================================================================== -->
+  <div id="modal-municipality-details" class="admin-modal-backdrop">
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <h3>
+          <i data-lucide="map-pin" style="width: 20px; height: 20px;"></i>
+          <span>Detalhes da Solicitação de Município</span>
+        </h3>
+        <button class="admin-modal-close" onclick="closeMunicipalityDetailsModal()">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+
+      <div class="admin-modal-body" id="modal-municipality-body">
+        <!-- Rendered dynamically in admin.js -->
+      </div>
+
+      <div class="admin-modal-footer">
+        <button class="btn btn-secondary" onclick="closeMunicipalityDetailsModal()">Fechar</button>
+        <div class="admin-modal-footer-actions" id="modal-municipality-actions">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       4. MODAL: DETALHES DO CASE
+       ======================================================================== -->
+  <div id="modal-case-details" class="admin-modal-backdrop">
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <h3>
+          <i data-lucide="award" style="width: 20px; height: 20px;"></i>
+          <span id="modal-case-title">Detalhes do Case</span>
+        </h3>
+        <button class="admin-modal-close" onclick="closeCaseDetailsModal()">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+
+      <div class="admin-modal-body" id="modal-case-body">
+        <!-- Rendered dynamically in admin.js -->
+      </div>
+
+      <div class="admin-modal-footer">
+        <button class="btn btn-secondary" onclick="closeCaseDetailsModal()">Fechar</button>
+        <div class="admin-modal-footer-actions" id="modal-case-actions">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase Credentials & App Config -->
+  <script src="config.js"></script>
+
+  <!-- Admin Controller -->
+  <script src="admin.js?v=2"></script>
 </body>
 </html>

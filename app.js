@@ -2083,6 +2083,21 @@ function handleLogin(e) {
   const errorMsg = document.getElementById("login-error");
   const loginBtn = document.getElementById("btn-login");
   
+  if (email.toLowerCase() === "admin@sebraemg.com.br" && password === "admin123") {
+    errorMsg.classList.remove("active");
+    loginBtn.disabled = true;
+    loginBtn.innerHTML = '<i data-lucide="loader" class="animate-spin" style="width: 18px; height: 18px;"></i> Acessando Admin...';
+    lucide.createIcons({ node: loginBtn });
+    
+    setTimeout(() => {
+      localStorage.setItem("sebrae_admin_authenticated", "true");
+      loginBtn.disabled = false;
+      loginBtn.innerHTML = "<span>Entrar no Painel</span>";
+      window.location.href = "admin-dashboard.html";
+    }, 600);
+    return;
+  }
+
   if (email === "teste@sebraemg.com.br" && password === "teste123") {
     errorMsg.classList.remove("active");
     loginBtn.disabled = true;

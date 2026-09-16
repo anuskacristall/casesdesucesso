@@ -156,7 +156,29 @@ async function getMunicipalityCoordinates(cityName, regionalName) {
   };
 }
 
+// Carrega municípios adicionais aprovados pela moderação
+try {
+  const approvedList = JSON.parse(localStorage.getItem("sebrae_approved_municipalities") || "[]");
+  if (Array.isArray(approvedList)) {
+    approvedList.forEach(item => {
+      const key = (item.nome || item.municipio || "").toLowerCase().trim();
+      if (key && !MUNICIPALITIES_DATABASE[key]) {
+        const regCoords = REGIONAL_FALLBACK_COORDINATES[item.regional] || REGIONAL_FALLBACK_COORDINATES["Centro"];
+        MUNICIPALITIES_DATABASE[key] = {
+          name: item.nome || item.municipio,
+          regional: item.regional || "Centro",
+          lat: item.lat || (regCoords ? regCoords.lat : -19.9167),
+          lng: item.lng || (regCoords ? regCoords.lng : -43.9345)
+        };
+      }
+    });
+  }
+} catch (err) {
+  console.warn("Aviso ao carregar municípios aprovados do cache local:", err);
+}
+
 // Exporta as variáveis para escopo global ou ES Modules
 window.MUNICIPALITIES_DATABASE = MUNICIPALITIES_DATABASE;
 window.REGIONAL_FALLBACK_COORDINATES = REGIONAL_FALLBACK_COORDINATES;
 window.getMunicipalityCoordinates = getMunicipalityCoordinates;
+
