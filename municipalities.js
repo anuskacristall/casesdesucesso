@@ -126,8 +126,7 @@ async function getMunicipalityCoordinates(cityName, regionalName) {
     const queryUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName + ", Minas Gerais, Brazil")}&limit=1`;
     const response = await fetch(queryUrl, {
       headers: {
-        "Accept-Language": "pt-BR",
-        "User-Agent": "MapaCasesSucessoSEBRAEMG/1.0" // Boa prática do Nominatim
+        "Accept-Language": "pt-BR"
       }
     });
     

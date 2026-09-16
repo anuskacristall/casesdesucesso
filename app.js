@@ -64,8 +64,9 @@ const SEED_CASES = [
   },
   {
     id: "seed-2",
-    titulo: "Horta Orgânica Escolar",
-    descricao: "Projeto de fomento à alimentação saudável, cultivo agroecológico e espírito cooperativo escolar na região de Pouso Alegre.",
+    tipoCase: "professor",
+    titulo: "Horta Pedagógica e Alimentação Consciente",
+    descricao: "Metodologia pedagógica interdisciplinar integrando ciências da natureza, nutrição e empreendedorismo por meio do cultivo agroecológico escolar.",
     municipio: "Pouso Alegre",
     regional: "Sul",
     mr: "MR Pouso Alegre",
@@ -73,11 +74,11 @@ const SEED_CASES = [
     tecnicoNome: "Roberto Fonseca",
     tecnicoEmail: "roberto.fonseca@sebraemg.com.br",
     tecnicoContato: "(35) 99888-7766",
-    hasStudentCase: true,
-    studentSummary: "Horta Orgânica Comunitária e Ecológica gerida integralmente pelos alunos, com venda direta em feira e doação a asilos locais.",
-    studentContact: "hortasul@escolaangelo.edu.br",
+    hasStudentCase: false,
+    studentSummary: "",
+    studentContact: "",
     hasCoop: true,
-    coopSummary: "Sicredi ministra oficinas mensais de cooperativismo de crédito e educação financeira, apoiando com insumos para a horta.",
+    coopSummary: "Sicredi ministra oficinas mensais de cooperativismo de crédito e educação financeira aos docentes e comunidade.",
     edu70: "nao",
     hasLaw: true,
     lawSummary: "Dispõe sobre a inclusão de temas de empreendedorismo na grade complementar das escolas locais. Lei aprovada em 2024.",
@@ -114,8 +115,9 @@ const SEED_CASES = [
   },
   {
     id: "seed-4",
-    titulo: "Sabão Ecológico e Sustentável",
-    descricao: "Desenvolvimento de produtos de limpeza sustentáveis a partir do reaproveitamento de óleos vegetais usados, fomentando o empreendedorismo ambiental.",
+    tipoCase: "professor",
+    titulo: "Metodologia STEAM com Química Sustentável",
+    descricao: "Prática pedagógica docente inovadora voltada à contextualização química e sustentabilidade prática: transformação de óleos residuais em sabão ecológico e bioinsumos.",
     municipio: "Montes Claros",
     regional: "Norte",
     mr: "MR Montes Claros",
@@ -123,11 +125,11 @@ const SEED_CASES = [
     tecnicoNome: "Clara Rocha",
     tecnicoEmail: "clara.rocha@sebraemg.com.br",
     tecnicoContato: "(38) 99911-2233",
-    hasStudentCase: true,
-    studentSummary: "Produção de Sabão Ecológico e velas aromatizadas a partir de óleo de fritura usado, recolhido em restaurantes parceiros da cidade.",
-    studentContact: "sabaoecojovem@ifnmg.edu.br",
+    hasStudentCase: false,
+    studentSummary: "",
+    studentContact: "",
     hasCoop: true,
-    coopSummary: "Apoio da Sicoob Credinor, promovendo mini-créditos simulados para aquisição de matéria-prima das equipes de estudantes.",
+    coopSummary: "Apoio da Sicoob Credinor, fomentando dinâmicas docentes de cooperativismo e simulação de microcrédito.",
     edu70: "nao",
     hasLaw: false,
     lawSummary: "",
@@ -164,8 +166,9 @@ const SEED_CASES = [
   },
   {
     id: "seed-6",
-    titulo: "Jogos de Tabuleiro Históricos",
-    descricao: "Fomento ao aprendizado dinâmico de história regional e educação financeira por meio da criação e jogabilidade de tabuleiros pedagógicos.",
+    tipoCase: "professor",
+    titulo: "Gamificação Pedagógica de História Regional",
+    descricao: "Metodologia docente de ensino de história e finanças por meio de jogos de tabuleiro didáticos desenvolvidos por educadores para dinamizar a sala de aula.",
     municipio: "Divinópolis",
     regional: "CentroOeste",
     mr: "MR Divinópolis",
@@ -173,18 +176,18 @@ const SEED_CASES = [
     tecnicoNome: "Patrícia Lima",
     tecnicoEmail: "patricia.lima@sebraemg.com.br",
     tecnicoContato: "(37) 98822-1100",
-    hasStudentCase: true,
-    studentSummary: "Criação de Jogos de Tabuleiro didáticos sobre história regional e finanças, utilizados como dinâmica de aprendizado lúdico.",
-    studentContact: "contato@tabuleirojovem.com.br",
+    hasStudentCase: false,
+    studentSummary: "",
+    studentContact: "",
     hasCoop: true,
-    coopSummary: "Patrocínio do Sicoob Divicred para impressão física dos tabuleiros criados pelos estudantes.",
+    coopSummary: "Patrocínio do Sicoob Divicred para impressão física dos materiais didáticos pedagógicos.",
     edu70: "nao",
     hasLaw: true,
     lawSummary: "Lei municipal determina incentivos fiscais para empresas locais que patrocinarem projetos de empreendedorismo juvenil escolar.",
     hasCommittee: false,
     committeeSummary: "",
     hasIes: true,
-    iesSummary: "Mentoria de design gráfico e regras de jogos com estudantes da UEMG Divinópolis.",
+    iesSummary: "Mentoria de design instrucional e regras de jogos com docentes da UEMG Divinópolis.",
     jeppStatus: "Sim"
   },
   {
@@ -264,8 +267,9 @@ const SEED_CASES = [
   },
   {
     id: "seed-10",
-    titulo: "Brechó e Moda Circular",
-    descricao: "Iniciativa de brechó estudantil e oficinas de customização de roupas escolares usadas, incentivando a redução do desperdício.",
+    tipoCase: "professor",
+    titulo: "Prática Docente de Economia Circular Escolar",
+    descricao: "Projeto pedagógico interdisciplinar integrando matemática, artes e sustentabilidade a partir da cultura do reaproveitamento e oficinas de moda circular.",
     municipio: "Belo Horizonte",
     regional: "Centro",
     mr: "MR Belo Horizonte",
@@ -273,9 +277,9 @@ const SEED_CASES = [
     tecnicoNome: "Amanda Souza",
     tecnicoEmail: "amanda.souza@sebraemg.com.br",
     tecnicoContato: "(31) 98765-4321",
-    hasStudentCase: true,
-    studentSummary: "Brechó e Customização de Roupas Escolares de segunda mão, promovendo consumo consciente e moda circular.",
-    studentContact: "@brecho_fdias",
+    hasStudentCase: false,
+    studentSummary: "",
+    studentContact: "",
     hasCoop: false,
     coopSummary: "",
     edu70: "sim",
@@ -314,8 +318,9 @@ const SEED_CASES = [
   },
   {
     id: "seed-12",
-    titulo: "Artesanato e Resgate Cultural Indígena",
-    descricao: "Projeto de resgate, valorização e empreendedorismo cultural com foco em artesanatos tradicionais e línguas nativas da região do Jequitinhonha.",
+    tipoCase: "professor",
+    titulo: "Etnopedagogia e Empreendedorismo Cultural",
+    descricao: "Prática pedagógica docente de valorização do patrimônio imaterial, línguas nativas e resgate da ancestralidade indígena do Vale do Mucuri aliada à economia criativa escolar.",
     escola: "Escola Estadual Xucuru Kariri",
     municipio: "Teófilo Otoni",
     regional: "Jequitinhonha/Mucuri",
@@ -323,9 +328,9 @@ const SEED_CASES = [
     tecnicoNome: "Samuel Santos",
     tecnicoEmail: "samuel.santos@sebraemg.com.br",
     tecnicoContato: "(33) 98444-5566",
-    hasStudentCase: true,
-    studentSummary: "Feira de artesanato estudantil indígena e produção de e-books de contos folclóricos locais, vendidos em benefício da comunidade escolar.",
-    studentContact: "contato.xucuru@gmail.com",
+    hasStudentCase: false,
+    studentSummary: "",
+    studentContact: "",
     hasCoop: false,
     coopSummary: "",
     edu70: "nao",
@@ -414,8 +419,9 @@ const SEED_CASES = [
   },
   {
     id: "seed-16",
-    titulo: "Ecomodas e Customização Social",
-    descricao: "Iniciativa de transformação de peças de vestuário descartadas ou doadas em roupas modernas e utilitárias de Governador Valadares.",
+    tipoCase: "professor",
+    titulo: "Design Sustentável e Upcycling na Educação",
+    descricao: "Metodologia docente integrando formação profissionalizante e design ecológico, capacitando turmas na transformação de resíduos da indústria têxtil e de confecção.",
     escola: "Escola Estadual Professor Nelson de Sena",
     municipio: "Governador Valadares",
     regional: "Rio Doce",
@@ -423,9 +429,9 @@ const SEED_CASES = [
     tecnicoNome: "Marcos Oliveira",
     tecnicoEmail: "marcos.oliveira@sebraemg.com.br",
     tecnicoContato: "(31) 97555-4433",
-    hasStudentCase: true,
-    studentSummary: "Desenvolvimento de ecobags e mochilas escolares resistentes criadas a partir de calças jeans velhas descartadas.",
-    studentContact: "@ecomodajovem_gv",
+    hasStudentCase: false,
+    studentSummary: "",
+    studentContact: "",
     hasCoop: false,
     coopSummary: "",
     edu70: "sim",
@@ -539,8 +545,9 @@ const SEED_CASES = [
   },
   {
     id: "seed-21",
-    titulo: "Fomento Agrícola e Compostagem do Cerrado",
-    descricao: "Desenvolvimento de um polo escolar de compostagem e reciclagem de resíduos orgânicos coletados nas cantinas públicas da região de Patos de Minas.",
+    tipoCase: "professor",
+    titulo: "Compostagem Pedagógica e Ciências do Solo",
+    descricao: "Projeto docente interdisciplinar articulando biologia, ciências agrícolas e sustentabilidade alimentar por meio de polo escolar de compostagem e reciclagem de resíduos orgânicos.",
     escola: "Escola Municipal Marcolino de Barros",
     municipio: "Patos de Minas",
     regional: "Noroeste",
@@ -548,9 +555,9 @@ const SEED_CASES = [
     tecnicoNome: "Denise Mendes",
     tecnicoEmail: "denise.mendes@sebraemg.com.br",
     tecnicoContato: "(38) 99222-8899",
-    hasStudentCase: true,
-    studentSummary: "Produção de adubo orgânico de alta qualidade a partir de resíduos de comida, distribuído a agricultores familiares locais.",
-    studentContact: "compostajovem@patos.gov.br",
+    hasStudentCase: false,
+    studentSummary: "",
+    studentContact: "",
     hasCoop: true,
     coopSummary: "Apoio e patrocínio das embalagens de adubo ecológicas promovidos pela cooperativa local.",
     edu70: "sim",
@@ -605,8 +612,23 @@ let currentRegisterType = 'professor'; // 'professor' or 'estudante'
 
 function mapDatabaseToApp(dbItem) {
   if (!dbItem) return null;
-  // If the database has student summary/contact from legacy format, default to estudante
-  const inferredType = dbItem.tipo_case || (dbItem.estudante_possui || (dbItem.estudante_resumo && dbItem.estudante_resumo.trim()) ? 'estudante' : 'professor');
+  // If dbItem.estudante_possui is false, it's explicitly professor
+  const isEstudante = dbItem.tipo_case === 'estudante' || (dbItem.tipo_case !== 'professor' && (dbItem.estudante_possui === true || (!('estudante_possui' in dbItem) && dbItem.estudante_resumo && dbItem.estudante_resumo.trim() && !dbItem.estudante_resumo.startsWith("Professor:"))));
+  const inferredType = isEstudante ? 'estudante' : 'professor';
+  
+  let profNome = dbItem.professor_nome || "";
+  let profEmail = dbItem.professor_email || "";
+  let profTel = dbItem.professor_telefone || "";
+  
+  if (!profNome && dbItem.estudante_resumo && dbItem.estudante_resumo.startsWith("Professor:")) {
+    const match = dbItem.estudante_resumo.match(/^Professor:\s*([^(]+)(?:\(([^ -]+)?\s*-\s*([^)]+)?\))?/);
+    if (match) {
+      profNome = match[1] ? match[1].trim() : "";
+      profEmail = match[2] ? match[2].trim() : "";
+      profTel = match[3] ? match[3].trim() : "";
+    }
+  }
+
   return {
     id: dbItem.id,
     titulo: dbItem.titulo_projeto || "",
@@ -620,16 +642,21 @@ function mapDatabaseToApp(dbItem) {
     tecnicoNome: dbItem.tecnico_nome || "",
     tecnicoEmail: dbItem.tecnico_email || "",
     tecnicoContato: dbItem.tecnico_telefone || "",
-    // Keep this for legacy compatibility
+    
+    // Legacy compatibility
     hasStudentCase: inferredType === 'estudante',
     studentSummary: dbItem.estudante_resumo || "",
     studentContact: dbItem.estudante_contato || "",
     
-    // New fields
+    // Type and contact fields
     tipoCase: inferredType,
     estudanteNome: dbItem.estudante_nome || "",
     estudanteEmail: dbItem.estudante_email || "",
-    estudanteTelefone: dbItem.estudante_telefone || "",
+    estudanteTelefone: dbItem.estudante_telefone || dbItem.estudante_contato || "",
+    
+    professorNome: profNome,
+    professorEmail: profEmail,
+    professorTelefone: profTel,
     
     hasCoop: dbItem.cooperativa_possui || false,
     coopSummary: dbItem.cooperativa_resumo || "",
@@ -646,7 +673,14 @@ function mapDatabaseToApp(dbItem) {
 
 function mapAppToDatabase(appItem) {
   if (!appItem) return null;
-  const inferredType = appItem.tipoCase || (appItem.hasStudentCase ? 'estudante' : 'professor');
+  const isEstudante = appItem.tipoCase === 'estudante';
+  let resumo = appItem.studentSummary || "";
+  let contato = isEstudante ? (appItem.studentContact || appItem.estudanteTelefone || "") : (appItem.professorTelefone || "");
+  
+  if (!isEstudante && (appItem.professorNome || appItem.professorEmail || appItem.professorTelefone)) {
+    resumo = `Professor: ${appItem.professorNome || ''} (${appItem.professorEmail || ''} - ${appItem.professorTelefone || ''})`;
+  }
+  
   return {
     id: appItem.id,
     titulo_projeto: appItem.titulo || "",
@@ -660,18 +694,9 @@ function mapAppToDatabase(appItem) {
     tecnico_nome: appItem.tecnicoNome || "",
     tecnico_email: appItem.tecnicoEmail || "",
     tecnico_telefone: appItem.tecnicoContato || "",
-    
-    // Set for backward database fields compatibility
-    estudante_possui: inferredType === 'estudante',
-    estudante_resumo: appItem.studentSummary || "",
-    estudante_contato: appItem.studentContact || "",
-    
-    // New columns mapping
-    tipo_case: inferredType,
-    estudante_nome: appItem.estudanteNome || "",
-    estudante_email: appItem.estudanteEmail || "",
-    estudante_telefone: appItem.estudanteTelefone || "",
-    
+    estudante_possui: isEstudante,
+    estudante_resumo: resumo,
+    estudante_contato: contato,
     cooperativa_possui: appItem.hasCoop || false,
     cooperativa_resumo: appItem.coopSummary || "",
     municipio_ee_70: appItem.edu70 || "nao",
@@ -723,6 +748,35 @@ if (document.readyState !== "loading") {
 async function initData() {
   updateDbStatus("connecting");
   
+  const supabaseUrl = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_URL) || "";
+  const supabaseKey = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_KEY) || "";
+
+  // 1. First attempt direct connection to Supabase Cloud REST API
+  if (supabaseUrl && supabaseKey) {
+    try {
+      const res = await fetch(`${supabaseUrl}/rest/v1/cases?select=*`, {
+        headers: {
+          "apikey": supabaseKey,
+          "Authorization": `Bearer ${supabaseKey}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        isCloudMode = true;
+        if (Array.isArray(data) && data.length > 0) {
+          cases = data.map(mapDatabaseToApp);
+        } else {
+          cases = [...SEED_CASES];
+        }
+        updateDbStatus("online");
+        return;
+      }
+    } catch (err) {
+      console.warn("Conexão direta com o Supabase falhou, tentando proxy /api/cases...", err);
+    }
+  }
+
+  // 2. Fallback to local server proxy /api/cases
   try {
     const res = await fetch("/api/cases");
     let data;
@@ -742,42 +796,14 @@ async function initData() {
     if (Array.isArray(data) && data.length > 0) {
       cases = data.map(mapDatabaseToApp);
     } else {
-      // If Supabase table is completely empty, insert seeds
-      console.log("Banco de dados na nuvem vazio. Enviando cases semente...");
-      
-      // Resolve coordinates for seed cases before inserting
-      const casesToInsert = SEED_CASES.map(item => {
-        const coords = getCaseCoordinates(item);
-        return {
-          ...item,
-          lat: coords.lat,
-          lng: coords.lng
-        };
-      });
-      
-      const dbCasesToInsert = casesToInsert.map(mapAppToDatabase);
-      
-      const insertRes = await fetch("/api/cases", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dbCasesToInsert)
-      });
-      
-      if (!insertRes.ok) {
-        throw new Error(`Falha ao inserir sementes: HTTP ${insertRes.status}`);
-      }
-      
-      cases = casesToInsert;
+      cases = [...SEED_CASES];
     }
     
     updateDbStatus("online");
     return;
   } catch (e) {
-    console.error("Falha ao conectar com o Supabase. Usando LocalStorage de backup.", e);
+    console.warn("Falha ao conectar com o Supabase. Usando LocalStorage de backup.", e);
     const errMsg = e.message || String(e);
-    showToast(`Erro na Nuvem: ${errMsg.substring(0, 45)}...`);
     
     isCloudMode = false;
     updateDbStatus("local", errMsg);
@@ -793,6 +819,12 @@ function loadLocalStorageFallback() {
       cases = JSON.parse(stored);
       if (!Array.isArray(cases) || cases.length === 0) {
         cases = [...SEED_CASES];
+      } else {
+        // If stored data has 0 professor cases, update with SEED_CASES so professor examples are available
+        const hasProfessor = cases.some(c => c.tipoCase === "professor");
+        if (!hasProfessor) {
+          cases = [...SEED_CASES];
+        }
       }
     } catch (e) {
       cases = [...SEED_CASES];
@@ -898,19 +930,16 @@ function initMap() {
 function updateMapTilesForTheme() {
   if (!map) return;
   
-  const isDark = document.body.classList.contains("dark-theme");
-  const tileUrl = isDark 
-    ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-    : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+  const tileUrl = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}";
     
   if (tileLayer) {
     map.removeLayer(tileLayer);
   }
   
   tileLayer = L.tileLayer(tileUrl, {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains: 'abcd',
-    maxZoom: 20
+    attribution: 'Tiles &copy; Esri',
+    className: 'gray-map-tiles',
+    maxZoom: 19
   }).addTo(map);
 }
 
@@ -1223,29 +1252,58 @@ function openDetailsModal(id) {
   document.getElementById("details-tecnico-email").innerHTML = `<i data-lucide="mail"></i> ${item.tecnicoEmail}`;
   document.getElementById("details-tecnico-contato").innerHTML = `<i data-lucide="phone"></i> ${item.tecnicoContato}`;
 
+  // Professor Details box setup
+  const profBox = document.getElementById("details-professor-box");
+  if (profBox) {
+    if (item.tipoCase === "professor" || (!item.tipoCase && !item.hasStudentCase)) {
+      profBox.style.display = "block";
+      document.getElementById("details-professor-nome").innerText = item.professorNome || "Não informado";
+      
+      const emailContainer = document.getElementById("details-professor-email-container");
+      if (item.professorEmail) {
+        emailContainer.style.display = "flex";
+        document.getElementById("details-professor-email").innerText = item.professorEmail;
+      } else {
+        emailContainer.style.display = "none";
+      }
+      
+      const contactContainer = document.getElementById("details-professor-contato-container");
+      if (item.professorTelefone) {
+        contactContainer.style.display = "flex";
+        document.getElementById("details-professor-contato").innerText = item.professorTelefone;
+      } else {
+        contactContainer.style.display = "none";
+      }
+    } else {
+      profBox.style.display = "none";
+    }
+  }
+
   // Student Details box setup
   const studentBox = document.getElementById("details-student-box");
-  if (item.tipoCase === "estudante") {
-    studentBox.style.display = "block";
-    document.getElementById("details-student-nome").innerText = item.estudanteNome || "Não informado";
-    
-    const emailContainer = document.getElementById("details-student-email-container");
-    if (item.estudanteEmail) {
-      emailContainer.style.display = "flex";
-      document.getElementById("details-student-email").innerText = item.estudanteEmail;
+  if (studentBox) {
+    if (item.tipoCase === "estudante") {
+      studentBox.style.display = "block";
+      document.getElementById("details-student-nome").innerText = item.estudanteNome || "Não informado";
+      
+      const emailContainer = document.getElementById("details-student-email-container");
+      if (item.estudanteEmail) {
+        emailContainer.style.display = "flex";
+        document.getElementById("details-student-email").innerText = item.estudanteEmail;
+      } else {
+        emailContainer.style.display = "none";
+      }
+      
+      const contactContainer = document.getElementById("details-student-contato-container");
+      if (item.estudanteTelefone) {
+        contactContainer.style.display = "flex";
+        document.getElementById("details-student-contato").innerText = item.estudanteTelefone;
+      } else {
+        contactContainer.style.display = "none";
+      }
     } else {
-      emailContainer.style.display = "none";
+      studentBox.style.display = "none";
     }
-    
-    const contactContainer = document.getElementById("details-student-contato-container");
-    if (item.estudanteTelefone) {
-      contactContainer.style.display = "flex";
-      document.getElementById("details-student-contato").innerText = item.estudanteTelefone;
-    } else {
-      contactContainer.style.display = "none";
-    }
-  } else {
-    studentBox.style.display = "none";
   }
 
   // JEPP Status Badge
@@ -1338,6 +1396,11 @@ function closeCaseTypeModal() {
 }
 
 function selectCaseType(type) {
+  if (type === "municipio") {
+    closeCaseTypeModal();
+    openMunicipalityModal();
+    return;
+  }
   currentRegisterType = type;
   closeCaseTypeModal();
   
@@ -1361,17 +1424,35 @@ function openRegisterPanel() {
   document.getElementById("register-panel").classList.add("active");
   document.getElementById("register-form").reset();
   
-  // Toggle student details conditional fieldset visibility based on register type
+  // Toggle student and professor fieldset visibility based on register type
   const studentFieldset = document.getElementById("student-details-fieldset");
-  if (studentFieldset) {
-    if (currentRegisterType === 'estudante') {
-      studentFieldset.style.display = "block";
-      document.getElementById("form-estudante-nome").value = "";
-      document.getElementById("form-estudante-email").value = "";
-      document.getElementById("form-estudante-contato").value = "";
-    } else {
-      studentFieldset.style.display = "none";
-    }
+  const professorFieldset = document.getElementById("professor-details-fieldset");
+  const profNome = document.getElementById("form-professor-nome");
+  const profEmail = document.getElementById("form-professor-email");
+  const profTel = document.getElementById("form-professor-contato");
+  const studNome = document.getElementById("form-estudante-nome");
+  const studEmail = document.getElementById("form-estudante-email");
+  const studTel = document.getElementById("form-estudante-contato");
+
+  if (currentRegisterType === 'estudante') {
+    if (studentFieldset) studentFieldset.style.display = "flex";
+    if (professorFieldset) professorFieldset.style.display = "none";
+    if (studNome) { studNome.required = true; studNome.value = ""; }
+    if (studEmail) { studEmail.required = true; studEmail.value = ""; }
+    if (studTel) { studTel.required = true; studTel.value = ""; }
+    if (profNome) { profNome.required = false; profNome.value = ""; }
+    if (profEmail) { profEmail.required = false; profEmail.value = ""; }
+    if (profTel) { profTel.required = false; profTel.value = ""; }
+  } else {
+    // Professor
+    if (studentFieldset) studentFieldset.style.display = "none";
+    if (professorFieldset) professorFieldset.style.display = "flex";
+    if (profNome) { profNome.required = true; profNome.value = ""; }
+    if (profEmail) { profEmail.required = true; profEmail.value = ""; }
+    if (profTel) { profTel.required = true; profTel.value = ""; }
+    if (studNome) { studNome.required = false; studNome.value = ""; }
+    if (studEmail) { studEmail.required = false; studEmail.value = ""; }
+    if (studTel) { studTel.required = false; studTel.value = ""; }
   }
   
   // Trigger conditional toggles resetting visibility
@@ -1383,6 +1464,52 @@ function openRegisterPanel() {
 
 function closeRegisterPanel() {
   document.getElementById("register-panel").classList.remove("active");
+}
+
+function openMunicipalityModal() {
+  const modal = document.getElementById("municipality-modal");
+  if (modal) {
+    modal.classList.add("active");
+    modal.style.display = "flex";
+    lucide.createIcons({ node: modal });
+  }
+}
+
+function closeMunicipalityModal() {
+  const modal = document.getElementById("municipality-modal");
+  if (modal) {
+    modal.classList.remove("active");
+    modal.style.display = "none";
+  }
+}
+
+function openConfirmCodeModal(code) {
+  const modal = document.getElementById("confirm-code-modal");
+  if (modal) {
+    const codeEl = document.getElementById("request-code-value");
+    if (codeEl) codeEl.innerText = code;
+    modal.classList.add("active");
+    modal.style.display = "flex";
+    lucide.createIcons({ node: modal });
+  }
+}
+
+function closeConfirmCodeModal() {
+  const modal = document.getElementById("confirm-code-modal");
+  if (modal) {
+    modal.classList.remove("active");
+    modal.style.display = "none";
+  }
+}
+
+function handleMunicipalitySubmit(e) {
+  e.preventDefault();
+  const name = document.getElementById("municipality-name").value.trim();
+  const randomCode = "#" + Math.floor(100000 + Math.random() * 900000);
+  closeMunicipalityModal();
+  openConfirmCodeModal(randomCode);
+  showToast(`Solicitação de cadastro de ${name} enviada com sucesso! Código: ${randomCode}`);
+  document.getElementById("municipality-form").reset();
 }
 
 function toggleConditionalFields(checkboxId, targetDivId) {
@@ -1546,6 +1673,21 @@ function bindEvents() {
   document.getElementById("select-type-professor").addEventListener("click", () => selectCaseType('professor'));
   document.getElementById("select-type-estudante").addEventListener("click", () => selectCaseType('estudante'));
 
+  const btnMun = document.getElementById("select-type-municipio");
+  if (btnMun) btnMun.addEventListener("click", () => selectCaseType('municipio'));
+
+  const btnCloseMun = document.getElementById("btn-close-municipality");
+  if (btnCloseMun) btnCloseMun.addEventListener("click", closeMunicipalityModal);
+
+  const formMun = document.getElementById("municipality-form");
+  if (formMun) formMun.addEventListener("submit", handleMunicipalitySubmit);
+
+  const btnCloseCode = document.getElementById("btn-close-code-modal");
+  if (btnCloseCode) btnCloseCode.addEventListener("click", closeConfirmCodeModal);
+
+  const btnFinishCode = document.getElementById("btn-finish-code-modal");
+  if (btnFinishCode) btnFinishCode.addEventListener("click", closeConfirmCodeModal);
+
   // Close modal/panel on click outer wrapper
   document.getElementById("details-modal").addEventListener("click", (e) => {
     if (e.target.id === "details-modal") closeDetailsModal();
@@ -1556,6 +1698,18 @@ function bindEvents() {
   document.getElementById("case-type-modal").addEventListener("click", (e) => {
     if (e.target.id === "case-type-modal") closeCaseTypeModal();
   });
+  const modalMun = document.getElementById("municipality-modal");
+  if (modalMun) {
+    modalMun.addEventListener("click", (e) => {
+      if (e.target.id === "municipality-modal") closeMunicipalityModal();
+    });
+  }
+  const modalCode = document.getElementById("confirm-code-modal");
+  if (modalCode) {
+    modalCode.addEventListener("click", (e) => {
+      if (e.target.id === "confirm-code-modal") closeConfirmCodeModal();
+    });
+  }
 
   // Form switches bindings
   document.getElementById("has-coop").addEventListener("change", () => {
@@ -1612,6 +1766,10 @@ async function handleFormSubmit(e) {
   const tecnicoEmail = document.getElementById("form-tecnico-email").value.trim();
   const tecnicoContato = document.getElementById("form-tecnico-contato").value.trim();
   
+  const professorNome = currentRegisterType === 'professor' ? document.getElementById("form-professor-nome").value.trim() : "";
+  const professorEmail = currentRegisterType === 'professor' ? document.getElementById("form-professor-email").value.trim() : "";
+  const professorTelefone = currentRegisterType === 'professor' ? document.getElementById("form-professor-contato").value.trim() : "";
+
   const estudanteNome = currentRegisterType === 'estudante' ? document.getElementById("form-estudante-nome").value.trim() : "";
   const estudanteEmail = currentRegisterType === 'estudante' ? document.getElementById("form-estudante-email").value.trim() : "";
   const estudanteTelefone = currentRegisterType === 'estudante' ? document.getElementById("form-estudante-contato").value.trim() : "";
@@ -1655,8 +1813,11 @@ async function handleFormSubmit(e) {
     tecnicoEmail,
     tecnicoContato,
     
-    // Type and student info
+    // Type and contact info
     tipoCase: currentRegisterType,
+    professorNome,
+    professorEmail,
+    professorTelefone,
     estudanteNome,
     estudanteEmail,
     estudanteTelefone,
@@ -1682,23 +1843,35 @@ async function handleFormSubmit(e) {
 
   // Add to state and persist
   if (isCloudMode) {
+    const supabaseUrl = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_URL) || "";
+    const supabaseKey = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_KEY) || "";
+
     try {
       const dbCase = mapAppToDatabase(newCase);
-      const res = await fetch("/api/cases", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dbCase)
-      });
+      let res;
+      if (supabaseUrl && supabaseKey) {
+        res = await fetch(`${supabaseUrl}/rest/v1/cases`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": supabaseKey,
+            "Authorization": `Bearer ${supabaseKey}`,
+            "Prefer": "return=minimal"
+          },
+          body: JSON.stringify(dbCase)
+        });
+      } else {
+        res = await fetch("/api/cases", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(dbCase)
+        });
+      }
       
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}`);
-      }
-      
-      const data = await res.json();
-      if (data && data.error) {
-        throw new Error(data.error);
       }
       
       cases.push(newCase);
