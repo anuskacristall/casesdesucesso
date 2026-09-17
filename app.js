@@ -1889,99 +1889,99 @@ function toggleConditionalFields(checkboxId, targetDivId) {
 function setupAutocomplete() {
   setupUnifiedLocationSearch();
 
-  const formInput = document.getElementById("form-municipio");
-  const formList = document.getElementById("form-municipio-suggestions");
-  if (formInput && formList) {
-    formInput.addEventListener("input", () => {
-      const val = formInput.value.trim().toLowerCase();
-      formList.innerHTML = "";
+  // Helper for municipality autocomplete setup
+  const setupMunicipalityInputAutocomplete = (inputId, listId, regionalSelectId, mrInputId) => {
+    const input = document.getElementById(inputId);
+    const list = document.getElementById(listId);
+    if (!input || !list) return;
+
+    const renderSuggestions = (query) => {
+      const val = query.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      list.innerHTML = "";
       if (!val) {
-        formList.style.display = "none";
+        list.style.display = "none";
         return;
       }
-      
-      const matches = Object.keys(window.MUNICIPALITIES_DATABASE).filter(key => 
-        key.includes(val) || window.MUNICIPALITIES_DATABASE[key].name.toLowerCase().includes(val)
-      );
-      
+
+      if (!window.MUNICIPALITIES_DATABASE) {
+        list.style.display = "none";
+        return;
+      }
+
+      const keys = Object.keys(window.MUNICIPALITIES_DATABASE);
+      const matches = keys.filter(key => {
+        const item = window.MUNICIPALITIES_DATABASE[key];
+        const normName = item.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const normReg = (item.regional || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const normMr = (item.mr || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return key.includes(val) || normName.includes(val) || normReg.includes(val) || normMr.includes(val);
+      });
+
       if (matches.length > 0) {
-        formList.style.display = "block";
-        matches.slice(0, 5).forEach(key => {
+        list.style.display = "block";
+        matches.slice(0, 10).forEach(key => {
           const item = window.MUNICIPALITIES_DATABASE[key];
           const li = document.createElement("li");
-          li.innerText = item.name;
+          li.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; cursor: pointer; border-bottom: 1px solid rgba(0,0,0,0.04); gap: 10px;";
+          
+          const mrText = item.mr ? (item.mr.startsWith("MR") ? item.mr : `MR ${item.mr}`) : "";
+          li.innerHTML = `
+            <strong style="color: var(--text-primary); font-size: 0.95rem;">${escapeHtml(item.name)}</strong>
+            <span style="font-size: 0.76rem; color: var(--text-muted); white-space: nowrap;">${escapeHtml(item.regional)}${mrText ? ` • ${escapeHtml(mrText)}` : ""}</span>
+          `;
+
           li.addEventListener("click", () => {
-            formInput.value = item.name;
-            formList.style.display = "none";
-            
-            // Auto-select regional and lock/suggest MR
-            const regionalSelect = document.getElementById("form-regional");
-            if (regionalSelect) regionalSelect.value = item.regional;
-            
-            // Fill suggested MR
-            const mrInput = document.getElementById("form-mr");
-            if (mrInput) mrInput.value = `MR ${item.name}`;
+            input.value = item.name;
+            list.style.display = "none";
+
+            // 1. Auto-select Regional
+            const regSelect = document.getElementById(regionalSelectId);
+            if (regSelect) {
+              regSelect.value = item.regional;
+              if (!regSelect.value) {
+                // Fuzzy match option text if exact value differs
+                for (let opt of regSelect.options) {
+                  if (opt.text.toLowerCase().includes(item.regional.toLowerCase()) || item.regional.toLowerCase().includes(opt.text.toLowerCase())) {
+                    regSelect.value = opt.value;
+                    break;
+                  }
+                }
+              }
+            }
+
+            // 2. Auto-fill Microrregião
+            const mrInp = document.getElementById(mrInputId);
+            if (mrInp) {
+              mrInp.value = mrText;
+            }
           });
-          formList.appendChild(li);
+
+          list.appendChild(li);
         });
       } else {
-        formList.style.display = "none";
+        list.style.display = "none";
+      }
+    };
+
+    input.addEventListener("input", () => renderSuggestions(input.value));
+    input.addEventListener("focus", () => {
+      if (input.value.trim().length > 0) {
+        renderSuggestions(input.value);
       }
     });
 
     document.addEventListener("click", (e) => {
-      if (e.target !== formInput) {
-        formList.style.display = "none";
+      if (e.target !== input && !list.contains(e.target)) {
+        list.style.display = "none";
       }
     });
-  }
+  };
 
-  // Autocomplete on Municipality Modal Form
-  const munInput = document.getElementById("municipality-name");
-  const munList = document.getElementById("municipality-suggestions");
-  if (munInput && munList) {
-    munInput.addEventListener("input", () => {
-      const val = munInput.value.trim().toLowerCase();
-      munList.innerHTML = "";
-      if (!val) {
-        munList.style.display = "none";
-        return;
-      }
-      
-      const matches = Object.keys(window.MUNICIPALITIES_DATABASE).filter(key => 
-        key.includes(val) || window.MUNICIPALITIES_DATABASE[key].name.toLowerCase().includes(val)
-      );
-      
-      if (matches.length > 0) {
-        munList.style.display = "block";
-        matches.slice(0, 5).forEach(key => {
-          const item = window.MUNICIPALITIES_DATABASE[key];
-          const li = document.createElement("li");
-          li.innerText = item.name;
-          li.addEventListener("click", () => {
-            munInput.value = item.name;
-            munList.style.display = "none";
-            
-            // Auto-select regional and suggested MR
-            const regionalSelect = document.getElementById("municipality-regional");
-            if (regionalSelect) regionalSelect.value = item.regional;
-            
-            const mrInput = document.getElementById("municipality-mr");
-            if (mrInput) mrInput.value = `MR ${item.name}`;
-          });
-          munList.appendChild(li);
-        });
-      } else {
-        munList.style.display = "none";
-      }
-    });
+  // Case Registration Form (Professor / Estudante)
+  setupMunicipalityInputAutocomplete("form-municipio", "form-municipio-suggestions", "form-regional", "form-mr");
 
-    document.addEventListener("click", (e) => {
-      if (e.target !== munInput) {
-        munList.style.display = "none";
-      }
-    });
-  }
+  // Municipality Registration Form
+  setupMunicipalityInputAutocomplete("municipality-name", "municipality-suggestions", "municipality-regional", "municipality-mr");
 }
 
 // ==========================================================================
