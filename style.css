@@ -707,14 +707,41 @@ body.light-theme .autocomplete-list li:hover {
 }
 
 /* ==========================================================================
+   SIDEBAR STACKING CONTEXTS (Ensure filters dropdown floats above other panels)
+   ========================================================================== */
+#panel-filters-card,
+.sidebar > .panel:first-of-type {
+  position: relative;
+  z-index: 50;
+}
+
+#panel-filters-card:has(.location-dropdown.active) {
+  z-index: 100;
+}
+
+.sidebar .stats-panel,
+.sidebar > .panel:nth-of-type(2) {
+  position: relative;
+  z-index: 10;
+}
+
+.sidebar .legend-panel,
+.sidebar > .panel:nth-of-type(3) {
+  position: relative;
+  z-index: 5;
+}
+
+/* ==========================================================================
    UNIFIED LOCATION SEARCH & MULTI-SELECT CHIPS
    ========================================================================== */
 .location-search-group {
   position: relative;
+  z-index: 55;
 }
 
 .location-input-wrap {
   position: relative;
+  z-index: 60;
   display: flex;
   align-items: center;
 }
@@ -748,7 +775,7 @@ body.light-theme .autocomplete-list li:hover {
   background: #ffffff;
   border: 1px solid var(--border-glass, #cbd5e1);
   border-radius: var(--border-radius-sm, 8px);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
   z-index: 1200;
   display: none;
   flex-direction: column;
