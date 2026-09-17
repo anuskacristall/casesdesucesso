@@ -1047,22 +1047,17 @@ function setupResetZoomController() {
 
   function checkMapZoomState() {
     const currentZoom = map.getZoom();
-    const center = map.getCenter();
-    const defaultCenter = [-18.5, -44.5];
 
-    // Check if zoomed in or significantly moved away from default view
-    const isZoomedIn = currentZoom > 7;
-    const isMoved = Math.abs(center.lat - defaultCenter[0]) > 0.4 || Math.abs(center.lng - defaultCenter[1]) > 0.4;
-
-    if (isZoomedIn || isMoved) {
+    // Show button strictly when user zooms in beyond the default zoom 7
+    if (currentZoom > 7) {
       resetZoomBtn.classList.add("visible");
     } else {
       resetZoomBtn.classList.remove("visible");
     }
   }
 
+  // Listen strictly to zoom changes (not panning/moving sideways)
   map.on("zoomend", checkMapZoomState);
-  map.on("moveend", checkMapZoomState);
 
   resetZoomBtn.addEventListener("click", () => {
     map.flyTo([-18.5, -44.5], 7, { duration: 0.8 });
