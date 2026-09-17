@@ -416,15 +416,6 @@ body.light-theme .logo-text h1 span {
   background: var(--bg-secondary);
 }
 
-.leaflet-tile.gray-map-tiles,
-.gray-map-tiles .leaflet-tile,
-.gray-map-tiles img,
-.leaflet-tile-pane img,
-img.gray-map-tiles {
-  filter: grayscale(100%) contrast(75%) brightness(112%) !important;
-  opacity: 0.92;
-}
-
 /* Style Leaflet Popups */
 .leaflet-popup-content-wrapper {
   background: var(--bg-glass-solid) !important;

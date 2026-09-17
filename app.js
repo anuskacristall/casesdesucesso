@@ -1076,7 +1076,6 @@ function updateMapTilesForTheme() {
   
   tileLayer = L.tileLayer(tileUrl, {
     attribution: 'Tiles &copy; Esri',
-    className: 'gray-map-tiles',
     maxZoom: 19
   }).addTo(map);
 }
