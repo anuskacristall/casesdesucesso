@@ -668,6 +668,8 @@ function mapDatabaseToApp(dbItem) {
     committeeSummary: dbItem.comite_resumo || "",
     hasIes: dbItem.ies_possui || false,
     iesSummary: dbItem.ies_resumo || "",
+    hasEmpresaSimulada: dbItem.empresa_simulada_possui || false,
+    hasEscolaSebrae: dbItem.escola_sebrae_possui || false,
     jeppStatus: dbItem.status_jepp || "Não",
     status: dbItem.status || "approved",
     request_code: dbItem.request_code || ""
@@ -2250,13 +2252,25 @@ function bindEvents() {
     });
   }
 
-  // Export CSV binding
+  // Export CSV confirmation modal binding
   const exportBtn = document.getElementById("btn-export-csv");
   if (exportBtn) {
-    exportBtn.addEventListener("click", () => {
-      const selectType = document.getElementById("export-select-type");
-      const selectedValue = selectType ? selectType.value : "all";
-      exportToCSV(selectedValue);
+    exportBtn.addEventListener("click", openExportConfirmModal);
+  }
+
+  const btnCloseExportModal = document.getElementById("btn-close-export-modal");
+  if (btnCloseExportModal) btnCloseExportModal.addEventListener("click", closeExportConfirmModal);
+
+  const btnCancelExport = document.getElementById("btn-cancel-export");
+  if (btnCancelExport) btnCancelExport.addEventListener("click", closeExportConfirmModal);
+
+  const btnConfirmExport = document.getElementById("btn-confirm-export-download");
+  if (btnConfirmExport) btnConfirmExport.addEventListener("click", performFilteredCSVExport);
+
+  const exportModalWrap = document.getElementById("export-confirm-modal");
+  if (exportModalWrap) {
+    exportModalWrap.addEventListener("click", (e) => {
+      if (e.target.id === "export-confirm-modal") closeExportConfirmModal();
     });
   }
 
@@ -2649,109 +2663,241 @@ function handleLogout() {
   showToast("Sessão encerrada com sucesso!");
 }
 
-function exportToCSV(type = 'all') {
-  let casesToExport = [...cases];
-  let filename = "Planilha_Cases_Todos.csv";
+// ==========================================================================
+// FILTERED EXPORT CONTROLLER WITH CONFIRMATION MODAL
+// ==========================================================================
+
+let pendingExportCases = [];
+let pendingExportType = "all";
+
+function getFilteredCasesForExport(selectedTypeScope = "all") {
+  const { selectedRegs, selectedMrs, selectedMuns } = getActiveLocationFilters();
   
-  if (type === 'professor') {
-    casesToExport = cases.filter(item => item.tipoCase === 'professor');
-    filename = "Planilha_Cases_Professor.csv";
-  } else if (type === 'estudante') {
-    casesToExport = cases.filter(item => item.tipoCase === 'estudante');
-    filename = "Planilha_Cases_Estudante.csv";
+  let effectiveType = selectedTypeScope;
+  if (effectiveType === "all") {
+    const sidebarType = document.getElementById("filter-type") ? document.getElementById("filter-type").value : "All";
+    if (sidebarType && sidebarType !== "All") {
+      effectiveType = sidebarType;
+    }
   }
-  
-  if (casesToExport.length === 0) {
-    showToast("Não há dados para exportar nesta categoria!");
+
+  return {
+    filteredCases: cases.filter(item => isCaseMatchingFilters(item, selectedRegs, selectedMrs, selectedMuns, effectiveType)),
+    effectiveType
+  };
+}
+
+function openExportConfirmModal() {
+  const modal = document.getElementById("export-confirm-modal");
+  if (!modal) return;
+
+  const selectType = document.getElementById("export-select-type");
+  const selectedScope = selectType ? selectType.value : "all";
+
+  const { filteredCases, effectiveType } = getFilteredCasesForExport(selectedScope);
+  pendingExportCases = filteredCases;
+  pendingExportType = effectiveType;
+
+  // Render location list in modal
+  const locList = document.getElementById("export-modal-locations");
+  if (locList) {
+    locList.innerHTML = "";
+    if (selectedLocationFilters.size === 0) {
+      locList.innerHTML = `
+        <span class="export-modal-location-tag" style="background: #eff6ff; color: #0054a6; border-color: #bfdbfe;">
+          <i data-lucide="map" style="width: 12px; height: 12px;"></i> Todas as localidades (Minas Gerais completa)
+        </span>
+      `;
+    } else {
+      selectedLocationFilters.forEach(item => {
+        let tagClass = "tag-municipio";
+        let tagLabel = "Município";
+        if (item.type === "regional") {
+          tagClass = "tag-regional";
+          tagLabel = "Regional";
+        } else if (item.type === "mr") {
+          tagClass = "tag-mr";
+          tagLabel = "MR";
+        }
+
+        const tag = document.createElement("span");
+        tag.className = "export-modal-location-tag";
+        tag.innerHTML = `
+          <span>${escapeHtml(item.name)}</span>
+          <span class="class-tag ${tagClass}">${tagLabel}</span>
+        `;
+        locList.appendChild(tag);
+      });
+    }
+  }
+
+  // Render type label
+  const typeLabel = document.getElementById("export-modal-type");
+  if (typeLabel) {
+    if (effectiveType === "professor") {
+      typeLabel.textContent = "Apenas Cases de Professor";
+    } else if (effectiveType === "estudante") {
+      typeLabel.textContent = "Apenas Cases de Estudante";
+    } else {
+      typeLabel.textContent = "Todos os Cases (Professor e Estudante)";
+    }
+  }
+
+  // Render count and download button state
+  const countBox = document.getElementById("export-modal-count-box");
+  const countText = document.getElementById("export-modal-count-text");
+  const downloadBtn = document.getElementById("btn-confirm-export-download");
+
+  if (filteredCases.length === 0) {
+    if (countBox) countBox.className = "export-count-box empty";
+    if (countText) countText.textContent = "Nenhum case encontrado para os filtros atuais.";
+    if (downloadBtn) downloadBtn.disabled = true;
+  } else {
+    if (countBox) countBox.className = "export-count-box";
+    if (countText) countText.textContent = `${filteredCases.length} case(s) pronto(s) para exportação.`;
+    if (downloadBtn) downloadBtn.disabled = false;
+  }
+
+  modal.style.display = "flex";
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons({ root: modal });
+  }
+}
+
+function closeExportConfirmModal() {
+  const modal = document.getElementById("export-confirm-modal");
+  if (modal) modal.style.display = "none";
+}
+
+function performFilteredCSVExport() {
+  if (!pendingExportCases || pendingExportCases.length === 0) {
+    showToast("Não há cases correspondentes para exportar!");
+    closeExportConfirmModal();
     return;
   }
-  
-  // Define CSV headers in Portuguese
+
+  const casesToExport = pendingExportCases;
+
+  // Determine which contacts to include
+  const hasProf = casesToExport.some(c => c.tipoCase === "professor");
+  const hasEst = casesToExport.some(c => c.tipoCase === "estudante");
+
+  // Helper to escape values for CSV
+  const escapeCSV = (val) => {
+    if (val === undefined || val === null) return '""';
+    let str = String(val).replace(/"/g, '""');
+    return `"${str}"`;
+  };
+
+  // Base Headers
   const headers = [
-    "ID",
     "Título do Projeto",
     "Descrição Geral",
     "Município",
     "Regional",
     "Microrregião (MR)",
     "Escola / Instituição",
-    "Latitude",
-    "Longitude",
     "Nome do Técnico",
     "E-mail do Técnico",
     "Telefone do Técnico",
-    "Tipo de Case",
-    "Nome do Estudante",
-    "E-mail do Estudante",
-    "Telefone do Estudante",
-    "Parceria com Cooperativa de Crédito",
-    "Resumo da Cooperativa",
-    "Município EE > 70%",
-    "Possui Lei Municipal de EE",
-    "Resumo da Lei",
-    "Possui Comitê Conjunto",
-    "Resumo do Comitê",
-    "Parceria com Ensino Superior (IES)",
-    "Resumo da IES",
-    "Status JEPP"
+    "Tipo de Case"
   ];
-  
-  // Helper to escape values for CSV
-  const escapeCSV = (val) => {
-    if (val === undefined || val === null) return '""';
-    let str = String(val).replace(/"/g, '""'); // escape quotes
-    return `"${str}"`;
-  };
-  
-  // Build rows
-  const csvRows = [headers.join(";")]; // Semicolon delimiter is best for Portuguese/Excel
-  
+
+  // Conditional Contact Columns
+  if (hasProf) {
+    headers.push("Nome do Professor", "E-mail do Professor", "Telefone do Professor");
+  }
+  if (hasEst) {
+    headers.push("Nome do Estudante", "E-mail do Estudante", "Contato do Estudante");
+  }
+
+  // Municipality Indicators
+  headers.push(
+    "Status JEPP",
+    "Parceria com Cooperativa de Crédito",
+    "Educação Empreendedora > 70%",
+    "Possui Lei Municipal de EE",
+    "Possui Comitê Conjunto",
+    "Parceria com IES",
+    "Possui Empresa Simulada",
+    "Possui Sistema de Ensino / Escola do Sebrae"
+  );
+
+  // Build CSV rows
+  const csvRows = [headers.join(";")];
+
   casesToExport.forEach(item => {
     const row = [
-      escapeCSV(item.id),
       escapeCSV(item.titulo),
       escapeCSV(item.descricao),
       escapeCSV(item.municipio),
       escapeCSV(REGIONAL_NAMES[item.regional] || item.regional),
       escapeCSV(item.mr),
       escapeCSV(item.escola),
-      escapeCSV(item.lat),
-      escapeCSV(item.lng),
       escapeCSV(item.tecnicoNome),
       escapeCSV(item.tecnicoEmail),
       escapeCSV(item.tecnicoContato),
-      escapeCSV(item.tipoCase === "estudante" ? "Estudante" : "Professor"),
-      escapeCSV(item.estudanteNome),
-      escapeCSV(item.estudanteEmail),
-      escapeCSV(item.estudanteTelefone),
+      escapeCSV(item.tipoCase === "estudante" ? "Estudante" : "Professor")
+    ];
+
+    if (hasProf) {
+      if (item.tipoCase === "professor") {
+        row.push(
+          escapeCSV(item.professorNome),
+          escapeCSV(item.professorEmail),
+          escapeCSV(item.professorTelefone)
+        );
+      } else {
+        row.push('""', '""', '""');
+      }
+    }
+
+    if (hasEst) {
+      if (item.tipoCase === "estudante") {
+        row.push(
+          escapeCSV(item.estudanteNome),
+          escapeCSV(item.estudanteEmail),
+          escapeCSV(item.estudanteTelefone || item.studentContact)
+        );
+      } else {
+        row.push('""', '""', '""');
+      }
+    }
+
+    // Municipality indicators
+    row.push(
+      escapeCSV(item.jeppStatus || "Não"),
       escapeCSV(item.hasCoop ? "Sim" : "Não"),
-      escapeCSV(item.coopSummary),
       escapeCSV(item.edu70 === "sim" ? "Sim" : "Não"),
       escapeCSV(item.hasLaw ? "Sim" : "Não"),
-      escapeCSV(item.lawSummary),
       escapeCSV(item.hasCommittee ? "Sim" : "Não"),
-      escapeCSV(item.committeeSummary),
       escapeCSV(item.hasIes ? "Sim" : "Não"),
-      escapeCSV(item.iesSummary),
-      escapeCSV(item.jeppStatus)
-    ];
+      escapeCSV(item.hasEmpresaSimulada ? "Sim" : "Não"),
+      escapeCSV(item.hasEscolaSebrae ? "Sim" : "Não")
+    );
+
     csvRows.push(row.join(";"));
   });
-  
-  // Join rows with CRLF
+
   const csvContent = csvRows.join("\r\n");
-  
-  // Create Blob with UTF-8 BOM so Excel opens it with accents correctly!
   const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
-  
+
+  let filename = "Planilha_Cases_SEBRAE.csv";
+  if (pendingExportType === "professor") {
+    filename = "Planilha_Cases_Professor.csv";
+  } else if (pendingExportType === "estudante") {
+    filename = "Planilha_Cases_Estudante.csv";
+  }
+
   const link = document.createElement("a");
   link.setAttribute("href", url);
   link.setAttribute("download", filename);
-  link.style.visibility = 'hidden';
+  link.style.display = "none";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  
-  showToast("Planilha (CSV) exportada com sucesso!");
+
+  closeExportConfirmModal();
+  showToast(`Planilha baixada com sucesso! (${casesToExport.length} cases)`);
 }

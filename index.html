@@ -684,6 +684,57 @@
     </div>
   </div>
 
+  <!-- MODAL DE CONFIRMAÇÃO DE EXPORTAÇÃO -->
+  <div id="export-confirm-modal" class="modal-wrapper" style="display: none;">
+    <div class="modal-content glass-panel export-confirm-content animate-zoom">
+      <div class="modal-header">
+        <div class="modal-title-area" style="display: flex; align-items: center; gap: 12px;">
+          <div class="export-modal-icon-badge">
+            <i data-lucide="file-spreadsheet"></i>
+          </div>
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin: 0;">Confirmar Exportação</h2>
+            <p style="font-size: 0.84rem; color: var(--text-muted); margin: 2px 0 0 0;">Os dados da planilha serão gerados conforme os filtros ativos</p>
+          </div>
+        </div>
+        <button id="btn-close-export-modal" class="btn-close" type="button">&times;</button>
+      </div>
+      
+      <div class="modal-body export-confirm-body">
+        <div class="export-summary-box">
+          <div class="export-summary-row">
+            <span class="export-summary-label">
+              <i data-lucide="map-pin" style="width: 13px; height: 13px;"></i> Localidades Selecionadas:
+            </span>
+            <div id="export-modal-locations" class="export-modal-locations-list">
+              <!-- Dynamically rendered location chips -->
+            </div>
+          </div>
+          
+          <div class="export-summary-row">
+            <span class="export-summary-label">
+              <i data-lucide="filter" style="width: 13px; height: 13px;"></i> Segmentação de Cases:
+            </span>
+            <span id="export-modal-type" class="export-summary-val">Todos os Cases</span>
+          </div>
+        </div>
+
+        <div id="export-modal-count-box" class="export-count-box">
+          <i data-lucide="check-circle" class="export-count-icon"></i>
+          <span id="export-modal-count-text">Calculando...</span>
+        </div>
+
+        <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+          <button type="button" id="btn-cancel-export" class="btn btn-secondary">Cancelar</button>
+          <button type="button" id="btn-confirm-export-download" class="btn btn-primary btn-export-confirm" style="display: flex; align-items: center; gap: 8px;">
+            <i data-lucide="download" style="width: 16px; height: 16px; stroke-width: 2.4; stroke: #ffffff !important; color: #ffffff !important;"></i>
+            <span>Baixar Planilha (CSV)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="confirm-code-modal" class="modal-wrapper" style="display: none;">
     <div class="modal-content glass-panel confirm-code-content">
       <div class="modal-header">
