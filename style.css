@@ -2945,3 +2945,57 @@ body.dark-theme .export-menu-item:hover {
   cursor: not-allowed;
   pointer-events: none;
 }
+
+
+/* ==========================================================================
+   RESET MAP ZOOM FLOATING BUTTON
+   ========================================================================== */
+.btn-reset-map-zoom {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 15px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--sebrae-blue, #0054a6);
+  border: 1px solid rgba(0, 84, 166, 0.25);
+  border-radius: 9999px;
+  font-family: var(--font-main);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  transform: translateY(-8px) scale(0.95);
+  pointer-events: none;
+}
+
+.btn-reset-map-zoom.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.btn-reset-map-zoom:hover {
+  background: #ffffff;
+  color: #003f80;
+  border-color: var(--sebrae-blue, #0054a6);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(0, 84, 166, 0.25);
+}
+
+.btn-reset-map-zoom i,
+.btn-reset-map-zoom svg {
+  width: 15px !important;
+  height: 15px !important;
+  stroke: var(--sebrae-blue, #0054a6) !important;
+  stroke-width: 2.3 !important;
+  display: inline-block;
+  vertical-align: middle;
+}

@@ -1036,6 +1036,38 @@ function initMap() {
   });
 
   updateMapTilesForTheme();
+
+  // Reset zoom button controller
+  setupResetZoomController();
+}
+
+function setupResetZoomController() {
+  const resetZoomBtn = document.getElementById("btn-reset-map-zoom");
+  if (!resetZoomBtn || !map) return;
+
+  function checkMapZoomState() {
+    const currentZoom = map.getZoom();
+    const center = map.getCenter();
+    const defaultCenter = [-18.5, -44.5];
+
+    // Check if zoomed in or significantly moved away from default view
+    const isZoomedIn = currentZoom > 7;
+    const isMoved = Math.abs(center.lat - defaultCenter[0]) > 0.4 || Math.abs(center.lng - defaultCenter[1]) > 0.4;
+
+    if (isZoomedIn || isMoved) {
+      resetZoomBtn.classList.add("visible");
+    } else {
+      resetZoomBtn.classList.remove("visible");
+    }
+  }
+
+  map.on("zoomend", checkMapZoomState);
+  map.on("moveend", checkMapZoomState);
+
+  resetZoomBtn.addEventListener("click", () => {
+    map.flyTo([-18.5, -44.5], 7, { duration: 0.8 });
+    resetZoomBtn.classList.remove("visible");
+  });
 }
 
 function updateMapTilesForTheme() {
