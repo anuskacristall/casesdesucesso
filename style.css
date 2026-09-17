@@ -2772,25 +2772,69 @@ body.dark-theme .export-menu-item:hover {
    EXPORT CONFIRMATION MODAL
    ========================================================================== */
 .export-confirm-content {
-  width: 540px;
+  position: relative;
+  width: 520px;
   max-width: 95%;
-  padding: 24px;
+  padding: 28px 24px 24px 24px;
   border-radius: var(--border-radius-md, 12px);
   background: #ffffff;
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.25);
   border: 1px solid var(--border-glass, #cbd5e1);
 }
 
-.export-modal-icon-badge {
-  background: rgba(0, 84, 166, 0.1);
-  color: var(--sebrae-blue, #0054a6);
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
+.export-modal-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 10;
+}
+
+.export-modal-header-centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.export-modal-icon-badge {
+  background: rgba(0, 84, 166, 0.1);
+  color: var(--sebrae-blue, #0054a6);
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
   flex-shrink: 0;
+}
+
+.export-modal-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-primary, #0f172a);
+  margin: 0 0 4px 0;
+}
+
+.export-modal-subtitle {
+  font-size: 0.86rem;
+  color: var(--text-muted, #64748b);
+  margin: 0;
+}
+
+.export-modal-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
 }
 
 .export-modal-icon-badge i,

@@ -1166,8 +1166,8 @@ function getActiveLocationFilters() {
 }
 
 function isCaseMatchingFilters(item, selectedRegs, selectedMrs, selectedMuns, typeFilter) {
-  // 1. Type filter
-  if (typeFilter !== "All" && item.tipoCase !== typeFilter) {
+  // 1. Type filter (case-insensitive check for 'all')
+  if (typeFilter && typeFilter.toLowerCase() !== "all" && item.tipoCase !== typeFilter.toLowerCase()) {
     return false;
   }
 
@@ -2673,11 +2673,11 @@ let pendingExportType = "all";
 function getFilteredCasesForExport(selectedTypeScope = "all") {
   const { selectedRegs, selectedMrs, selectedMuns } = getActiveLocationFilters();
   
-  let effectiveType = selectedTypeScope;
+  let effectiveType = (selectedTypeScope || "all").toLowerCase();
   if (effectiveType === "all") {
     const sidebarType = document.getElementById("filter-type") ? document.getElementById("filter-type").value : "All";
-    if (sidebarType && sidebarType !== "All") {
-      effectiveType = sidebarType;
+    if (sidebarType && sidebarType.toLowerCase() !== "all") {
+      effectiveType = sidebarType.toLowerCase();
     }
   }
 
