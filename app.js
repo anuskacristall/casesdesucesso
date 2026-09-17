@@ -1567,70 +1567,53 @@ function openDetailsModal(id) {
     }
   }
 
+  // Helper to check if indicator is affirmative
+  const isAffirmative = (v) => v === true || String(v || "").trim().toLowerCase() === "sim" || String(v || "").trim().toLowerCase() === "true" || String(v || "").trim().toLowerCase() === "sim (total)";
+
   // JEPP Status Badge
   const jeppBadge = document.getElementById("details-jepp");
-  jeppBadge.innerText = item.jeppStatus === "Sim" ? "Sim (Total)" : (item.jeppStatus === "Parcial" ? "Parcial" : "Não");
-  jeppBadge.className = "badge";
-  if (item.jeppStatus === "Sim") jeppBadge.classList.add("bg-centro"); // green
-  else if (item.jeppStatus === "Parcial") jeppBadge.classList.add("bg-centro-oeste"); // orange
-  else jeppBadge.classList.add("bg-rio-doce"); // red
-
-  // Coop Credit Indicator & Box
-  const coopBadge = document.getElementById("details-coop-status");
-  const coopBox = document.getElementById("details-coop-box");
-  coopBadge.innerText = item.hasCoop ? "Sim" : "Não";
-  coopBadge.className = "badge " + (item.hasCoop ? "bg-centro" : "bg-rio-doce");
-  if (item.hasCoop) {
-    coopBox.style.display = "flex";
-    document.getElementById("details-coop-summary").innerText = item.coopSummary;
-  } else {
-    coopBox.style.display = "none";
+  if (jeppBadge) {
+    const jeppVal = String(item.jeppStatus || item.status_jepp || "").trim().toLowerCase();
+    if (jeppVal === "sim" || jeppVal === "sim (total)") {
+      jeppBadge.innerText = "Sim (Total)";
+      jeppBadge.className = "badge bg-centro";
+    } else if (jeppVal === "parcial") {
+      jeppBadge.innerText = "Parcial";
+      jeppBadge.className = "badge bg-centro-oeste";
+    } else {
+      jeppBadge.innerText = "Não";
+      jeppBadge.className = "badge bg-rio-doce";
+    }
   }
+
+  // Helper to format Sim / Não badges
+  const setYesNoBadge = (elementId, isSim) => {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    el.innerText = isSim ? "Sim" : "Não";
+    el.className = "badge " + (isSim ? "bg-centro" : "bg-rio-doce");
+  };
 
   // EE > 70% Indicator
-  const edu70Badge = document.getElementById("details-edu-70");
-  edu70Badge.innerText = item.edu70 === "sim" ? "Sim" : "Não";
-  edu70Badge.className = "badge " + (item.edu70 === "sim" ? "bg-centro" : "bg-rio-doce");
+  setYesNoBadge("details-edu-70", isAffirmative(item.edu70) || isAffirmative(item.municipio_ee_70));
 
-  // Municipal Law Indicator & Box
-  const lawBadge = document.getElementById("details-law-status");
-  const lawBox = document.getElementById("details-law-box");
-  lawBadge.innerText = item.hasLaw ? "Sim" : "Não";
-  lawBadge.className = "badge " + (item.hasLaw ? "bg-centro" : "bg-rio-doce");
-  if (item.hasLaw) {
-    lawBox.style.display = "flex";
-    document.getElementById("details-law-summary").innerText = item.lawSummary;
-  } else {
-    lawBox.style.display = "none";
-  }
+  // Coop Credit Indicator
+  setYesNoBadge("details-coop-status", isAffirmative(item.hasCoop) || isAffirmative(item.cooperativa_possui));
 
-  // Committee Box
-  const committeeBox = document.getElementById("details-committee-box");
-  const committeeBadge = document.getElementById("details-committee-badge");
-  if (item.hasCommittee) {
-    committeeBox.style.display = "flex";
-    committeeBadge.innerText = "Sim";
-    committeeBadge.className = "indicator-badge status-sim";
-    document.getElementById("details-committee-summary").innerText = item.committeeSummary;
-  } else {
-    committeeBox.style.display = "none";
-    committeeBadge.innerText = "Não";
-    committeeBadge.className = "indicator-badge status-nao";
-  }
+  // Municipal Law Indicator
+  setYesNoBadge("details-law-status", isAffirmative(item.hasLaw) || isAffirmative(item.lei_possui));
 
-  // IES Partnership Box
-  const iesBox = document.getElementById("details-ies-box");
-  const iesBadge = document.getElementById("details-ies-badge");
-  if (item.hasIes) {
-    iesBox.style.display = "flex";
-    iesBadge.innerText = "Sim";
-    iesBadge.className = "indicator-badge status-sim";
-    document.getElementById("details-ies-summary").innerText = item.iesSummary;
-  } else {
-    iesBox.style.display = "none";
-    iesBadge.innerText = "Não";
-    iesBadge.className = "indicator-badge status-nao";
-  }
+  // Committee Indicator
+  setYesNoBadge("details-committee-status", isAffirmative(item.hasCommittee) || isAffirmative(item.comite_possui));
+
+  // IES Partnership Indicator
+  setYesNoBadge("details-ies-status", isAffirmative(item.hasIes) || isAffirmative(item.ies_possui));
+
+  // Empresa Simulada Indicator
+  setYesNoBadge("details-empresa-simulada-status", isAffirmative(item.hasEmpresaSimulada) || isAffirmative(item.empresa_simulada));
+
+  // Escola do Sebrae Indicator
+  setYesNoBadge("details-escola-sebrae-status", isAffirmative(item.hasEscolaSebrae) || isAffirmative(item.escola_sebrae));
 
   // Open Modal
   document.getElementById("details-modal").classList.add("active");
