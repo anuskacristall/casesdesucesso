@@ -721,6 +721,16 @@ function mapAppToDatabase(appItem) {
 // API & NETWORK HELPERS
 // ==========================================================================
 
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function getApiUrl(path) {
   if (window.location.protocol === "file:") {
     return `http://localhost:8001${path}`;
@@ -2016,9 +2026,9 @@ function setupUnifiedLocationSearch() {
       row.innerHTML = `
         <input type="checkbox" id="chk-${escapeHtml(item.id)}" ${isSelected ? "checked" : ""}>
         <div class="location-item-info">
-          <div class="location-item-row">
-            <span class="class-tag ${tagClass}">${tagLabel}</span>
+          <div class="location-item-row" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;">
             <span class="location-item-name">${escapeHtml(item.name)}</span>
+            <span class="class-tag ${tagClass}">${tagLabel}</span>
           </div>
           <span class="location-item-sub">${escapeHtml(item.sub)}</span>
         </div>
@@ -2094,30 +2104,49 @@ function renderSelectedChips() {
   container.innerHTML = "";
 
   if (selectedLocationFilters.size === 0) {
+    container.style.display = "none";
     return;
   }
+
+  container.style.display = "flex";
+
+  const titleRow = document.createElement("div");
+  titleRow.className = "selected-chips-header";
+  titleRow.innerHTML = `<span>Selecionados (${selectedLocationFilters.size}):</span>`;
+  container.appendChild(titleRow);
+
+  const chipsList = document.createElement("div");
+  chipsList.className = "selected-chips-list";
 
   selectedLocationFilters.forEach(item => {
     const chip = document.createElement("div");
     chip.className = "selected-chip";
 
     let tagClass = "tag-municipio";
-    let tagLabel = "MUNICÍPIO";
+    let tagLabel = "Município";
     if (item.type === "regional") {
       tagClass = "tag-regional";
-      tagLabel = "REGIONAL";
+      tagLabel = "Regional";
     } else if (item.type === "mr") {
       tagClass = "tag-mr";
       tagLabel = "MR";
     }
 
     chip.innerHTML = `
+      <span class="selected-chip-name">${escapeHtml(item.name)}</span>
       <span class="class-tag ${tagClass}">${tagLabel}</span>
-      <span>${escapeHtml(item.name)}</span>
-      <button type="button" class="chip-remove-btn" title="Remover filtro" onclick="removeLocationFilter('${escapeHtml(item.id)}')">&times;</button>
+      <button type="button" class="chip-remove-btn" title="Remover este local" onclick="removeLocationFilter('${escapeHtml(item.id)}')">
+        <i data-lucide="x" style="width: 12px; height: 12px;"></i>
+      </button>
     `;
-    container.appendChild(chip);
+    chipsList.appendChild(chip);
   });
+
+  container.appendChild(chipsList);
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons({ root: container });
+  }
 }
 
 function removeLocationFilter(id) {
