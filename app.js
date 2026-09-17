@@ -13,27 +13,44 @@ let isCloudMode = false;
 // ==========================================================================
 
 const COLOR_MAP = {
-  "CentroOeste": "#F97316",
+  // Nomes Oficiais SEBRAE MG
   "Centro": "#10B981",
-  "Noroeste": "#8B5CF6",
-  "Triângulo": "#06B6D4",
+  "Centro-Oeste e Sudoeste": "#F97316",
+  "Jequitinhonha e Mucuri": "#84CC16",
+  "Noroeste e Alto Paranaíba": "#8B5CF6",
   "Norte": "#F59E0B",
-  "Rio Doce": "#EF4444",
+  "Rio Doce e Vale do Aço": "#EF4444",
   "Sul": "#3B82F6",
+  "Triângulo": "#06B6D4",
+  "Zona da Mata e Vertentes": "#EC4899",
+  
+  // Compatibilidade com chaves legadas
+  "CentroOeste": "#F97316",
+  "Centro-Oeste": "#F97316",
+  "Noroeste": "#8B5CF6",
+  "Rio Doce": "#EF4444",
   "Zona da Mata": "#EC4899",
   "Jequitinhonha/Mucuri": "#84CC16"
 };
 
 const REGIONAL_NAMES = {
-  "CentroOeste": "Centro-Oeste",
   "Centro": "Centro",
-  "Noroeste": "Noroeste",
-  "Triângulo": "Triângulo",
+  "Centro-Oeste e Sudoeste": "Centro-Oeste e Sudoeste",
+  "Jequitinhonha e Mucuri": "Jequitinhonha e Mucuri",
+  "Noroeste e Alto Paranaíba": "Noroeste e Alto Paranaíba",
   "Norte": "Norte",
-  "Rio Doce": "Rio Doce",
+  "Rio Doce e Vale do Aço": "Rio Doce e Vale do Aço",
   "Sul": "Sul",
-  "Zona da Mata": "Zona da Mata",
-  "Jequitinhonha/Mucuri": "Jequitinhonha/Mucuri"
+  "Triângulo": "Triângulo",
+  "Zona da Mata e Vertentes": "Zona da Mata e Vertentes",
+  
+  // Compatibilidade
+  "CentroOeste": "Centro-Oeste e Sudoeste",
+  "Centro-Oeste": "Centro-Oeste e Sudoeste",
+  "Noroeste": "Noroeste e Alto Paranaíba",
+  "Rio Doce": "Rio Doce e Vale do Aço",
+  "Zona da Mata": "Zona da Mata e Vertentes",
+  "Jequitinhonha/Mucuri": "Jequitinhonha e Mucuri"
 };
 
 const SEED_CASES = [
@@ -43,7 +60,7 @@ const SEED_CASES = [
     descricao: "Implantação de práticas de economia circular e sustentabilidade ecológica de forma interdisciplinar na rede de ensino de Belo Horizonte.",
     municipio: "Belo Horizonte",
     regional: "Centro",
-    mr: "MR Belo Horizonte",
+    mr: "MR Grande Belo Horizonte",
     escola: "Escola Estadual Sebrae",
     tecnicoNome: "Amanda Souza",
     tecnicoEmail: "amanda.souza@sebraemg.com.br",
@@ -144,7 +161,7 @@ const SEED_CASES = [
     titulo: "Doces Saudáveis de Frutas Locais",
     descricao: "Projeto de capacitação em desidratação de frutas locais e produção de alimentos gourmet saudáveis no Vale do Aço.",
     municipio: "Ipatinga",
-    regional: "Rio Doce",
+    regional: "Rio Doce e Vale do Aço",
     mr: "MR Ipatinga",
     escola: "Escola Estadual Alberto Giovannini",
     tecnicoNome: "Marcos Oliveira",
@@ -170,7 +187,7 @@ const SEED_CASES = [
     titulo: "Gamificação Pedagógica de História Regional",
     descricao: "Metodologia docente de ensino de história e finanças por meio de jogos de tabuleiro didáticos desenvolvidos por educadores para dinamizar a sala de aula.",
     municipio: "Divinópolis",
-    regional: "CentroOeste",
+    regional: "Centro-Oeste e Sudoeste",
     mr: "MR Divinópolis",
     escola: "Escola Estadual Joaquim Nabuco",
     tecnicoNome: "Patrícia Lima",
@@ -195,7 +212,7 @@ const SEED_CASES = [
     titulo: "Costura Criativa e Reciclagem",
     descricao: "Cooperativa de costura focada na reciclagem de retalhos descartados por indústrias têxteis locais, promovendo a moda circular.",
     municipio: "Juiz de Fora",
-    regional: "Zona da Mata",
+    regional: "Zona da Mata e Vertentes",
     mr: "MR Juiz de Fora",
     escola: "Colégio de Aplicação João XXIII",
     tecnicoNome: "Beatriz Neves",
@@ -220,7 +237,7 @@ const SEED_CASES = [
     titulo: "Mini-Agência de Ecoturismo",
     descricao: "Mini-agência escolar focada na valorização e mapeamento do potencial turístico, cultural e ecológico do Vale do Mucuri.",
     municipio: "Teófilo Otoni",
-    regional: "Jequitinhonha/Mucuri",
+    regional: "Jequitinhonha e Mucuri",
     mr: "MR Teófilo Otoni",
     escola: "Escola Municipal Pastor Hollerbach",
     tecnicoNome: "Samuel Santos",
@@ -245,7 +262,7 @@ const SEED_CASES = [
     titulo: "Mel Orgânico e Apicultura Escolar",
     descricao: "Projeto de apicultura pedagógica e cooperativa escolar de Paracatu, aliando ecologia e empreendedorismo rural.",
     municipio: "Paracatu",
-    regional: "Noroeste",
+    regional: "Noroeste e Alto Paranaíba",
     mr: "MR Paracatu",
     escola: "Escola Estadual Afonso Roquete",
     tecnicoNome: "Denise Mendes",
@@ -272,7 +289,7 @@ const SEED_CASES = [
     descricao: "Projeto pedagógico interdisciplinar integrando matemática, artes e sustentabilidade a partir da cultura do reaproveitamento e oficinas de moda circular.",
     municipio: "Belo Horizonte",
     regional: "Centro",
-    mr: "MR Belo Horizonte",
+    mr: "MR Grande Belo Horizonte",
     escola: "Escola Municipal Fernando Dias",
     tecnicoNome: "Amanda Souza",
     tecnicoEmail: "amanda.souza@sebraemg.com.br",
@@ -323,7 +340,7 @@ const SEED_CASES = [
     descricao: "Prática pedagógica docente de valorização do patrimônio imaterial, línguas nativas e resgate da ancestralidade indígena do Vale do Mucuri aliada à economia criativa escolar.",
     escola: "Escola Estadual Xucuru Kariri",
     municipio: "Teófilo Otoni",
-    regional: "Jequitinhonha/Mucuri",
+    regional: "Jequitinhonha e Mucuri",
     mr: "MR Teófilo Otoni",
     tecnicoNome: "Samuel Santos",
     tecnicoEmail: "samuel.santos@sebraemg.com.br",
@@ -348,7 +365,7 @@ const SEED_CASES = [
     descricao: "Produção cooperativa de doces, geleias e panificações utilizando frutos típicos do Cerrado, promovendo o beneficiamento alimentar rural e empreendedorismo sustentável.",
     escola: "Escola Estadual Dona Guiomar de Melo",
     municipio: "Patos de Minas",
-    regional: "Noroeste",
+    regional: "Noroeste e Alto Paranaíba",
     mr: "MR Patos de Minas",
     tecnicoNome: "Denise Mendes",
     tecnicoEmail: "denise.mendes@sebraemg.com.br",
@@ -373,8 +390,8 @@ const SEED_CASES = [
     descricao: "Desenvolvimento de velas de cera de soja e aromas naturais da Mata Atlântica, reduzindo o uso de parafinas derivadas do petróleo.",
     escola: "Escola Estadual Professor Mário Casassanta",
     municipio: "São João del-Rei",
-    regional: "CentroOeste",
-    mr: "MR São João del-Rei",
+    regional: "Zona da Mata e Vertentes",
+    mr: "MR São João Del Rei",
     tecnicoNome: "Patrícia Lima",
     tecnicoEmail: "patricia.lima@sebraemg.com.br",
     tecnicoContato: "(37) 98822-1100",
@@ -424,7 +441,7 @@ const SEED_CASES = [
     descricao: "Metodologia docente integrando formação profissionalizante e design ecológico, capacitando turmas na transformação de resíduos da indústria têxtil e de confecção.",
     escola: "Escola Estadual Professor Nelson de Sena",
     municipio: "Governador Valadares",
-    regional: "Rio Doce",
+    regional: "Rio Doce e Vale do Aço",
     mr: "MR Governador Valadares",
     tecnicoNome: "Marcos Oliveira",
     tecnicoEmail: "marcos.oliveira@sebraemg.com.br",
@@ -450,7 +467,7 @@ const SEED_CASES = [
     escola: "Escola Estadual Virgílio de Melo Franco",
     municipio: "Betim",
     regional: "Centro",
-    mr: "MR Belo Horizonte",
+    mr: "MR Das Indústrias",
     tecnicoNome: "Amanda Souza",
     tecnicoEmail: "amanda.souza@sebraemg.com.br",
     tecnicoContato: "(31) 98765-4321",
@@ -474,7 +491,7 @@ const SEED_CASES = [
     descricao: "Produção de biomassa compactada (briquetes) para lareiras e churrasqueiras a partir de serragem descartada por serrarias e marcenarias locais.",
     escola: "Escola Estadual Dom João Antônio dos Santos",
     municipio: "Diamantina",
-    regional: "Jequitinhonha/Mucuri",
+    regional: "Jequitinhonha e Mucuri",
     mr: "MR Diamantina",
     tecnicoNome: "Samuel Santos",
     tecnicoEmail: "samuel.santos@sebraemg.com.br",
@@ -499,7 +516,7 @@ const SEED_CASES = [
     descricao: "Desenvolvimento e fabricação de copos biodegradáveis a partir de fibras da casca de coco e mandioca, reduzindo plásticos de uso único.",
     escola: "Escola Estadual Professor Nelson de Sena",
     municipio: "Governador Valadares",
-    regional: "Rio Doce",
+    regional: "Rio Doce e Vale do Aço",
     mr: "MR Governador Valadares",
     tecnicoNome: "Marcos Oliveira",
     tecnicoEmail: "marcos.oliveira@sebraemg.com.br",
@@ -524,7 +541,7 @@ const SEED_CASES = [
     descricao: "Criação de jogos eletrônicos interativos para alfabetização matemática e financeira nas séries iniciais do ensino fundamental de Divinópolis.",
     escola: "Escola Estadual Dona Antonieta Fonseca",
     municipio: "Divinópolis",
-    regional: "CentroOeste",
+    regional: "Centro-Oeste e Sudoeste",
     mr: "MR Divinópolis",
     tecnicoNome: "Patrícia Lima",
     tecnicoEmail: "patricia.lima@sebraemg.com.br",
@@ -550,7 +567,7 @@ const SEED_CASES = [
     descricao: "Projeto docente interdisciplinar articulando biologia, ciências agrícolas e sustentabilidade alimentar por meio de polo escolar de compostagem e reciclagem de resíduos orgânicos.",
     escola: "Escola Municipal Marcolino de Barros",
     municipio: "Patos de Minas",
-    regional: "Noroeste",
+    regional: "Noroeste e Alto Paranaíba",
     mr: "MR Patos de Minas",
     tecnicoNome: "Denise Mendes",
     tecnicoEmail: "denise.mendes@sebraemg.com.br",
@@ -576,7 +593,7 @@ const SEED_CASES = [
     escola: "Escola Estadual Padre Alberto Fuger",
     municipio: "Campo Belo",
     regional: "Sul",
-    mr: "MR Campo Belo",
+    mr: "MR Lavras",
     tecnicoNome: "Roberto Fonseca",
     tecnicoEmail: "roberto.fonseca@sebraemg.com.br",
     tecnicoContato: "(35) 99888-7766",
@@ -1496,16 +1513,7 @@ function openDetailsModal(id) {
   regionalBadge.innerText = REGIONAL_NAMES[item.regional];
   regionalBadge.className = "badge"; // reset classes
   
-  let badgeColorClass = "bg-centro";
-  if (item.regional === "CentroOeste") badgeColorClass = "bg-centro-oeste";
-  else if (item.regional === "Centro") badgeColorClass = "bg-centro";
-  else if (item.regional === "Noroeste") badgeColorClass = "bg-noroeste";
-  else if (item.regional === "Triângulo") badgeColorClass = "bg-triangulo";
-  else if (item.regional === "Norte") badgeColorClass = "bg-norte";
-  else if (item.regional === "Rio Doce") badgeColorClass = "bg-rio-doce";
-  else if (item.regional === "Sul") badgeColorClass = "bg-sul";
-  else if (item.regional === "Zona da Mata") badgeColorClass = "bg-zona-mata";
-  else if (item.regional === "Jequitinhonha/Mucuri") badgeColorClass = "bg-jequitinhonha-mucuri";
+  let badgeColorClass = getRegionalColorClass(item.regional);
   regionalBadge.classList.add(badgeColorClass);
 
   // Technical details
