@@ -605,6 +605,7 @@ let tileLayer = null;
 let cases = [];
 let markersLayer = null;
 let currentRegisterType = 'professor'; // 'professor' or 'estudante'
+const selectedLocationFilters = new Map(); // id -> { id, type, name, val, regional, lat, lng }
 
 // ==========================================================================
 // SUPABASE DATABASE COLUMN MAPPING (PORTUGUESE COLUMN NAMES)
@@ -1041,6 +1042,148 @@ function updateMapTilesForTheme() {
   }).addTo(map);
 }
 
+
+// ==========================================================================
+// UNIFIED LOCATION ENTITIES & FILTER HELPERS
+// ==========================================================================
+
+function getAllLocationEntities() {
+  const list = [];
+  
+  // 1. Regionais SEBRAE (all 9)
+  const regKeys = ["CentroOeste", "Centro", "Noroeste", "Triângulo", "Norte", "Rio Doce", "Sul", "Zona da Mata", "Jequitinhonha/Mucuri"];
+  regKeys.forEach(k => {
+    const label = (window.REGIONAL_NAMES && window.REGIONAL_NAMES[k]) || k;
+    list.push({
+      id: `reg:${k}`,
+      type: 'regional',
+      name: label,
+      val: k,
+      searchStr: `${label} regional sebrae minas gerais`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
+      sub: "Regional SEBRAE"
+    });
+  });
+
+  // 2. Microrregiões (MRs)
+  const seenMrs = new Set();
+  cases.forEach(c => {
+    if (c.mr && c.mr.trim()) {
+      let mrName = c.mr.trim();
+      if (!mrName.startsWith("MR ") && !mrName.startsWith("MR")) mrName = `MR ${mrName}`;
+      const normKey = mrName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      if (!seenMrs.has(normKey)) {
+        seenMrs.add(normKey);
+        const regLabel = (window.REGIONAL_NAMES && window.REGIONAL_NAMES[c.regional]) || c.regional || "";
+        list.push({
+          id: `mr:${normKey}`,
+          type: 'mr',
+          name: mrName,
+          val: mrName,
+          searchStr: `${mrName} microrregiao mr ${regLabel}`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
+          sub: regLabel ? `Microrregião • ${regLabel}` : "Microrregião"
+        });
+      }
+    }
+  });
+
+  // 3. Municípios from MUNICIPALITIES_DATABASE + loaded cases
+  const seenMuns = new Set();
+  if (window.MUNICIPALITIES_DATABASE) {
+    Object.keys(window.MUNICIPALITIES_DATABASE).forEach(k => {
+      const m = window.MUNICIPALITIES_DATABASE[k];
+      const normKey = m.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      if (!seenMuns.has(normKey)) {
+        seenMuns.add(normKey);
+        const regLabel = (window.REGIONAL_NAMES && window.REGIONAL_NAMES[m.regional]) || m.regional || "";
+        list.push({
+          id: `mun:${normKey}`,
+          type: 'municipio',
+          name: m.name,
+          val: normKey,
+          lat: m.lat,
+          lng: m.lng,
+          regional: m.regional,
+          searchStr: `${m.name} municipio cidade ${regLabel}`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
+          sub: regLabel ? `Município • ${regLabel}` : "Município"
+        });
+      }
+    });
+  }
+
+  cases.forEach(c => {
+    if (c.municipio && c.municipio.trim()) {
+      const normKey = c.municipio.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      if (!seenMuns.has(normKey)) {
+        seenMuns.add(normKey);
+        const regLabel = (window.REGIONAL_NAMES && window.REGIONAL_NAMES[c.regional]) || c.regional || "";
+        list.push({
+          id: `mun:${normKey}`,
+          type: 'municipio',
+          name: c.municipio.trim(),
+          val: normKey,
+          lat: c.lat,
+          lng: c.lng,
+          regional: c.regional,
+          searchStr: `${c.municipio} municipio cidade ${regLabel}`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
+          sub: regLabel ? `Município • ${regLabel}` : "Município"
+        });
+      }
+    }
+  });
+
+  return list;
+}
+
+function getActiveLocationFilters() {
+  const selectedRegs = [];
+  const selectedMrs = [];
+  const selectedMuns = [];
+
+  selectedLocationFilters.forEach(item => {
+    if (item.type === 'regional') {
+      selectedRegs.push(item.val);
+    } else if (item.type === 'mr') {
+      const norm = item.val.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/^mr\s*/, "").trim();
+      selectedMrs.push(norm);
+    } else if (item.type === 'municipio') {
+      selectedMuns.push(item.val);
+    }
+  });
+
+  return { selectedRegs, selectedMrs, selectedMuns };
+}
+
+function isCaseMatchingFilters(item, selectedRegs, selectedMrs, selectedMuns, typeFilter) {
+  // 1. Type filter
+  if (typeFilter !== "All" && item.tipoCase !== typeFilter) {
+    return false;
+  }
+
+  // 2. Location filter
+  const hasLocationFilter = selectedRegs.length > 0 || selectedMrs.length > 0 || selectedMuns.length > 0;
+  if (!hasLocationFilter) {
+    return true;
+  }
+
+  const normCity = (item.municipio || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+  const normMr = (item.mr || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/^mr\s*/, "").trim();
+  const regVal = item.regional;
+
+  if (selectedRegs.length > 0 && selectedRegs.includes(regVal)) {
+    return true;
+  }
+
+  if (selectedMrs.length > 0 && selectedMrs.some(sm => normMr.includes(sm) || sm.includes(normMr))) {
+    return true;
+  }
+
+  if (selectedMuns.length > 0 && selectedMuns.includes(normCity)) {
+    return true;
+  }
+
+  return false;
+}
+
 // ==========================================================================
 // RENDER MARKERS & PLOTTING WITH JITTERING
 // ==========================================================================
@@ -1049,25 +1192,13 @@ function renderMarkers() {
   if (!markersLayer) return;
   markersLayer.clearLayers();
   
-  const searchVal = document.getElementById("search-city").value.trim().toLowerCase()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // remove accents
-  const regionalFilter = document.getElementById("filter-regional").value;
+  const { selectedRegs, selectedMrs, selectedMuns } = getActiveLocationFilters();
   const typeFilter = document.getElementById("filter-type") ? document.getElementById("filter-type").value : "All";
   
-  // Filter cases
-  const filteredCases = cases.filter(item => {
-    // City filter
-    const normCity = item.municipio.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    const matchesCity = !searchVal || normCity.includes(searchVal);
-    
-    // Regional filter
-    const matchesRegional = regionalFilter === "All" || item.regional === regionalFilter;
-    
-    // Type filter
-    const matchesType = typeFilter === "All" || item.tipoCase === typeFilter;
-    
-    return matchesCity && matchesRegional && matchesType;
-  });
+  // Filter cases with unified location & type filter
+  const filteredCases = cases.filter(item => 
+    isCaseMatchingFilters(item, selectedRegs, selectedMrs, selectedMuns, typeFilter)
+  );
 
   // Track coordinate collision for jittering
   const coordinateRegistry = {};
@@ -1226,19 +1357,13 @@ function renderDashboard() {
 }
 
 function updateStatistics() {
-  const searchVal = document.getElementById("search-city").value.trim().toLowerCase()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  const regionalFilter = document.getElementById("filter-regional").value;
+  const { selectedRegs, selectedMrs, selectedMuns } = getActiveLocationFilters();
   const typeFilter = document.getElementById("filter-type") ? document.getElementById("filter-type").value : "All";
   
-  // Current active filtered cases
-  const filtered = cases.filter(item => {
-    const normCity = item.municipio.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    const matchesCity = !searchVal || normCity.includes(searchVal);
-    const matchesRegional = regionalFilter === "All" || item.regional === regionalFilter;
-    const matchesType = typeFilter === "All" || item.tipoCase === typeFilter;
-    return matchesCity && matchesRegional && matchesType;
-  });
+  // Current active filtered cases with unified location & type filter
+  const filtered = cases.filter(item => 
+    isCaseMatchingFilters(item, selectedRegs, selectedMrs, selectedMuns, typeFilter)
+  );
   
   // Total cases display
   document.getElementById("stat-total-cases").innerText = filtered.length;
@@ -1733,95 +1858,54 @@ function toggleConditionalFields(checkboxId, targetDivId) {
 // ==========================================================================
 
 function setupAutocomplete() {
-  const searchInput = document.getElementById("search-city");
-  const searchList = document.getElementById("search-suggestions");
-  
+  setupUnifiedLocationSearch();
+
   const formInput = document.getElementById("form-municipio");
   const formList = document.getElementById("form-municipio-suggestions");
-  
-  // Autocomplete on search bar
-  searchInput.addEventListener("input", () => {
-    const val = searchInput.value.trim().toLowerCase();
-    searchList.innerHTML = "";
-    if (!val) {
-      searchList.style.display = "none";
-      renderDashboard(); // Re-render markers if clearing search
-      return;
-    }
-    
-    const matches = Object.keys(window.MUNICIPALITIES_DATABASE).filter(key => 
-      key.includes(val) || window.MUNICIPALITIES_DATABASE[key].name.toLowerCase().includes(val)
-    );
-    
-    if (matches.length > 0) {
-      searchList.style.display = "block";
-      matches.slice(0, 5).forEach(key => {
-        const item = window.MUNICIPALITIES_DATABASE[key];
-        const li = document.createElement("li");
-        li.innerText = item.name;
-        li.addEventListener("click", () => {
-          searchInput.value = item.name;
-          searchList.style.display = "none";
-          renderDashboard();
-          
-          // Pan map to search target city
-          map.setView([item.lat, item.lng], 11);
+  if (formInput && formList) {
+    formInput.addEventListener("input", () => {
+      const val = formInput.value.trim().toLowerCase();
+      formList.innerHTML = "";
+      if (!val) {
+        formList.style.display = "none";
+        return;
+      }
+      
+      const matches = Object.keys(window.MUNICIPALITIES_DATABASE).filter(key => 
+        key.includes(val) || window.MUNICIPALITIES_DATABASE[key].name.toLowerCase().includes(val)
+      );
+      
+      if (matches.length > 0) {
+        formList.style.display = "block";
+        matches.slice(0, 5).forEach(key => {
+          const item = window.MUNICIPALITIES_DATABASE[key];
+          const li = document.createElement("li");
+          li.innerText = item.name;
+          li.addEventListener("click", () => {
+            formInput.value = item.name;
+            formList.style.display = "none";
+            
+            // Auto-select regional and lock/suggest MR
+            const regionalSelect = document.getElementById("form-regional");
+            if (regionalSelect) regionalSelect.value = item.regional;
+            
+            // Fill suggested MR
+            const mrInput = document.getElementById("form-mr");
+            if (mrInput) mrInput.value = `MR ${item.name}`;
+          });
+          formList.appendChild(li);
         });
-        searchList.appendChild(li);
-      });
-    } else {
-      searchList.style.display = "none";
-    }
-    renderDashboard(); // filter on typing
-  });
+      } else {
+        formList.style.display = "none";
+      }
+    });
 
-  // Close search suggestions on outer click
-  document.addEventListener("click", (e) => {
-    if (e.target !== searchInput) {
-      searchList.style.display = "none";
-    }
-    if (e.target !== formInput) {
-      formList.style.display = "none";
-    }
-  });
-
-  // Autocomplete on Register Form (with regional auto-fill!)
-  formInput.addEventListener("input", () => {
-    const val = formInput.value.trim().toLowerCase();
-    formList.innerHTML = "";
-    if (!val) {
-      formList.style.display = "none";
-      return;
-    }
-    
-    const matches = Object.keys(window.MUNICIPALITIES_DATABASE).filter(key => 
-      key.includes(val) || window.MUNICIPALITIES_DATABASE[key].name.toLowerCase().includes(val)
-    );
-    
-    if (matches.length > 0) {
-      formList.style.display = "block";
-      matches.slice(0, 5).forEach(key => {
-        const item = window.MUNICIPALITIES_DATABASE[key];
-        const li = document.createElement("li");
-        li.innerText = item.name;
-        li.addEventListener("click", () => {
-          formInput.value = item.name;
-          formList.style.display = "none";
-          
-          // Auto-select regional and lock/suggest MR
-          const regionalSelect = document.getElementById("form-regional");
-          regionalSelect.value = item.regional;
-          
-          // Fill suggested MR
-          const mrInput = document.getElementById("form-mr");
-          mrInput.value = `MR ${item.name}`;
-        });
-        formList.appendChild(li);
-      });
-    } else {
-      formList.style.display = "none";
-    }
-  });
+    document.addEventListener("click", (e) => {
+      if (e.target !== formInput) {
+        formList.style.display = "none";
+      }
+    });
+  }
 
   // Autocomplete on Municipality Modal Form
   const munInput = document.getElementById("municipality-name");
@@ -1872,28 +1956,269 @@ function setupAutocomplete() {
 }
 
 // ==========================================================================
+// UNIFIED LOCATION SEARCH CONTROLLER (CHECKBOXES & CHIPS)
+// ==========================================================================
+
+function setupUnifiedLocationSearch() {
+  const searchInput = document.getElementById("search-location");
+  const dropdown = document.getElementById("location-suggestions-dropdown");
+  const dropdownList = document.getElementById("location-dropdown-list");
+  const countLabel = document.getElementById("location-dropdown-count");
+  const clearInputBtn = document.getElementById("btn-clear-location-input");
+  const clearFiltersBtn = document.getElementById("btn-clear-filters");
+
+  if (!searchInput || !dropdown || !dropdownList) return;
+
+  function renderDropdownItems(query = "") {
+    const allEntities = getAllLocationEntities();
+    const cleanQuery = query.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    let matches = allEntities;
+    if (cleanQuery) {
+      matches = allEntities.filter(item => item.searchStr.includes(cleanQuery));
+    }
+
+    dropdownList.innerHTML = "";
+
+    if (matches.length === 0) {
+      dropdownList.innerHTML = `
+        <div style="padding: 14px 12px; text-align: center; color: #94a3b8; font-size: 0.85rem;">
+          Nenhum local encontrado para "<strong>${escapeHtml(query)}</strong>"
+        </div>
+      `;
+      if (countLabel) countLabel.textContent = "0 opções encontradas";
+      return;
+    }
+
+    if (countLabel) {
+      countLabel.textContent = `${matches.length} opções disponíveis`;
+    }
+
+    // Limit to max 35 items
+    const sliceMatches = matches.slice(0, 35);
+
+    sliceMatches.forEach(item => {
+      const isSelected = selectedLocationFilters.has(item.id);
+      const row = document.createElement("div");
+      row.className = `location-dropdown-item ${isSelected ? "selected" : ""}`;
+      row.setAttribute("data-id", item.id);
+
+      let tagClass = "tag-municipio";
+      let tagLabel = "MUNICÍPIO";
+      if (item.type === "regional") {
+        tagClass = "tag-regional";
+        tagLabel = "REGIONAL";
+      } else if (item.type === "mr") {
+        tagClass = "tag-mr";
+        tagLabel = "MICRORREGIÃO";
+      }
+
+      row.innerHTML = `
+        <input type="checkbox" id="chk-${escapeHtml(item.id)}" ${isSelected ? "checked" : ""}>
+        <div class="location-item-info">
+          <div class="location-item-row">
+            <span class="class-tag ${tagClass}">${tagLabel}</span>
+            <span class="location-item-name">${escapeHtml(item.name)}</span>
+          </div>
+          <span class="location-item-sub">${escapeHtml(item.sub)}</span>
+        </div>
+      `;
+
+      row.addEventListener("click", (e) => {
+        const checkbox = row.querySelector("input[type='checkbox']");
+        if (e.target !== checkbox) {
+          checkbox.checked = !checkbox.checked;
+        }
+        toggleLocationSelection(item, checkbox.checked);
+        row.classList.toggle("selected", checkbox.checked);
+        searchInput.focus();
+      });
+
+      dropdownList.appendChild(row);
+    });
+  }
+
+  function toggleLocationSelection(item, shouldSelect) {
+    if (shouldSelect) {
+      selectedLocationFilters.set(item.id, item);
+    } else {
+      selectedLocationFilters.delete(item.id);
+    }
+
+    renderSelectedChips();
+    renderDashboard();
+    applySmartLocationZoom();
+  }
+
+  // Open dropdown on focus or typing
+  searchInput.addEventListener("focus", () => {
+    dropdown.classList.add("active");
+    renderDropdownItems(searchInput.value);
+  });
+
+  searchInput.addEventListener("input", () => {
+    const val = searchInput.value;
+    if (clearInputBtn) {
+      clearInputBtn.style.display = val.length > 0 ? "flex" : "none";
+    }
+    dropdown.classList.add("active");
+    renderDropdownItems(val);
+  });
+
+  if (clearInputBtn) {
+    clearInputBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      clearInputBtn.style.display = "none";
+      renderDropdownItems("");
+      searchInput.focus();
+    });
+  }
+
+  // Close dropdown on click outside
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".location-search-group")) {
+      dropdown.classList.remove("active");
+    }
+  });
+
+  // Clear filters button
+  if (clearFiltersBtn) {
+    clearFiltersBtn.addEventListener("click", clearAllFilters);
+  }
+}
+
+function renderSelectedChips() {
+  const container = document.getElementById("selected-location-chips");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  if (selectedLocationFilters.size === 0) {
+    return;
+  }
+
+  selectedLocationFilters.forEach(item => {
+    const chip = document.createElement("div");
+    chip.className = "selected-chip";
+
+    let tagClass = "tag-municipio";
+    let tagLabel = "MUNICÍPIO";
+    if (item.type === "regional") {
+      tagClass = "tag-regional";
+      tagLabel = "REGIONAL";
+    } else if (item.type === "mr") {
+      tagClass = "tag-mr";
+      tagLabel = "MR";
+    }
+
+    chip.innerHTML = `
+      <span class="class-tag ${tagClass}">${tagLabel}</span>
+      <span>${escapeHtml(item.name)}</span>
+      <button type="button" class="chip-remove-btn" title="Remover filtro" onclick="removeLocationFilter('${escapeHtml(item.id)}')">&times;</button>
+    `;
+    container.appendChild(chip);
+  });
+}
+
+function removeLocationFilter(id) {
+  selectedLocationFilters.delete(id);
+  renderSelectedChips();
+  
+  // Update checkbox state in dropdown if visible
+  const chk = document.getElementById(`chk-${id}`);
+  if (chk) {
+    chk.checked = false;
+    const row = chk.closest(".location-dropdown-item");
+    if (row) row.classList.remove("selected");
+  }
+
+  renderDashboard();
+  applySmartLocationZoom();
+}
+
+function applySmartLocationZoom() {
+  if (!map) return;
+
+  if (selectedLocationFilters.size === 0) {
+    return;
+  }
+
+  // If exactly 1 item selected:
+  if (selectedLocationFilters.size === 1) {
+    const item = Array.from(selectedLocationFilters.values())[0];
+    if (item.type === "municipio" && item.lat && item.lng) {
+      map.setView([item.lat, item.lng], 11);
+      return;
+    }
+    if (item.type === "regional" && window.REGIONAL_FALLBACK_COORDINATES && window.REGIONAL_FALLBACK_COORDINATES[item.val]) {
+      const c = window.REGIONAL_FALLBACK_COORDINATES[item.val];
+      map.setView([c.lat, c.lng], 8);
+      return;
+    }
+  }
+
+  // If multiple or MR: fit markers if present
+  if (markersLayer) {
+    try {
+      const bounds = markersLayer.getBounds();
+      if (bounds && bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+}
+
+function clearAllFilters() {
+  selectedLocationFilters.clear();
+  
+  const searchInput = document.getElementById("search-location");
+  if (searchInput) searchInput.value = "";
+  
+  const clearInputBtn = document.getElementById("btn-clear-location-input");
+  if (clearInputBtn) clearInputBtn.style.display = "none";
+
+  const typeFilter = document.getElementById("filter-type");
+  if (typeFilter) typeFilter.value = "All";
+
+  renderSelectedChips();
+
+  // Uncheck all dropdown items
+  document.querySelectorAll(".location-dropdown-item").forEach(row => {
+    row.classList.remove("selected");
+    const chk = row.querySelector("input[type='checkbox']");
+    if (chk) chk.checked = false;
+  });
+
+  const dropdown = document.getElementById("location-suggestions-dropdown");
+  if (dropdown) dropdown.classList.remove("active");
+
+  renderDashboard();
+
+  // Reset map view to full state of Minas Gerais
+  if (map) {
+    map.setView([-18.5, -44.5], 7);
+  }
+}
+
+// Make helpers globally accessible
+window.removeLocationFilter = removeLocationFilter;
+window.clearAllFilters = clearAllFilters;
+
+
+// ==========================================================================
 // EVENT BINDINGS
 // ==========================================================================
 
 function bindEvents() {
-  // Filters
-  document.getElementById("filter-regional").addEventListener("change", () => {
-    renderDashboard();
-    
-    // Zoom to regional center if selecting specific regional
-    const selectedReg = document.getElementById("filter-regional").value;
-    if (selectedReg !== "All" && window.REGIONAL_FALLBACK_COORDINATES[selectedReg]) {
-      const regCoords = window.REGIONAL_FALLBACK_COORDINATES[selectedReg];
-      map.setView([regCoords.lat, regCoords.lng], 8);
-    } else {
-      map.setView([-18.5, -44.5], 7); // reset view
-    }
-  });
-
   // Type filter binding
   const typeFilter = document.getElementById("filter-type");
   if (typeFilter) {
-    typeFilter.addEventListener("change", renderDashboard);
+    typeFilter.addEventListener("change", () => {
+      renderDashboard();
+      applySmartLocationZoom();
+    });
   }
 
   // Export CSV binding

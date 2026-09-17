@@ -702,6 +702,249 @@ body.light-theme .autocomplete-list li:hover {
 }
 
 /* ==========================================================================
+   UNIFIED LOCATION SEARCH & MULTI-SELECT CHIPS
+   ========================================================================== */
+.location-search-group {
+  position: relative;
+}
+
+.location-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.btn-clear-input {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #94a3b8);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.btn-clear-input:hover {
+  color: var(--text-primary, #0f172a);
+}
+
+/* Location Dropdown */
+.location-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--bg-glass-solid, #ffffff);
+  border: 1px solid var(--border-glass, #cbd5e1);
+  border-radius: var(--border-radius-sm, 8px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+  z-index: 1060;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  animation: fadeIn 0.15s ease;
+}
+
+.location-dropdown.active {
+  display: flex;
+}
+
+.location-dropdown-header {
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.02);
+  border-bottom: 1px solid var(--border-glass, #e2e8f0);
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-secondary, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.location-dropdown-list {
+  max-height: 250px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.location-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  transition: background 0.15s ease;
+  user-select: none;
+}
+
+.location-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.location-dropdown-item:hover {
+  background-color: rgba(0, 84, 166, 0.06);
+}
+
+.location-dropdown-item.selected {
+  background-color: rgba(0, 84, 166, 0.09);
+}
+
+.location-dropdown-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #0054a6;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.location-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.location-item-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.location-item-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.location-item-sub {
+  font-size: 0.72rem;
+  color: var(--text-secondary, #64748b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 3 Classification Badges: Regional (Azul), MR (Roxo), Município (Verde) */
+.class-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.class-tag.tag-regional {
+  background: #dbeafe;
+  color: #0054a6;
+  border: 1px solid #bfdbfe;
+}
+
+.class-tag.tag-mr {
+  background: #ede9fe;
+  color: #6d28d9;
+  border: 1px solid #ddd6fe;
+}
+
+.class-tag.tag-municipio {
+  background: #d1fae5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+/* Selected Chips */
+.selected-chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  min-height: 0;
+}
+
+.selected-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px 3px 6px;
+  border-radius: 6px;
+  background: var(--bg-glass-solid, #ffffff);
+  border: 1px solid var(--border-glass, #cbd5e1);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary, #1e293b);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.15s ease;
+}
+
+.selected-chip .chip-remove-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-left: 2px;
+  cursor: pointer;
+  color: var(--text-muted, #94a3b8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: color 0.15s ease, background 0.15s ease;
+  width: 16px;
+  height: 16px;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.selected-chip .chip-remove-btn:hover {
+  color: #e11d48;
+  background: #fee2e2;
+}
+
+/* Filter Footer Actions (Limpar Filtros) */
+.filter-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-glass, #e2e8f0);
+}
+
+.btn-clear-filters {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-clear-filters:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+/* ==========================================================================
    STATISTICS & LEGEND PANELS
    ========================================================================== */
 .stat-main {

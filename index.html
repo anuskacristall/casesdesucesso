@@ -147,37 +147,35 @@
           </div>
           
           <div class="panel-body">
-            <!-- Search City -->
-            <div class="form-group">
-              <label for="search-city">Município</label>
-              <div class="input-with-icon">
+            <!-- Unified Location Search (Município, Regional, Microrregião) -->
+            <div class="form-group location-search-group">
+              <label for="search-location">Localização (Município, Regional ou MR)</label>
+              <div class="input-with-icon location-input-wrap">
                 <i data-lucide="search"></i>
-                <input type="text" id="search-city" placeholder="Buscar município..." autocomplete="off">
+                <input type="text" id="search-location" placeholder="Buscar município, regional ou MR..." autocomplete="off">
+                <button type="button" id="btn-clear-location-input" class="btn-clear-input" title="Limpar texto da busca" style="display: none;">
+                  <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+                </button>
               </div>
-              <ul id="search-suggestions" class="autocomplete-list"></ul>
-            </div>
-            
-            <!-- Regional Filter -->
-            <div class="form-group">
-              <label for="filter-regional">Regional SEBRAE</label>
-              <div class="select-wrapper">
-                <select id="filter-regional">
-                  <option value="All">Todas as Regionais</option>
-                  <option value="CentroOeste">Centro-Oeste</option>
-                  <option value="Centro">Centro</option>
-                  <option value="Noroeste">Noroeste</option>
-                  <option value="Triângulo">Triângulo</option>
-                  <option value="Norte">Norte</option>
-                  <option value="Rio Doce">Rio Doce</option>
-                  <option value="Sul">Sul</option>
-                  <option value="Zona da Mata">Zona da Mata</option>
-                  <option value="Jequitinhonha/Mucuri">Jequitinhonha/Mucuri</option>
-                </select>
+              
+              <!-- Location Suggestions Dropdown with Checkboxes -->
+              <div id="location-suggestions-dropdown" class="location-dropdown">
+                <div class="location-dropdown-header">
+                  <span id="location-dropdown-count">Selecione uma ou mais opções</span>
+                </div>
+                <div id="location-dropdown-list" class="location-dropdown-list">
+                  <!-- Dynamically rendered -->
+                </div>
+              </div>
+
+              <!-- Selected Items Chips Container -->
+              <div id="selected-location-chips" class="selected-chips-container">
+                <!-- Dynamically rendered selected chips -->
               </div>
             </div>
             
-            <!-- Tipo de Case Filter -->
-            <div class="form-group">
+            <!-- Tipo de Case Filter (Separated) -->
+            <div class="form-group" style="margin-top: 2px;">
               <label for="filter-type">Tipo de Case</label>
               <div class="select-wrapper">
                 <select id="filter-type">
@@ -186,6 +184,14 @@
                   <option value="estudante">Cases de Estudante</option>
                 </select>
               </div>
+            </div>
+
+            <!-- Footer Action: Limpar Filtros -->
+            <div class="filter-footer-actions">
+              <button type="button" id="btn-clear-filters" class="btn btn-clear-filters" title="Limpar todos os filtros e ver mapa completo">
+                <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i>
+                <span>Limpar Filtros</span>
+              </button>
             </div>
           </div>
         </div>
