@@ -2581,6 +2581,11 @@ function checkAuth() {
     loginView.style.display = "none";
     dashboardView.style.display = "flex";
     
+    // Ensure all icons are rendered once dashboard view becomes visible
+    if (typeof lucide !== "undefined") {
+      lucide.createIcons();
+    }
+    
     // Recalculate leaflet map boundary sizes now that container is visible
     if (map) {
       setTimeout(() => {

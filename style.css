@@ -2560,28 +2560,116 @@ body.light-theme .stat-type-box.est-box {
   background: rgba(16, 185, 129, 0.03);
 }
 
-/* Header actions export CSV button overrides */
-.header-actions #btn-export-csv {
-  font-size: 0.88rem;
-  font-weight: 600;
-  padding: 8px 16px;
-  height: 38px;
+/* ==========================================================================
+   HEADER EXPORT ACTIONS & CONTROLS (HIGH CONTRAST ICONS & STYLING)
+   ========================================================================== */
+.export-dropdown-container {
   display: flex;
   align-items: center;
-  gap: 8px;
-  border-radius: var(--border-radius-sm);
+  gap: 10px;
 }
 
+.export-select-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.export-select-icon {
+  position: absolute;
+  left: 12px;
+  width: 17px !important;
+  height: 17px !important;
+  color: var(--sebrae-blue, #0054a6) !important;
+  stroke: var(--sebrae-blue, #0054a6) !important;
+  stroke-width: 2.2 !important;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.export-select-chevron {
+  position: absolute;
+  right: 12px;
+  width: 15px !important;
+  height: 15px !important;
+  color: #64748b !important;
+  stroke: #64748b !important;
+  stroke-width: 2.2 !important;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.export-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  font-family: var(--font-main);
+  font-size: 0.88rem;
+  font-weight: 600;
+  height: 40px;
+  padding: 0 34px 0 38px !important;
+  border-radius: var(--border-radius-sm, 8px);
+  border: 1px solid #cbd5e1;
+  background: #ffffff !important;
+  color: var(--text-primary, #0f172a) !important;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.export-select:hover {
+  border-color: var(--sebrae-blue, #0054a6);
+  background: #f8fafc !important;
+}
+
+.export-select:focus {
+  border-color: var(--sebrae-blue, #0054a6);
+  box-shadow: 0 0 0 3px rgba(0, 84, 166, 0.15);
+}
+
+/* Botão Exportar (Sebrae Blue sólido com ícone branco vívido) */
+.btn-export,
+.header-actions #btn-export-csv,
 body.light-theme .header-actions #btn-export-csv {
-  background-color: rgba(0, 0, 0, 0.02);
-  border-color: rgba(0, 0, 0, 0.1);
-  color: var(--text-primary);
+  background-color: var(--sebrae-blue, #0054a6) !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-size: 0.88rem;
+  font-weight: 600;
+  height: 40px;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--border-radius-sm, 8px);
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 84, 166, 0.25);
+  transition: all 0.2s ease;
 }
 
+.btn-export:hover,
+.header-actions #btn-export-csv:hover,
 body.light-theme .header-actions #btn-export-csv:hover {
-  background-color: rgba(0, 84, 166, 0.05);
-  border-color: var(--sebrae-blue);
-  color: var(--sebrae-blue);
+  background-color: #003f80 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 84, 166, 0.35);
+}
+
+.btn-export i,
+.btn-export svg,
+.btn-export-icon,
+.header-actions #btn-export-csv i,
+.header-actions #btn-export-csv svg {
+  width: 18px !important;
+  height: 18px !important;
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  stroke-width: 2.5 !important;
+  display: inline-block !important;
+  vertical-align: middle;
 }
 
 /* Export Dropdown Menu Item Hovers */

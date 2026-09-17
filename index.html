@@ -107,14 +107,20 @@
           <i data-lucide="database"></i>
           <span>Modo Local</span>
         </div>
-        <div class="export-dropdown-container" style="display: flex; align-items: center; gap: 8px;">
-          <select id="export-select-type" class="btn btn-secondary" style="font-size: 0.88rem; font-weight: 600; padding: 0 12px; height: 38px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-glass); cursor: pointer; outline: none; background: var(--bg-glass-solid); color: var(--text-primary);">
-            <option value="all">Exportar Todos</option>
-            <option value="professor">Apenas Professor</option>
-            <option value="estudante">Apenas Estudante</option>
-          </select>
-          <button id="btn-export-csv" class="btn btn-primary" title="Exportar Planilha (CSV)" style="font-size: 0.88rem; font-weight: 600; padding: 8px 16px; height: 38px; display: flex; align-items: center; gap: 8px; border-radius: var(--border-radius-sm); border: none;">
-            <i data-lucide="download" style="width: 16px; height: 16px;"></i>
+        <div class="export-dropdown-container">
+          <!-- Select com ícone à esquerda e seta à direita -->
+          <div class="export-select-wrapper">
+            <i data-lucide="file-spreadsheet" class="export-select-icon"></i>
+            <select id="export-select-type" class="export-select" title="Selecione quais dados exportar">
+              <option value="all">Exportar Todos</option>
+              <option value="professor">Apenas Professor</option>
+              <option value="estudante">Apenas Estudante</option>
+            </select>
+            <i data-lucide="chevron-down" class="export-select-chevron"></i>
+          </div>
+          <!-- Botão Exportar com ícone de download destacado -->
+          <button id="btn-export-csv" class="btn btn-primary btn-export" title="Exportar Planilha (CSV)">
+            <i data-lucide="download" class="btn-export-icon"></i>
             <span>Exportar</span>
           </button>
         </div>
