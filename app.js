@@ -2004,8 +2004,8 @@ function setupUnifiedLocationSearch() {
       countLabel.textContent = `${matches.length} opções disponíveis`;
     }
 
-    // Limit to max 35 items
-    const sliceMatches = matches.slice(0, 35);
+    // Allow scrolling through all options (up to 150 items)
+    const sliceMatches = matches.slice(0, 150);
 
     sliceMatches.forEach(item => {
       const isSelected = selectedLocationFilters.has(item.id);
