@@ -118,7 +118,13 @@ class SecureBackendHandler(SimpleHTTPRequestHandler):
             super().do_HEAD()
 
     def do_GET(self):
-        if self.path == "/api/cases":
+        clean_path = urlsplit(self.path).path
+        if clean_path in ("/admin", "/admin/", "/admin-dashboard", "/admin-dashboard.html"):
+            self.send_response(301)
+            self.send_header("Location", "/admin.html")
+            self.end_headers()
+            return
+        elif self.path == "/api/cases":
             self.handle_get_cases()
         elif self.path == "/api/municipalities":
             self.handle_get_municipalities()

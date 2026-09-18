@@ -227,18 +227,17 @@ body.light-theme .glass-box {
 }
 
 .logo-img-container {
-  background-color: var(--sebrae-blue);
-  padding: 8px 16px;
-  border-radius: var(--border-radius-md);
+  background-color: transparent;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 64px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  height: 48px;
+  box-shadow: none;
 }
 
 .logo-image {
-  height: 100%;
+  height: 44px;
   width: auto;
   object-fit: contain;
 }
@@ -1986,22 +1985,21 @@ body.light-theme .contact-subbox {
   gap: 24px;
 }
 
-/* Sebrae brand logo inside card (Blue banner) */
+/* Sebrae brand logo inside card */
 .login-card-header {
-  background-color: #0054A6;
-  padding: 28px 24px;
+  background-color: #ffffff;
+  padding: 24px 24px;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .login-card-header .logo-image {
-  height: 60px; /* Drastically enlarged logo */
+  height: 52px;
   width: auto;
   object-fit: contain;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
 }
 
 /* Enlarge login form fonts/inputs specifically */

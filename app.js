@@ -2646,7 +2646,7 @@ function handleLogin(e) {
       localStorage.setItem("sebrae_admin_authenticated", "true");
       loginBtn.disabled = false;
       loginBtn.innerHTML = "<span>Entrar no Painel</span>";
-      window.location.href = "admin-dashboard.html";
+      window.location.href = "admin.html";
     }, 600);
     return;
   }
