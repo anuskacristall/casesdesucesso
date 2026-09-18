@@ -2,6 +2,9 @@
 config.js
 .env
 
-# Ignorar arquivos temporários do sistema
+# Ignorar arquivos temporários do sistema e python
 .DS_Store
 Thumbs.db
+__pycache__/
+*.pyc
+
