@@ -647,16 +647,24 @@ function mapDatabaseToApp(dbItem) {
     }
   }
 
+  const normCityKey = (dbItem.municipio || "").trim().toLowerCase().replace(/-/g, " ").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const officialCity = (typeof window !== "undefined" && window.MUNICIPALITIES_DATABASE && window.MUNICIPALITIES_DATABASE[normCityKey]) ? window.MUNICIPALITIES_DATABASE[normCityKey] : null;
+
+  const resolvedRegional = officialCity ? officialCity.regional : (REGIONAL_NAMES[dbItem.regional] || dbItem.regional || "");
+  const resolvedMr = officialCity ? (officialCity.mr.startsWith("MR ") ? officialCity.mr : `MR ${officialCity.mr}`) : (dbItem.microrregiao_mr || "");
+  const resolvedLat = officialCity ? officialCity.lat : dbItem.latitude;
+  const resolvedLng = officialCity ? officialCity.lng : dbItem.longitude;
+
   return {
     id: dbItem.id,
     titulo: dbItem.titulo_projeto || "",
     descricao: dbItem.descricao_geral || "",
-    municipio: dbItem.municipio || "",
-    regional: dbItem.regional || "",
-    mr: dbItem.microrregiao_mr || "",
+    municipio: dbItem.municipio || (officialCity ? officialCity.name : ""),
+    regional: resolvedRegional,
+    mr: resolvedMr,
     escola: dbItem.escola_instituicao || "",
-    lat: dbItem.latitude,
-    lng: dbItem.longitude,
+    lat: resolvedLat,
+    lng: resolvedLng,
     tecnicoNome: dbItem.tecnico_nome || "",
     tecnicoEmail: dbItem.tecnico_email || "",
     tecnicoContato: dbItem.tecnico_telefone || "",
@@ -1313,22 +1321,25 @@ function renderMarkers() {
 }
 
 function getCaseCoordinates(item) {
+  if (item && item.municipio) {
+    const normalizedKey = item.municipio.trim().toLowerCase()
+      .replace(/-/g, " ")
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      
+    if (typeof window !== "undefined" && window.MUNICIPALITIES_DATABASE && window.MUNICIPALITIES_DATABASE[normalizedKey]) {
+      return window.MUNICIPALITIES_DATABASE[normalizedKey];
+    }
+  }
+
   // Check if case has custom stored coordinates
-  if (item.lat && item.lng) {
+  if (item && item.lat && item.lng) {
     return { lat: item.lat, lng: item.lng };
   }
   
-  // Otherwise lookup static municipalities database
-  const normalizedKey = item.municipio.trim().toLowerCase()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    
-  if (window.MUNICIPALITIES_DATABASE && window.MUNICIPALITIES_DATABASE[normalizedKey]) {
-    return window.MUNICIPALITIES_DATABASE[normalizedKey];
-  }
-  
   // Fallback to regional coordinates
-  if (window.REGIONAL_FALLBACK_COORDINATES && window.REGIONAL_FALLBACK_COORDINATES[item.regional]) {
-    return window.REGIONAL_FALLBACK_COORDINATES[item.regional];
+  const regKey = (item && (REGIONAL_NAMES[item.regional] || item.regional)) || "Centro";
+  if (typeof window !== "undefined" && window.REGIONAL_FALLBACK_COORDINATES && window.REGIONAL_FALLBACK_COORDINATES[regKey]) {
+    return window.REGIONAL_FALLBACK_COORDINATES[regKey];
   }
   
   return { lat: -19.9191, lng: -43.9378 }; // Belo Horizonte default fallback
@@ -1437,47 +1448,55 @@ function updateStatistics() {
   document.getElementById("stat-professor-count").innerText = professorCount;
   document.getElementById("stat-estudante-count").innerText = estudanteCount;
   
-  // Compute regional stats count
-  const counts = {
-    "CentroOeste": 0, "Centro": 0, "Noroeste": 0, "Triângulo": 0, "Norte": 0,
-    "Rio Doce": 0, "Sul": 0, "Zona da Mata": 0, "Jequitinhonha/Mucuri": 0
-  };
-  
+  // Official 9 Regionais list
+  const OFFICIAL_REGIONAIS = [
+    "Centro",
+    "Centro-Oeste e Sudoeste",
+    "Jequitinhonha e Mucuri",
+    "Noroeste e Alto Paranaíba",
+    "Norte",
+    "Rio Doce e Vale do Aço",
+    "Sul",
+    "Triângulo",
+    "Zona da Mata e Vertentes"
+  ];
+
+  const counts = {};
+  OFFICIAL_REGIONAIS.forEach(reg => { counts[reg] = 0; });
+
   filtered.forEach(item => {
-    if (counts[item.regional] !== undefined) {
-      counts[item.regional]++;
+    const rawReg = item.regional || "";
+    const regName = REGIONAL_NAMES[rawReg] || rawReg;
+    if (counts[regName] !== undefined) {
+      counts[regName]++;
+    } else {
+      for (const k of OFFICIAL_REGIONAIS) {
+        if (regName && (regName.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(regName.toLowerCase()))) {
+          counts[k]++;
+          break;
+        }
+      }
     }
   });
-  
+
   // Max count to base progress bar percentages on
   const maxCount = Math.max(...Object.values(counts), 1);
-  
+
   // Build sidebar listing
   const listContainer = document.getElementById("stats-regional-list");
   listContainer.innerHTML = "";
-  
-  Object.keys(counts).forEach(key => {
-    const count = counts[key];
+
+  OFFICIAL_REGIONAIS.forEach(key => {
+    const count = counts[key] || 0;
     const percentage = (count / maxCount) * 100;
-    const colorClass = key.toLowerCase().replace("/", "-").replace("â", "a"); // handle Triângulo / Jequitinhonha-Mucuri
-    
-    // Normalize class names for styling: CentroOeste -> centro-oeste, Triângulo -> triangulo etc
-    let colorStyleClass = "bg-centro";
-    if (key === "CentroOeste") colorStyleClass = "bg-centro-oeste";
-    else if (key === "Centro") colorStyleClass = "bg-centro";
-    else if (key === "Noroeste") colorStyleClass = "bg-noroeste";
-    else if (key === "Triângulo") colorStyleClass = "bg-triangulo";
-    else if (key === "Norte") colorStyleClass = "bg-norte";
-    else if (key === "Rio Doce") colorStyleClass = "bg-rio-doce";
-    else if (key === "Sul") colorStyleClass = "bg-sul";
-    else if (key === "Zona da Mata") colorStyleClass = "bg-zona-mata";
-    else if (key === "Jequitinhonha/Mucuri") colorStyleClass = "bg-jequitinhonha-mucuri";
+    const colorStyleClass = getRegionalColorClass(key);
 
     const li = document.createElement("li");
     li.className = "stats-regional-item";
     li.innerHTML = `
       <div class="stats-regional-label">
-        <span class="color-dot ${colorStyleClass}"></span> ${REGIONAL_NAMES[key]}
+        <span class="color-dot ${colorStyleClass}"></span>
+        <span class="stats-regional-text" title="${escapeHtml(key)}">${escapeHtml(key)}</span>
       </div>
       <div class="stats-regional-bar-container">
         <div class="stats-regional-bar">
@@ -1488,6 +1507,22 @@ function updateStatistics() {
     `;
     listContainer.appendChild(li);
   });
+}
+
+function getRegionalColorClass(regional) {
+  if (!regional) return "bg-centro";
+  const norm = regional.toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  if (norm.includes("centro-oeste") || norm.includes("centro oeste") || norm.includes("centrooeste")) return "bg-centro-oeste";
+  if (norm.includes("jequitinhonha") || norm.includes("mucuri")) return "bg-jequitinhonha-mucuri";
+  if (norm.includes("noroeste") || norm.includes("paranaiba")) return "bg-noroeste";
+  if (norm.includes("norte")) return "bg-norte";
+  if (norm.includes("rio doce") || norm.includes("vale do aco")) return "bg-rio-doce";
+  if (norm.includes("sul")) return "bg-sul";
+  if (norm.includes("triangulo")) return "bg-triangulo";
+  if (norm.includes("zona da mata") || norm.includes("vertentes")) return "bg-zona-mata";
+  if (norm.includes("centro")) return "bg-centro";
+  return "bg-centro";
 }
 
 // ==========================================================================
