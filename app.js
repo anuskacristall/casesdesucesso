@@ -1113,10 +1113,30 @@ function updateMapTilesForTheme() {
 function getAllLocationEntities() {
   const list = [];
   
-  // 1. Regionais SEBRAE (all 9)
+  // 1. Regionais SEBRAE - Apenas as que possuem pelo menos 1 case cadastrado
   const regKeys = ["CentroOeste", "Centro", "Noroeste", "Triângulo", "Norte", "Rio Doce", "Sul", "Zona da Mata", "Jequitinhonha/Mucuri"];
+  
+  // Mapeia as regionais presentes nos cases cadastrados (normalizadas)
+  const regionalsWithCases = new Set();
+  if (Array.isArray(cases)) {
+    cases.forEach(c => {
+      if (c.regional && typeof c.regional === 'string' && c.regional.trim()) {
+        regionalsWithCases.add(c.regional.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
+      }
+    });
+  }
+
   regKeys.forEach(k => {
     const label = (window.REGIONAL_NAMES && window.REGIONAL_NAMES[k]) || k;
+    const normKey = k.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const normLabel = label.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    
+    // Inclui na busca somente se houver pelo menos um case cadastrado nesta regional
+    const hasCase = regionalsWithCases.has(normKey) || regionalsWithCases.has(normLabel);
+    if (!hasCase) {
+      return;
+    }
+
     list.push({
       id: `reg:${k}`,
       type: 'regional',
@@ -1791,8 +1811,45 @@ function closeConfirmCodeModal() {
   }
 }
 
+// ==========================================================================
+// POPUP MODAL DE CARREGAMENTO & PREVENÇÃO DE MÚLTIPLOS ENVIOS
+// ==========================================================================
+
+let isSubmittingMunicipality = false;
+
+function showSubmissionLoadingModal(title = "Aguarde, estamos registrando as informações...", desc = "Por favor, não feche a página. Sua solicitação está sendo processada com segurança.") {
+  const modal = document.getElementById("modal-submission-loading");
+  if (modal) {
+    const titleEl = document.getElementById("submission-loading-title");
+    const descEl = document.getElementById("submission-loading-desc");
+    if (titleEl) titleEl.textContent = title;
+    if (descEl) descEl.textContent = desc;
+    modal.classList.add("active");
+    modal.style.display = "flex";
+    if (typeof lucide !== "undefined") {
+      lucide.createIcons({ root: modal });
+    }
+  }
+}
+
+function hideSubmissionLoadingModal() {
+  const modal = document.getElementById("modal-submission-loading");
+  if (modal) {
+    modal.classList.remove("active");
+    modal.style.display = "none";
+  }
+}
+
 async function handleMunicipalitySubmit(e) {
   e.preventDefault();
+
+  if (isSubmittingMunicipality) {
+    return; // Impede duplo clique e múltiplos envios simultâneos
+  }
+
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const origBtnContent = submitBtn ? submitBtn.innerHTML : "";
+
   const name = document.getElementById("municipality-name").value.trim();
   const regional = document.getElementById("municipality-regional").value;
   const mr = document.getElementById("municipality-mr").value.trim();
@@ -1856,74 +1913,102 @@ async function handleMunicipalitySubmit(e) {
     return;
   }
 
-  const requestCode = generateNextRequestCode();
-
-  const newMunicipality = {
-    id: "mun-" + Date.now(),
-    request_code: requestCode,
-    nome: name,
-    regional,
-    mr,
-    responsavel_nome: contactName,
-    responsavel_email: contactEmail,
-    responsavel_telefone: formatPhoneNumber(contactPhone),
-    status_jepp: jeppStatus,
-    municipio_ee_70: edu70,
-    cooperativa_possui: hasCoop,
-    lei_possui: hasLaw,
-    comite_possui: hasCommittee,
-    ies_possui: hasIes,
-    empresa_simulada: hasEmpresaSimulada,
-    escola_sebrae: hasEscolaSebrae,
-    status: "pending",
-    created_at: new Date().toISOString()
-  };
-
-  try {
-    const existing = JSON.parse(localStorage.getItem("sebrae_pending_municipalities") || "[]");
-    existing.push(newMunicipality);
-    localStorage.setItem("sebrae_pending_municipalities", JSON.stringify(existing));
-  } catch (err) {
-    console.error("Erro ao salvar no localStorage:", err);
+  // Trava o envio para evitar múltiplos cliques
+  isSubmittingMunicipality = true;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i data-lucide="loader" class="animate-spin"></i> Registrando...';
+    if (typeof lucide !== "undefined") lucide.createIcons({ root: submitBtn });
   }
 
-  // Envia via backend local/remoto com token JWT e tenta direto no Supabase
-  try {
-    const token = localStorage.getItem("sebrae_auth_token") || localStorage.getItem("sebrae_admin_token") || "";
-    const headers = { "Content-Type": "application/json" };
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
-    await fetch(getApiUrl("/api/municipalities"), {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify(newMunicipality)
-    });
-  } catch (err) {
-    // Ignored in static / file mode
-  }
+  // Exibe o Pop-up com a mensagem solicitada pelo usuário
+  showSubmissionLoadingModal("Aguarde, estamos registrando as informações...");
 
-  const supabaseUrl = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_URL) || "";
-  const supabaseKey = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_KEY) || "";
-  if (supabaseUrl && supabaseKey) {
+  try {
+    const requestCode = generateNextRequestCode();
+
+    const newMunicipality = {
+      id: "mun-" + Date.now(),
+      request_code: requestCode,
+      nome: name,
+      regional,
+      mr,
+      responsavel_nome: contactName,
+      responsavel_email: contactEmail,
+      responsavel_telefone: formatPhoneNumber(contactPhone),
+      status_jepp: jeppStatus,
+      municipio_ee_70: edu70,
+      cooperativa_possui: hasCoop,
+      lei_possui: hasLaw,
+      comite_possui: hasCommittee,
+      ies_possui: hasIes,
+      empresa_simulada: hasEmpresaSimulada,
+      escola_sebrae: hasEscolaSebrae,
+      status: "pending",
+      created_at: new Date().toISOString()
+    };
+
     try {
-      await fetch(`${supabaseUrl}/rest/v1/municipalities`, {
+      const existing = JSON.parse(localStorage.getItem("sebrae_pending_municipalities") || "[]");
+      existing.push(newMunicipality);
+      localStorage.setItem("sebrae_pending_municipalities", JSON.stringify(existing));
+    } catch (err) {
+      console.error("Erro ao salvar no localStorage:", err);
+    }
+
+    // Envia via backend local/remoto com token JWT e tenta direto no Supabase
+    try {
+      const token = localStorage.getItem("sebrae_auth_token") || localStorage.getItem("sebrae_admin_token") || "";
+      const headers = { "Content-Type": "application/json" };
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+      await fetch(getApiUrl("/api/municipalities"), {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": supabaseKey,
-          "Authorization": `Bearer ${supabaseKey}`,
-          "Prefer": "return=minimal"
-        },
+        headers: headers,
         body: JSON.stringify(newMunicipality)
       });
-    } catch (sbErr) {}
-  }
+    } catch (err) {
+      // Ignored in static / file mode
+    }
 
-  closeMunicipalityModal();
-  openConfirmCodeModal(requestCode);
-  showToast(`Solicitação de cadastro de ${name} enviada com sucesso! Protocolo: ${requestCode}`);
-  document.getElementById("municipality-form").reset();
+    const supabaseUrl = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_URL) || "";
+    const supabaseKey = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_KEY) || "";
+    if (supabaseUrl && supabaseKey) {
+      try {
+        await fetch(`${supabaseUrl}/rest/v1/municipalities`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": supabaseKey,
+            "Authorization": `Bearer ${supabaseKey}`,
+            "Prefer": "return=minimal"
+          },
+          body: JSON.stringify(newMunicipality)
+        });
+      } catch (sbErr) {}
+    }
+
+    // Delay de segurança (setTimeout) para garantia de persistência e feedback visual
+    await new Promise(resolve => setTimeout(resolve, 1400));
+
+    hideSubmissionLoadingModal();
+    closeMunicipalityModal();
+    openConfirmCodeModal(requestCode);
+    showToast(`Solicitação de cadastro de ${name} enviada com sucesso! Protocolo: ${requestCode}`);
+    document.getElementById("municipality-form").reset();
+  } catch (err) {
+    console.error("Erro no processamento do município:", err);
+    hideSubmissionLoadingModal();
+    showToast("Erro ao processar as informações. Tente novamente.");
+  } finally {
+    isSubmittingMunicipality = false;
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = origBtnContent;
+      if (typeof lucide !== "undefined") lucide.createIcons({ root: submitBtn });
+    }
+  }
 }
 
 function toggleConditionalFields(checkboxId, targetDivId) {
@@ -2447,8 +2532,14 @@ function bindEvents() {
 // FORM SUBMISSION & CASE CREATION
 // ==========================================================================
 
+let isSubmittingCase = false;
+
 async function handleFormSubmit(e) {
   e.preventDefault();
+
+  if (isSubmittingCase) {
+    return; // Impede duplo clique no cadastro de cases
+  }
 
   const submitBtn = e.target.querySelector('button[type="submit"]');
   const origText = submitBtn ? submitBtn.innerHTML : "";
@@ -2549,121 +2640,135 @@ async function handleFormSubmit(e) {
     }
   }
 
-  // Show a loading feedback on the submit button
+  // Show a loading feedback on the submit button and open loading modal
   if (submitBtn) {
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i data-lucide="loader" class="animate-spin"></i> Salvando...';
     lucide.createIcons({ root: submitBtn });
   }
+  showSubmissionLoadingModal("Aguarde, estamos registrando as informações...");
 
-  // Look up coordinates (dynamic Nominatim / static fallback)
-  const coordsObj = await window.getMunicipalityCoordinates(municipio, regional);
-  
-  const requestCode = generateNextRequestCode();
-
-  const newCase = {
-    id: "case-" + Date.now(),
-    request_code: requestCode,
-    municipio: coordsObj.name, // standardize name if matched in db
-    regional,
-    mr,
-    escola,
-    titulo,
-    descricao,
-    tecnicoNome,
-    tecnicoEmail,
-    tecnicoContato: formatPhoneNumber(tecnicoContato),
+  try {
+    // Look up coordinates (dynamic Nominatim / static fallback)
+    const coordsObj = await window.getMunicipalityCoordinates(municipio, regional);
     
-    // Type and contact info
-    tipoCase: currentRegisterType,
-    professorNome,
-    professorEmail,
-    professorTelefone: formatPhoneNumber(professorTelefone),
-    estudanteNome,
-    estudanteEmail,
-    estudanteTelefone: formatPhoneNumber(estudanteTelefone),
-    
-    // Legacy support fields
-    hasStudentCase: currentRegisterType === 'estudante',
-    studentSummary: "",
-    studentContact: "",
-    
-    hasCoop,
-    coopSummary: hasCoop ? coopSummary : "",
-    edu70: edu70Val,
-    hasLaw,
-    lawSummary: hasLaw ? lawSummary : "",
-    hasCommittee,
-    committeeSummary: hasCommittee ? committeeSummary : "",
-    hasIes,
-    iesSummary: hasIes ? iesSummary : "",
-    jeppStatus,
-    lat: coordsObj.lat,
-    lng: coordsObj.lng
-  };
+    const requestCode = generateNextRequestCode();
 
-  // Add to state and persist
-  if (isCloudMode) {
-    const supabaseUrl = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_URL) || "";
-    const supabaseKey = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_KEY) || "";
+    const newCase = {
+      id: "case-" + Date.now(),
+      request_code: requestCode,
+      municipio: coordsObj.name, // standardize name if matched in db
+      regional,
+      mr,
+      escola,
+      titulo,
+      descricao,
+      tecnicoNome,
+      tecnicoEmail,
+      tecnicoContato: formatPhoneNumber(tecnicoContato),
+      
+      // Type and contact info
+      tipoCase: currentRegisterType,
+      professorNome,
+      professorEmail,
+      professorTelefone: formatPhoneNumber(professorTelefone),
+      estudanteNome,
+      estudanteEmail,
+      estudanteTelefone: formatPhoneNumber(estudanteTelefone),
+      
+      // Legacy support fields
+      hasStudentCase: currentRegisterType === 'estudante',
+      studentSummary: "",
+      studentContact: "",
+      
+      hasCoop,
+      coopSummary: hasCoop ? coopSummary : "",
+      edu70: edu70Val,
+      hasLaw,
+      lawSummary: hasLaw ? lawSummary : "",
+      hasCommittee,
+      committeeSummary: hasCommittee ? committeeSummary : "",
+      hasIes,
+      iesSummary: hasIes ? iesSummary : "",
+      jeppStatus,
+      lat: coordsObj.lat,
+      lng: coordsObj.lng
+    };
 
-    try {
-      const dbCase = mapAppToDatabase(newCase);
-      let res;
-      if (supabaseUrl && supabaseKey) {
-        res = await fetch(`${supabaseUrl}/rest/v1/cases`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "apikey": supabaseKey,
-            "Authorization": `Bearer ${supabaseKey}`,
-            "Prefer": "return=minimal"
-          },
-          body: JSON.stringify(dbCase)
-        });
-      } else {
-        const token = localStorage.getItem("sebrae_auth_token") || localStorage.getItem("sebrae_admin_token") || "";
-        const headers = { "Content-Type": "application/json" };
-        if (token) {
-          headers["Authorization"] = `Bearer ${token}`;
+    // Add to state and persist
+    if (isCloudMode) {
+      const supabaseUrl = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_URL) || "";
+      const supabaseKey = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_KEY) || "";
+
+      try {
+        const dbCase = mapAppToDatabase(newCase);
+        let res;
+        if (supabaseUrl && supabaseKey) {
+          res = await fetch(`${supabaseUrl}/rest/v1/cases`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "apikey": supabaseKey,
+              "Authorization": `Bearer ${supabaseKey}`,
+              "Prefer": "return=minimal"
+            },
+            body: JSON.stringify(dbCase)
+          });
+        } else {
+          const token = localStorage.getItem("sebrae_auth_token") || localStorage.getItem("sebrae_admin_token") || "";
+          const headers = { "Content-Type": "application/json" };
+          if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+          }
+          res = await fetch(getApiUrl("/api/cases"), {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify(dbCase)
+          });
         }
-        res = await fetch(getApiUrl("/api/cases"), {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify(dbCase)
-        });
+        
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+        
+        cases.push(newCase);
+      } catch (e) {
+        console.error("Erro ao salvar case no Supabase:", e);
+        showToast("Erro ao salvar na nuvem! O case foi mantido apenas localmente.");
+        cases.push(newCase);
+        localStorage.setItem("sebrae_success_cases", JSON.stringify(cases));
       }
-      
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
-      
-      cases.push(newCase);
-    } catch (e) {
-      console.error("Erro ao salvar case no Supabase:", e);
-      showToast("Erro ao salvar na nuvem! O case foi mantido apenas localmente.");
+    } else {
       cases.push(newCase);
       localStorage.setItem("sebrae_success_cases", JSON.stringify(cases));
     }
-  } else {
-    cases.push(newCase);
-    localStorage.setItem("sebrae_success_cases", JSON.stringify(cases));
+
+    // Delay de segurança (setTimeout) para feedback e persistência
+    await new Promise(resolve => setTimeout(resolve, 1200));
+
+    hideSubmissionLoadingModal();
+
+    // Close panel and notify dashboard
+    closeRegisterPanel();
+    renderDashboard();
+
+    // Focus map on the newly added marker
+    map.setView([coordsObj.lat, coordsObj.lng], 10);
+    
+    // Custom toast notification of success
+    showToast(`Case de sucesso da ${escola} em ${municipio} foi cadastrado com sucesso!`);
+  } catch (err) {
+    console.error("Erro no cadastro de case:", err);
+    hideSubmissionLoadingModal();
+    showToast("Erro ao processar as informações do case. Tente novamente.");
+  } finally {
+    isSubmittingCase = false;
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = origText;
+      if (typeof lucide !== "undefined") lucide.createIcons({ root: submitBtn });
+    }
   }
-
-  // Reset button state
-  submitBtn.disabled = false;
-  submitBtn.innerHTML = origText;
-  lucide.createIcons({ root: submitBtn });
-
-  // Close panel and notify dashboard
-  closeRegisterPanel();
-  renderDashboard();
-
-  // Focus map on the newly added marker
-  map.setView([coordsObj.lat, coordsObj.lng], 10);
-  
-  // Custom toast notification of success
-  showToast(`Case de sucesso da ${escola} em ${municipio} foi cadastrado com sucesso!`);
 }
 
 function showToast(message) {

@@ -192,6 +192,26 @@ class SecurityRateLimiter:
 
 rate_limiter = SecurityRateLimiter()
 
+# Cooldown e controle de desduplicação de submissões de formulários
+recent_form_submissions = {}
+SUBMISSION_COOLDOWN_SECONDS = 15
+
+def check_form_duplicate_submission(form_type: str, client_ip: str, unique_key: str) -> tuple[bool, int]:
+    now = time.time()
+    composite_key = (form_type, client_ip, unique_key.strip().lower())
+    last_time = recent_form_submissions.get(composite_key, 0)
+    if now - last_time < SUBMISSION_COOLDOWN_SECONDS:
+        remaining = max(1, int(SUBMISSION_COOLDOWN_SECONDS - (now - last_time)))
+        return True, remaining
+    # Purge old entries if dict grows
+    if len(recent_form_submissions) > 500:
+        cutoff = now - 3600
+        for k in list(recent_form_submissions.keys()):
+            if recent_form_submissions[k] < cutoff:
+                del recent_form_submissions[k]
+    recent_form_submissions[composite_key] = now
+    return False, 0
+
 def is_valid_resource_id(identifier: str) -> bool:
     if not identifier or not isinstance(identifier, str):
         return False
@@ -400,6 +420,18 @@ class SecureBackendHandler(SimpleHTTPRequestHandler):
                 self.send_json_response(400, {"error": err})
                 return
 
+        # Prevenção contra múltiplos envios do mesmo case em rápida sucessão
+        client_ip = self.get_client_ip()
+        first_rec = records[0] if records else {}
+        case_key = f"{first_rec.get('titulo') or first_rec.get('titulo_projeto') or ''}:{first_rec.get('municipio') or ''}"
+        is_dup, remaining = check_form_duplicate_submission("case", client_ip, case_key)
+        if is_dup:
+            self.send_json_response(429, {
+                "error": f"Esta solicitação já foi enviada e está sendo processada. Aguarde {remaining} segundos para evitar envios duplicados.",
+                "retry_after": remaining
+            })
+            return
+
         records = [sanitize_string_fields(r) for r in records]
 
         for record in records:
@@ -440,6 +472,17 @@ class SecureBackendHandler(SimpleHTTPRequestHandler):
         ok, err = validate_space_string(payload, [name_field, reg_field, mr_field])
         if not ok:
             self.send_json_response(400, {"error": err})
+            return
+
+        # Prevenção contra múltiplos envios do mesmo município em rápida sucessão
+        client_ip = self.get_client_ip()
+        mun_name = str(payload.get(name_field) or "").strip()
+        is_dup, remaining = check_form_duplicate_submission("municipality", client_ip, mun_name)
+        if is_dup:
+            self.send_json_response(429, {
+                "error": f"Esta solicitação já foi enviada e está sendo processada. Aguarde {remaining} segundos para evitar envios duplicados.",
+                "retry_after": remaining
+            })
             return
 
         payload = sanitize_string_fields(payload)

@@ -183,6 +183,8 @@ class TestLint(unittest.TestCase):
             "function handleFormSubmit",
             "function handleMunicipalitySubmit",
             "function getRegionalColorClass",
+            "function showSubmissionLoadingModal",
+            "isSubmittingMunicipality",
             "sebrae_auth_token"
         ]
         for func in required_app_funcs:
@@ -207,7 +209,7 @@ class TestLint(unittest.TestCase):
             self.assertIn(func, admin_code, f"admin.js deve conter '{func}'")
 
     def test_html_files_integrity(self):
-        """Verifica que index.html e admin.html existem e referenciam os scripts corretos."""
+        """Verifica que index.html e admin.html existem e referenciam os scripts e modais corretos."""
         for html_name, script_name in [("index.html", "app.js"), ("admin.html", "admin.js")]:
             html_path = os.path.join(ROOT_DIR, html_name)
             self.assertTrue(os.path.exists(html_path), f"{html_name} deve existir.")
@@ -215,6 +217,12 @@ class TestLint(unittest.TestCase):
                 content = f.read()
             self.assertIn("<!DOCTYPE html>", content)
             self.assertIn(script_name, content, f"{html_name} deve referenciar {script_name}")
+        
+        # Verifica presenca do modal de bloqueio de submissao
+        with open(os.path.join(ROOT_DIR, "index.html"), "r", encoding="utf-8") as f:
+            index_content = f.read()
+        self.assertIn("modal-submission-loading", index_content, "index.html deve conter o modal de bloqueio de envio.")
+        self.assertIn("Aguarde, estamos registrando as informações...", index_content)
 
 
 if __name__ == "__main__":
