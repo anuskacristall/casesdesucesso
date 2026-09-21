@@ -1800,6 +1800,28 @@ async function handleMunicipalitySubmit(e) {
   const contactEmail = document.getElementById("municipality-contact-email").value.trim();
   const contactPhone = document.getElementById("municipality-contact-phone").value.trim();
   const jeppStatus = document.getElementById("municipality-jepp-status").value;
+
+  // Space String validation on required fields
+  const requiredFields = [
+    { name: "Nome do Município", val: name, id: "municipality-name" },
+    { name: "Regional", val: regional, id: "municipality-regional" },
+    { name: "Microrregião", val: mr, id: "municipality-mr" },
+    { name: "Nome do Responsável", val: contactName, id: "municipality-contact-name" },
+    { name: "E-mail do Responsável", val: contactEmail, id: "municipality-contact-email" },
+    { name: "Telefone do Responsável", val: contactPhone, id: "municipality-contact-phone" }
+  ];
+
+  for (const f of requiredFields) {
+    if (!f.val || f.val.trim().length === 0) {
+      showToast(`O campo "${f.name}" não pode ficar vazio ou conter apenas espaços.`);
+      const el = document.getElementById(f.id);
+      if (el) {
+        el.focus();
+        el.style.borderColor = "var(--danger, #ef4444)";
+      }
+      return;
+    }
+  }
   
   const edu70El = document.querySelector('input[name="municipality-edu-70"]:checked');
   const edu70 = edu70El ? edu70El.value : "nao";
@@ -1865,11 +1887,16 @@ async function handleMunicipalitySubmit(e) {
     console.error("Erro ao salvar no localStorage:", err);
   }
 
-  // Envia via backend local/remoto e tenta direto no Supabase
+  // Envia via backend local/remoto com token JWT e tenta direto no Supabase
   try {
+    const token = localStorage.getItem("sebrae_auth_token") || localStorage.getItem("sebrae_admin_token") || "";
+    const headers = { "Content-Type": "application/json" };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
     await fetch(getApiUrl("/api/municipalities"), {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: headers,
       body: JSON.stringify(newMunicipality)
     });
   } catch (err) {
@@ -2422,7 +2449,10 @@ function bindEvents() {
 
 async function handleFormSubmit(e) {
   e.preventDefault();
-  
+
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const origText = submitBtn ? submitBtn.innerHTML : "";
+
   const municipio = document.getElementById("form-municipio").value.trim();
   const regional = document.getElementById("form-regional").value;
   const mr = document.getElementById("form-mr").value.trim();
@@ -2441,6 +2471,37 @@ async function handleFormSubmit(e) {
   const estudanteNome = currentRegisterType === 'estudante' ? document.getElementById("form-estudante-nome").value.trim() : "";
   const estudanteEmail = currentRegisterType === 'estudante' ? document.getElementById("form-estudante-email").value.trim() : "";
   const estudanteTelefone = currentRegisterType === 'estudante' ? document.getElementById("form-estudante-contato").value.trim() : "";
+
+  // Space String validation on required fields
+  const requiredFields = [
+    { name: "Município", val: municipio, id: "form-municipio" },
+    { name: "Regional", val: regional, id: "form-regional" },
+    { name: "Microrregião", val: mr, id: "form-mr" },
+    { name: "Escola / Instituição", val: escola, id: "form-escola" },
+    { name: "Título", val: titulo, id: "form-titulo" },
+    { name: "Descrição", val: descricao, id: "form-descricao" },
+    { name: "Nome do Técnico", val: tecnicoNome, id: "form-tecnico-nome" },
+    { name: "E-mail do Técnico", val: tecnicoEmail, id: "form-tecnico-email" }
+  ];
+
+  if (currentRegisterType === 'professor') {
+    requiredFields.push({ name: "Nome do Professor", val: professorNome, id: "form-professor-nome" });
+    requiredFields.push({ name: "E-mail do Professor", val: professorEmail, id: "form-professor-email" });
+  } else if (currentRegisterType === 'estudante') {
+    requiredFields.push({ name: "Nome do Estudante", val: estudanteNome, id: "form-estudante-nome" });
+  }
+
+  for (const f of requiredFields) {
+    if (!f.val || f.val.trim().length === 0) {
+      showToast(`O campo "${f.name}" não pode ficar vazio ou conter apenas espaços.`);
+      const el = document.getElementById(f.id);
+      if (el) {
+        el.focus();
+        el.style.borderColor = "var(--danger, #ef4444)";
+      }
+      return;
+    }
+  }
   
   const hasCoop = document.getElementById("has-coop").checked;
   const coopSummary = document.getElementById("form-coop-summary").value.trim();
@@ -2464,8 +2525,7 @@ async function handleFormSubmit(e) {
     showToast("Telefone do técnico inválido. Use o formato com DDD: (XX) XXXXX-XXXX");
     const el = document.getElementById("form-tecnico-contato");
     if (el) { el.focus(); el.style.borderColor = "var(--danger, #ef4444)"; }
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = origText;
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = origText; }
     return;
   }
 
@@ -2474,8 +2534,7 @@ async function handleFormSubmit(e) {
       showToast("Telefone do professor inválido. Use o formato com DDD: (XX) XXXXX-XXXX");
       const el = document.getElementById("form-professor-contato");
       if (el) { el.focus(); el.style.borderColor = "var(--danger, #ef4444)"; }
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = origText;
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = origText; }
       return;
     }
   }
@@ -2485,18 +2544,17 @@ async function handleFormSubmit(e) {
       showToast("Telefone do estudante inválido. Use o formato com DDD: (XX) XXXXX-XXXX");
       const el = document.getElementById("form-estudante-contato");
       if (el) { el.focus(); el.style.borderColor = "var(--danger, #ef4444)"; }
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = origText;
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = origText; }
       return;
     }
   }
 
   // Show a loading feedback on the submit button
-  const submitBtn = e.target.querySelector('button[type="submit"]');
-  const origText = submitBtn.innerHTML;
-  submitBtn.disabled = true;
-  submitBtn.innerHTML = '<i data-lucide="loader" class="animate-spin"></i> Salvando...';
-  lucide.createIcons({ root: submitBtn });
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i data-lucide="loader" class="animate-spin"></i> Salvando...';
+    lucide.createIcons({ root: submitBtn });
+  }
 
   // Look up coordinates (dynamic Nominatim / static fallback)
   const coordsObj = await window.getMunicipalityCoordinates(municipio, regional);
@@ -2564,11 +2622,14 @@ async function handleFormSubmit(e) {
           body: JSON.stringify(dbCase)
         });
       } else {
+        const token = localStorage.getItem("sebrae_auth_token") || localStorage.getItem("sebrae_admin_token") || "";
+        const headers = { "Content-Type": "application/json" };
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
         res = await fetch(getApiUrl("/api/cases"), {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          headers: headers,
           body: JSON.stringify(dbCase)
         });
       }
@@ -2664,48 +2725,86 @@ function checkAuth() {
   }
 }
 
-function handleLogin(e) {
+async function handleLogin(e) {
   e.preventDefault();
   const email = document.getElementById("login-email").value.trim();
   const password = document.getElementById("login-password").value;
   const errorMsg = document.getElementById("login-error");
   const loginBtn = document.getElementById("btn-login");
   
-  if (email.toLowerCase() === "admin@sebraemg.com.br" && password === "admin123") {
-    errorMsg.classList.remove("active");
-    loginBtn.disabled = true;
-    loginBtn.innerHTML = '<i data-lucide="loader" class="animate-spin" style="width: 18px; height: 18px;"></i> Acessando Admin...';
-    lucide.createIcons({ root: loginBtn });
-    
-    setTimeout(() => {
-      localStorage.setItem("sebrae_admin_authenticated", "true");
+  errorMsg.classList.remove("active");
+  loginBtn.disabled = true;
+  loginBtn.innerHTML = '<i data-lucide="loader" class="animate-spin" style="width: 18px; height: 18px;"></i> Autenticando...';
+  lucide.createIcons({ root: loginBtn });
+
+  try {
+    const res = await fetch(getApiUrl("/api/login/user"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+
+    if (res.status === 429) {
+      const data = await res.json();
+      errorMsg.textContent = data.error || "Muitas tentativas. Bloqueio temporário por segurança.";
+      errorMsg.classList.add("active");
       loginBtn.disabled = false;
       loginBtn.innerHTML = "<span>Entrar no Painel</span>";
-      window.location.href = "admin.html";
-    }, 600);
-    return;
-  }
+      return;
+    }
 
-  if (email === "teste@sebraemg.com.br" && password === "teste123") {
-    errorMsg.classList.remove("active");
-    loginBtn.disabled = true;
-    loginBtn.innerHTML = '<i data-lucide="loader" class="animate-spin" style="width: 18px; height: 18px;"></i> Entrando...';
-    lucide.createIcons({ root: loginBtn });
-    
-    setTimeout(() => {
+    if (res.ok) {
+      const data = await res.json();
+      if (data.token) {
+        localStorage.setItem("sebrae_auth_token", data.token);
+      }
+      if (data.role === "admin") {
+        localStorage.setItem("sebrae_admin_token", data.token);
+        localStorage.setItem("sebrae_admin_authenticated", "true");
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = "<span>Entrar no Painel</span>";
+        window.location.href = "admin.html";
+        return;
+      }
+
       localStorage.setItem("sebrae_authenticated", "true");
       loginBtn.disabled = false;
       loginBtn.innerHTML = "<span>Entrar no Painel</span>";
       checkAuth();
       showToast("Autenticado com sucesso!");
-    }, 800);
-  } else {
-    errorMsg.classList.add("active");
+      return;
+    }
+  } catch (err) {
+    console.warn("Backend login indisponível, fallback para credenciais locais:", err);
   }
+
+  // Fallback demo credentials (for static/offline file usage)
+  if (email.toLowerCase() === "admin@sebraemg.com.br" && password === "admin123") {
+    localStorage.setItem("sebrae_admin_authenticated", "true");
+    loginBtn.disabled = false;
+    loginBtn.innerHTML = "<span>Entrar no Painel</span>";
+    window.location.href = "admin.html";
+    return;
+  }
+
+  if (email.toLowerCase() === "teste@sebraemg.com.br" && password === "teste123") {
+    localStorage.setItem("sebrae_authenticated", "true");
+    loginBtn.disabled = false;
+    loginBtn.innerHTML = "<span>Entrar no Painel</span>";
+    checkAuth();
+    showToast("Autenticado com sucesso!");
+    return;
+  }
+
+  errorMsg.textContent = "Credenciais inválidas. Verifique seu e-mail e senha.";
+  errorMsg.classList.add("active");
+  loginBtn.disabled = false;
+  loginBtn.innerHTML = "<span>Entrar no Painel</span>";
 }
 
 function handleLogout() {
   localStorage.removeItem("sebrae_authenticated");
+  localStorage.removeItem("sebrae_auth_token");
   checkAuth();
   
   // Clear input fields

@@ -18,6 +18,15 @@ function getApiUrl(path) {
   return path;
 }
 
+function getAdminAuthHeaders(extraHeaders = {}) {
+  const token = localStorage.getItem("sebrae_admin_token") || localStorage.getItem("sebrae_auth_token") || "";
+  const headers = { "Content-Type": "application/json", ...extraHeaders };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
 // Status formatting helper
 const STATUS_CONFIG = {
   pending: { label: 'Pendente', class: 'pending' },
@@ -74,7 +83,17 @@ async function handleAdminLoginSubmit(e) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password })
     });
+    if (res.status === 429) {
+      const data = await res.json();
+      errorBox.textContent = data.error || "Muitas tentativas incorretas. Bloqueio temporário por segurança.";
+      errorBox.classList.add("active");
+      return;
+    }
     if (res.ok) {
+      const data = await res.json();
+      if (data.token) {
+        localStorage.setItem("sebrae_admin_token", data.token);
+      }
       isAuthenticated = true;
     }
   } catch (err) {
@@ -100,12 +119,14 @@ async function handleAdminLoginSubmit(e) {
       checkAdminAuth();
     }, 400);
   } else {
+    errorBox.textContent = "Credenciais administrativas inválidas. Acesso restrito.";
     errorBox.classList.add("active");
   }
 }
 
 function handleAdminLogout() {
   localStorage.removeItem("sebrae_admin_authenticated");
+  localStorage.removeItem("sebrae_admin_token");
   checkAdminAuth();
 }
 
@@ -719,7 +740,10 @@ async function updateMunicipalityStatus(id, newStatus, successMsg) {
   // 2. Try Server backend PATCH
   const action = newStatus === "approved" ? "approve" : "reject";
   try {
-    await fetch(getApiUrl(`/api/municipalities/${action}/${encodeURIComponent(id)}`), { method: "PATCH" });
+    await fetch(getApiUrl(`/api/municipalities/${action}/${encodeURIComponent(id)}`), {
+      method: "PATCH",
+      headers: getAdminAuthHeaders()
+    });
   } catch (err) {
     // 3. Try Supabase REST Direct PATCH
     const supabaseUrl = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_URL) || "";
@@ -786,7 +810,10 @@ async function updateCaseStatus(id, newStatus, successMsg) {
   // 2. Try Server backend PATCH
   const action = newStatus === "approved" ? "approve" : "reject";
   try {
-    await fetch(getApiUrl(`/api/cases/${action}/${encodeURIComponent(id)}`), { method: "PATCH" });
+    await fetch(getApiUrl(`/api/cases/${action}/${encodeURIComponent(id)}`), {
+      method: "PATCH",
+      headers: getAdminAuthHeaders()
+    });
   } catch (err) {
     // 3. Try Supabase REST Direct PATCH
     const supabaseUrl = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_URL) || "";
@@ -1078,7 +1105,10 @@ function deleteMunicipality(id) {
 
       // 3. Try server DELETE
       try {
-        await fetch(getApiUrl(`/api/municipalities/${encodeURIComponent(id)}`), { method: "DELETE" });
+        await fetch(getApiUrl(`/api/municipalities/${encodeURIComponent(id)}`), {
+          method: "DELETE",
+          headers: getAdminAuthHeaders()
+        });
       } catch (err) {
         console.warn("Falha no DELETE servidor:", err);
       }
@@ -1128,7 +1158,10 @@ function deleteCase(id) {
 
       // 3. Try server DELETE
       try {
-        await fetch(getApiUrl(`/api/cases/${encodeURIComponent(id)}`), { method: "DELETE" });
+        await fetch(getApiUrl(`/api/cases/${encodeURIComponent(id)}`), {
+          method: "DELETE",
+          headers: getAdminAuthHeaders()
+        });
       } catch (err) {
         console.warn("Falha no DELETE servidor:", err);
       }
@@ -1196,11 +1229,21 @@ async function handleSaveMunicipalityEdit(e) {
   const item = loadedMunicipalities.find((m) => String(m.id) === String(id));
   if (!item) return;
 
+  const nome = document.getElementById("edit-mun-nome").value.trim();
+  const regional = document.getElementById("edit-mun-regional").value.trim();
+  const mr = document.getElementById("edit-mun-mr").value.trim();
+
+  // Space string validation
+  if (!nome || nome.length === 0 || !regional || regional.length === 0 || !mr || mr.length === 0) {
+    showAdminToast("Os campos Nome, Regional e Microrregião não podem ficar vazios ou conter apenas espaços.", "error");
+    return;
+  }
+
   const updatedFields = {
-    nome: document.getElementById("edit-mun-nome").value.trim(),
-    municipio: document.getElementById("edit-mun-nome").value.trim(),
-    regional: document.getElementById("edit-mun-regional").value.trim(),
-    mr: document.getElementById("edit-mun-mr").value.trim(),
+    nome: nome,
+    municipio: nome,
+    regional: regional,
+    mr: mr,
     status: document.getElementById("edit-mun-status").value,
     responsavel_nome: document.getElementById("edit-mun-resp-nome").value.trim(),
     responsavel_email: document.getElementById("edit-mun-resp-email").value.trim(),
@@ -1242,7 +1285,7 @@ async function handleSaveMunicipalityEdit(e) {
   try {
     await fetch(getApiUrl(`/api/municipalities/${encodeURIComponent(id)}`), {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: getAdminAuthHeaders(),
       body: JSON.stringify(updatedFields)
     });
   } catch (err) {
@@ -1313,19 +1356,31 @@ async function handleSaveCaseEdit(e) {
   const modalidade = document.getElementById("edit-case-modalidade").value;
   const isEstudante = modalidade === "estudante";
 
+  const titulo = document.getElementById("edit-case-titulo").value.trim();
+  const municipio = document.getElementById("edit-case-municipio").value.trim();
+  const regional = document.getElementById("edit-case-regional").value.trim();
+  const escola = document.getElementById("edit-case-escola").value.trim();
+  const descricao = document.getElementById("edit-case-descricao").value.trim();
+
+  // Space string validation
+  if (!titulo || titulo.length === 0 || !municipio || municipio.length === 0 || !regional || regional.length === 0 || !escola || escola.length === 0 || !descricao || descricao.length === 0) {
+    showAdminToast("Os campos Título, Município, Regional, Escola e Descrição não podem ficar vazios ou conter apenas espaços.", "error");
+    return;
+  }
+
   const updatedFields = {
-    titulo_projeto: document.getElementById("edit-case-titulo").value.trim(),
-    titulo: document.getElementById("edit-case-titulo").value.trim(),
+    titulo_projeto: titulo,
+    titulo: titulo,
     tipo_case: modalidade,
     tipoCase: modalidade,
     estudante_possui: isEstudante,
     status: document.getElementById("edit-case-status").value,
-    municipio: document.getElementById("edit-case-municipio").value.trim(),
-    regional: document.getElementById("edit-case-regional").value.trim(),
-    escola_instituicao: document.getElementById("edit-case-escola").value.trim(),
-    escola: document.getElementById("edit-case-escola").value.trim(),
-    descricao_geral: document.getElementById("edit-case-descricao").value.trim(),
-    descricao: document.getElementById("edit-case-descricao").value.trim()
+    municipio: municipio,
+    regional: regional,
+    escola_instituicao: escola,
+    escola: escola,
+    descricao_geral: descricao,
+    descricao: descricao
   };
 
   const autorNome = document.getElementById("edit-case-autor-nome").value.trim();
@@ -1366,7 +1421,7 @@ async function handleSaveCaseEdit(e) {
   try {
     await fetch(getApiUrl(`/api/cases/${encodeURIComponent(id)}`), {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: getAdminAuthHeaders(),
       body: JSON.stringify(updatedFields)
     });
   } catch (err) {
