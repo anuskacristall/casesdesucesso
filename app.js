@@ -1769,6 +1769,23 @@ function openRegisterPanel() {
   toggleConditionalFields("has-ies", "ies-fields");
 }
 
+function confirmDiscardForm(formId) {
+  const form = document.getElementById(formId);
+  if (!form) return true;
+  const textInputs = form.querySelectorAll("input[type='text'], input[type='email'], input[type='tel'], textarea");
+  let hasData = false;
+  for (const inp of textInputs) {
+    if (inp.value && inp.value.trim().length > 0) {
+      hasData = true;
+      break;
+    }
+  }
+  if (hasData) {
+    return window.confirm("Atenção: Existem dados preenchidos no formulário. Tem certeza de que deseja fechar e descartar as informações?");
+  }
+  return true;
+}
+
 function closeRegisterPanel() {
   document.getElementById("register-panel").classList.remove("active");
 }
@@ -2440,8 +2457,12 @@ function bindEvents() {
 
   // Open & Close Panels/Modals
   document.getElementById("btn-open-register").addEventListener("click", openCaseTypeModal);
-  document.getElementById("btn-close-register").addEventListener("click", closeRegisterPanel);
-  document.getElementById("btn-cancel-register").addEventListener("click", closeRegisterPanel);
+  document.getElementById("btn-close-register").addEventListener("click", () => {
+    if (confirmDiscardForm("register-form")) closeRegisterPanel();
+  });
+  document.getElementById("btn-cancel-register").addEventListener("click", () => {
+    if (confirmDiscardForm("register-form")) closeRegisterPanel();
+  });
   
   document.getElementById("btn-close-details").addEventListener("click", closeDetailsModal);
   
@@ -2454,7 +2475,9 @@ function bindEvents() {
   if (btnMun) btnMun.addEventListener("click", () => selectCaseType('municipio'));
 
   const btnCloseMun = document.getElementById("btn-close-municipality");
-  if (btnCloseMun) btnCloseMun.addEventListener("click", closeMunicipalityModal);
+  if (btnCloseMun) btnCloseMun.addEventListener("click", () => {
+    if (confirmDiscardForm("municipality-form")) closeMunicipalityModal();
+  });
 
   const formMun = document.getElementById("municipality-form");
   if (formMun) formMun.addEventListener("submit", handleMunicipalitySubmit);
@@ -2466,30 +2489,38 @@ function bindEvents() {
   if (btnFinishCode) btnFinishCode.addEventListener("click", closeConfirmCodeModal);
 
   const btnCancelMun = document.getElementById("btn-cancel-municipality");
-  if (btnCancelMun) btnCancelMun.addEventListener("click", closeMunicipalityModal);
+  if (btnCancelMun) btnCancelMun.addEventListener("click", () => {
+    if (confirmDiscardForm("municipality-form")) closeMunicipalityModal();
+  });
 
-  // Close modal/panel on click outer wrapper
+  // Close informational modals on backdrop click
+  // NOTA IMPORTANTE: Formulários de cadastro (register-panel e municipality-modal) NUNCA devem fechar
+  // por clique acidental no backdrop ou ao arrastar barra de rolagem até o final da tela!
   document.getElementById("details-modal").addEventListener("click", (e) => {
     if (e.target.id === "details-modal") closeDetailsModal();
-  });
-  document.getElementById("register-panel").addEventListener("click", (e) => {
-    if (e.target.id === "register-panel") closeRegisterPanel();
   });
   document.getElementById("case-type-modal").addEventListener("click", (e) => {
     if (e.target.id === "case-type-modal") closeCaseTypeModal();
   });
-  const modalMun = document.getElementById("municipality-modal");
-  if (modalMun) {
-    modalMun.addEventListener("click", (e) => {
-      if (e.target.id === "municipality-modal") closeMunicipalityModal();
-    });
-  }
   const modalCode = document.getElementById("confirm-code-modal");
   if (modalCode) {
     modalCode.addEventListener("click", (e) => {
       if (e.target.id === "confirm-code-modal") closeConfirmCodeModal();
     });
   }
+
+  // Previne envio acidental de formulários ao pressionar ENTER em campos de texto
+  const preventPrematureEnterSubmit = (formId) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    form.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && e.target.tagName === "INPUT" && e.target.type !== "submit") {
+        e.preventDefault();
+      }
+    });
+  };
+  preventPrematureEnterSubmit("municipality-form");
+  preventPrematureEnterSubmit("register-form");
 
   // Form switches bindings (Case Registration)
   document.getElementById("has-coop").addEventListener("change", () => {

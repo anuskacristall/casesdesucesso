@@ -224,6 +224,18 @@ class TestLint(unittest.TestCase):
         self.assertIn("modal-submission-loading", index_content, "index.html deve conter o modal de bloqueio de envio.")
         self.assertIn("Aguarde, estamos registrando as informações...", index_content)
 
+    def test_form_protection_against_accidental_close(self):
+        """Garante que formulários não fecham ao clicar fora nem ao teclar Enter nos inputs."""
+        app_js_path = os.path.join(ROOT_DIR, "app.js")
+        with open(app_js_path, "r", encoding="utf-8") as f:
+            app_code = f.read()
+
+        self.assertIn("function confirmDiscardForm", app_code)
+        self.assertIn("preventPrematureEnterSubmit", app_code)
+        # Garante que cliques no backdrop de register-panel e municipality-modal NÃO chamam o fechamento
+        self.assertNotIn('if (e.target.id === "register-panel") closeRegisterPanel()', app_code)
+        self.assertNotIn('if (e.target.id === "municipality-modal") closeMunicipalityModal()', app_code)
+
 
 if __name__ == "__main__":
     unittest.main()

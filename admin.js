@@ -1464,12 +1464,10 @@ document.addEventListener("DOMContentLoaded", () => {
     logoutBtn.addEventListener("click", handleAdminLogout);
   }
 
-  // Close modals on clicking outside backdrop
+  // Close modals on clicking outside backdrop (only for read-only view modals)
   window.addEventListener("click", (e) => {
     if (e.target.id === "modal-municipality-details") closeMunicipalityDetailsModal();
     if (e.target.id === "modal-case-details") closeCaseDetailsModal();
-    if (e.target.id === "modal-edit-municipality") closeEditMunicipalityModal();
-    if (e.target.id === "modal-edit-case") closeEditCaseModal();
   });
 
   checkAdminAuth();
