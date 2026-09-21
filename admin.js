@@ -421,13 +421,15 @@ function renderMunicipalitiesTable() {
     // Todos os indicadores selecionados como SIM citados
     const isValSim = (v) => v === true || String(v || "").trim().toLowerCase() === "sim";
     const indBadges = [];
-    if (isValSim(item.municipio_ee_70)) indBadges.push(`<span class="mini-badge sim" title="Educação Empreendedora em > 70% da Rede">Educação Empreendedora &gt; 70%</span>`);
+    if (isValSim(item.municipio_ee_70)) indBadges.push(`<span class="mini-badge sim" title="Educação Empreendedora em mais de 70% do município">EE &gt; 70%</span>`);
+    if (isValSim(item.convenio_sebrae)) indBadges.push(`<span class="mini-badge sim" title="Convênio/termo de parceria com o Sebrae">Convênio Sebrae</span>`);
+    if (isValSim(item.parceria_superintendencia)) indBadges.push(`<span class="mini-badge sim" title="Parceria com superintendência de ensino">Parceria Superintendência</span>`);
     if (isValSim(item.cooperativa_possui)) indBadges.push(`<span class="mini-badge sim" title="Cooperativa Escolar/Crédito">Cooperativa</span>`);
     if (isValSim(item.lei_possui)) indBadges.push(`<span class="mini-badge sim" title="Lei Municipal de Educação Empreendedora">Lei Educação Empreendedora</span>`);
     if (isValSim(item.comite_possui)) indBadges.push(`<span class="mini-badge sim" title="Comitê Gestor Municipal">Comitê Gestor</span>`);
     if (isValSim(item.ies_possui)) indBadges.push(`<span class="mini-badge sim" title="Parceria com Instituição de Ensino Superior">Parceria Inst. Ensino Superior</span>`);
     if (isValSim(item.empresa_simulada)) indBadges.push(`<span class="mini-badge sim" title="Empresa Simulada">Emp. Simulada</span>`);
-    if (isValSim(item.escola_sebrae)) indBadges.push(`<span class="mini-badge sim" title="Sistema de Ensino / Escola Sebrae">Escola Sebrae</span>`);
+    if (isValSim(item.escola_sebrae)) indBadges.push(`<span class="mini-badge sim" title="Sistema de Ensino Escola do Sebrae">Escola do Sebrae</span>`);
 
     const indicatorsHtml = (jeppBadge || indBadges.length > 0)
       ? `${jeppBadge}${indBadges.join("")}`
@@ -926,8 +928,16 @@ function openMunicipalityDetails(id) {
           ${getIndicatorBadge(item.status_jepp)}
         </div>
         <div class="indicator-check-row">
-          <span>Educação Empreendedora em &gt; 70% da Rede</span>
+          <span>Educação Empreendedora em mais de 70% do município</span>
           ${getIndicatorBadge(item.municipio_ee_70)}
+        </div>
+        <div class="indicator-check-row">
+          <span>Convênio/termo de parceria com o Sebrae</span>
+          ${getIndicatorBadge(item.convenio_sebrae)}
+        </div>
+        <div class="indicator-check-row">
+          <span>Parceria com superintendência de ensino</span>
+          ${getIndicatorBadge(item.parceria_superintendencia)}
         </div>
         <div class="indicator-check-row">
           <span>Cooperativa Escolar/Crédito</span>
@@ -950,7 +960,7 @@ function openMunicipalityDetails(id) {
           ${getIndicatorBadge(item.empresa_simulada)}
         </div>
         <div class="indicator-check-row">
-          <span>Sistema de Ensino / Escola Sebrae</span>
+          <span>Sistema de Ensino Escola do Sebrae</span>
           ${getIndicatorBadge(item.escola_sebrae)}
         </div>
       </div>
@@ -1039,6 +1049,28 @@ function openCaseDetails(id) {
         ${escapeHtml(item.descricao_geral || item.descricao || "Nenhuma descrição fornecida.")}
       </div>
     </div>
+
+    ${(item.empresa_nome || item.empresaNome || item.empresa_tipo || item.empresaTipo || item.empresa_descricao || item.empresaDescricao) ? `
+    <div>
+      <div class="modal-section-title">Dados do Empreendimento</div>
+      <div class="modal-grid-2">
+        <div class="detail-item">
+          <span class="detail-label">Nome da Empresa</span>
+          <span class="detail-value"><strong>${escapeHtml(item.empresa_nome || item.empresaNome || "Não informado")}</strong></span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Tipo de Negócio</span>
+          <span class="detail-value">${escapeHtml(item.empresa_tipo || item.empresaTipo || "Não informado")}</span>
+        </div>
+        <div class="detail-item" style="grid-column: span 2;">
+          <span class="detail-label">Descrição da Empresa</span>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; font-size: 0.88rem; color: #475569; line-height: 1.5; margin-top: 4px;">
+            ${escapeHtml(item.empresa_descricao || item.empresaDescricao || "Não informada.")}
+          </div>
+        </div>
+      </div>
+    </div>
+    ` : ""}
 
     <div>
       <div class="modal-section-title">Autor / Responsável</div>
@@ -1216,6 +1248,12 @@ function openEditMunicipalityModal(id) {
   // Indicators
   document.getElementById("edit-mun-jepp").value = item.status_jepp || "Não";
   document.getElementById("edit-mun-ee70").value = (item.municipio_ee_70 === 'sim' || item.municipio_ee_70 === true) ? "sim" : "nao";
+  if (document.getElementById("edit-mun-convenio")) {
+    document.getElementById("edit-mun-convenio").value = (item.convenio_sebrae === 'sim' || item.convenio_sebrae === true) ? "sim" : "nao";
+  }
+  if (document.getElementById("edit-mun-superintendencia")) {
+    document.getElementById("edit-mun-superintendencia").value = (item.parceria_superintendencia === 'sim' || item.parceria_superintendencia === true) ? "sim" : "nao";
+  }
   document.getElementById("edit-mun-cooperativa").value = (item.cooperativa_possui === 'sim' || item.cooperativa_possui === true) ? "sim" : "nao";
   document.getElementById("edit-mun-lei").value = (item.lei_possui === 'sim' || item.lei_possui === true) ? "sim" : "nao";
   document.getElementById("edit-mun-comite").value = (item.comite_possui === 'sim' || item.comite_possui === true) ? "sim" : "nao";
@@ -1260,6 +1298,8 @@ async function handleSaveMunicipalityEdit(e) {
     responsavel_telefone: document.getElementById("edit-mun-resp-tel").value.trim(),
     status_jepp: document.getElementById("edit-mun-jepp").value,
     municipio_ee_70: document.getElementById("edit-mun-ee70").value,
+    convenio_sebrae: document.getElementById("edit-mun-convenio") ? document.getElementById("edit-mun-convenio").value === "sim" : false,
+    parceria_superintendencia: document.getElementById("edit-mun-superintendencia") ? document.getElementById("edit-mun-superintendencia").value === "sim" : false,
     cooperativa_possui: document.getElementById("edit-mun-cooperativa").value === "sim",
     lei_possui: document.getElementById("edit-mun-lei").value === "sim",
     comite_possui: document.getElementById("edit-mun-comite").value === "sim",
@@ -1339,6 +1379,16 @@ function openEditCaseModal(id) {
   document.getElementById("edit-case-escola").value = item.escola_instituicao || item.escola || "";
   document.getElementById("edit-case-descricao").value = item.descricao_geral || item.descricao || "";
 
+  if (document.getElementById("edit-case-empresa-nome")) {
+    document.getElementById("edit-case-empresa-nome").value = item.empresa_nome || item.empresaNome || "";
+  }
+  if (document.getElementById("edit-case-empresa-tipo")) {
+    document.getElementById("edit-case-empresa-tipo").value = item.empresa_tipo || item.empresaTipo || "";
+  }
+  if (document.getElementById("edit-case-empresa-descricao")) {
+    document.getElementById("edit-case-empresa-descricao").value = item.empresa_descricao || item.empresaDescricao || "";
+  }
+
   const authorName = isEstudante ? (item.estudante_nome || item.estudanteNome) : (item.professor_nome || item.professorNome);
   const authorEmail = isEstudante ? (item.estudante_email || item.estudanteEmail) : (item.professor_email || item.professorEmail);
   const authorTel = isEstudante ? (item.estudante_telefone || item.estudanteTelefone || item.estudante_contato) : (item.professor_telefone || item.professorTelefone);
@@ -1390,7 +1440,13 @@ async function handleSaveCaseEdit(e) {
     escola_instituicao: escola,
     escola: escola,
     descricao_geral: descricao,
-    descricao: descricao
+    descricao: descricao,
+    empresa_nome: document.getElementById("edit-case-empresa-nome") ? document.getElementById("edit-case-empresa-nome").value.trim() : "",
+    empresaNome: document.getElementById("edit-case-empresa-nome") ? document.getElementById("edit-case-empresa-nome").value.trim() : "",
+    empresa_tipo: document.getElementById("edit-case-empresa-tipo") ? document.getElementById("edit-case-empresa-tipo").value.trim() : "",
+    empresaTipo: document.getElementById("edit-case-empresa-tipo") ? document.getElementById("edit-case-empresa-tipo").value.trim() : "",
+    empresa_descricao: document.getElementById("edit-case-empresa-descricao") ? document.getElementById("edit-case-empresa-descricao").value.trim() : "",
+    empresaDescricao: document.getElementById("edit-case-empresa-descricao") ? document.getElementById("edit-case-empresa-descricao").value.trim() : ""
   };
 
   const autorNome = document.getElementById("edit-case-autor-nome").value.trim();

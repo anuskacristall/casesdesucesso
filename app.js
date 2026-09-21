@@ -695,6 +695,9 @@ function mapDatabaseToApp(dbItem) {
     iesSummary: dbItem.ies_resumo || "",
     hasEmpresaSimulada: dbItem.empresa_simulada_possui || false,
     hasEscolaSebrae: dbItem.escola_sebrae_possui || false,
+    empresaNome: dbItem.empresa_nome || "",
+    empresaTipo: dbItem.empresa_tipo || "",
+    empresaDescricao: dbItem.empresa_descricao || "",
     nivel_ensino: dbItem.nivel_ensino || "",
     dependencia_adm: dbItem.dependencia_adm || "",
     jeppStatus: dbItem.status_jepp || "Não",
@@ -731,6 +734,9 @@ function mapAppToDatabase(appItem) {
     estudante_possui: isEstudante,
     estudante_resumo: resumo,
     estudante_contato: contato,
+    empresa_nome: appItem.empresaNome || appItem.empresa_nome || "",
+    empresa_tipo: appItem.empresaTipo || appItem.empresa_tipo || "",
+    empresa_descricao: appItem.empresaDescricao || appItem.empresa_descricao || "",
     cooperativa_possui: appItem.hasCoop || false,
     cooperativa_resumo: appItem.coopSummary || "",
     municipio_ee_70: appItem.edu70 || "nao",
@@ -1660,6 +1666,23 @@ function openDetailsModal(id) {
     }
   }
 
+  // Enterprise details box setup
+  const empresaBox = document.getElementById("details-empresa-box");
+  if (empresaBox) {
+    const nomeEmp = item.empresaNome || item.empresa_nome || "";
+    const tipoEmp = item.empresaTipo || item.empresa_tipo || "";
+    const descEmp = item.empresaDescricao || item.empresa_descricao || "";
+
+    if (nomeEmp || tipoEmp || descEmp) {
+      empresaBox.style.display = "block";
+      document.getElementById("details-empresa-nome").innerText = nomeEmp || "Não informado";
+      document.getElementById("details-empresa-tipo").innerText = tipoEmp || "Não informado";
+      document.getElementById("details-empresa-descricao").innerText = descEmp || "Não informada";
+    } else {
+      empresaBox.style.display = "none";
+    }
+  }
+
   // Helper to check if indicator is affirmative
   const isAffirmative = (v) => v === true || String(v || "").trim().toLowerCase() === "sim" || String(v || "").trim().toLowerCase() === "true" || String(v || "").trim().toLowerCase() === "sim (total)";
 
@@ -1957,6 +1980,12 @@ async function handleMunicipalitySubmit(e) {
   const escSebEl = document.querySelector('input[name="municipality-escola-sebrae"]:checked');
   const hasEscolaSebrae = escSebEl ? escSebEl.value === "sim" : false;
 
+  const convSebEl = document.querySelector('input[name="municipality-convenio-sebrae"]:checked');
+  const hasConvenioSebrae = convSebEl ? convSebEl.value === "sim" : false;
+
+  const parcSupEl = document.querySelector('input[name="municipality-parceria-superintendencia"]:checked');
+  const hasParceriaSuperintendencia = parcSupEl ? parcSupEl.value === "sim" : false;
+
   // Validação de telefone com DDD entre parênteses
   if (!isValidPhone(contactPhone)) {
     showToast("Por favor, preencha o Telefone/WhatsApp válido com DDD: (XX) XXXXX-XXXX");
@@ -1996,6 +2025,8 @@ async function handleMunicipalitySubmit(e) {
       responsavel_telefone: formatPhoneNumber(contactPhone),
       status_jepp: jeppStatus,
       municipio_ee_70: edu70,
+      convenio_sebrae: hasConvenioSebrae,
+      parceria_superintendencia: hasParceriaSuperintendencia,
       cooperativa_possui: hasCoop,
       lei_possui: hasLaw,
       comite_possui: hasCommittee,
@@ -2637,6 +2668,10 @@ async function handleFormSubmit(e) {
   const estudanteEmail = currentRegisterType === 'estudante' ? document.getElementById("form-estudante-email").value.trim() : "";
   const estudanteTelefone = currentRegisterType === 'estudante' ? document.getElementById("form-estudante-contato").value.trim() : "";
 
+  const empresaNome = (document.getElementById("form-empresa-nome") ? document.getElementById("form-empresa-nome").value : "").trim();
+  const empresaTipo = (document.getElementById("form-empresa-tipo") ? document.getElementById("form-empresa-tipo").value : "").trim();
+  const empresaDescricao = (document.getElementById("form-empresa-descricao") ? document.getElementById("form-empresa-descricao").value : "").trim();
+
   // Space String validation on required fields
   const requiredFields = [
     { name: "Município", val: municipio, id: "form-municipio" },
@@ -2754,6 +2789,14 @@ async function handleFormSubmit(e) {
       estudanteEmail,
       estudanteTelefone: formatPhoneNumber(estudanteTelefone),
       
+      // Enterprise fields
+      empresaNome,
+      empresaTipo,
+      empresaDescricao,
+      empresa_nome: empresaNome,
+      empresa_tipo: empresaTipo,
+      empresa_descricao: empresaDescricao,
+
       // Legacy support fields
       hasStudentCase: currentRegisterType === 'estudante',
       studentSummary: "",
@@ -3148,16 +3191,19 @@ function performFilteredCSVExport() {
     headers.push("Nome do Estudante Empreendedor", "E-mail do Estudante Empreendedor", "Contato do Estudante Empreendedor");
   }
 
+  // Enterprise Columns
+  headers.push("Nome da Empresa", "Tipo de Negócio", "Descrição da Empresa");
+
   // Municipality Indicators
   headers.push(
     "Status JEPP",
     "Parceria com Cooperativa de Crédito",
-    "Educação Empreendedora > 70%",
+    "Educação Empreendedora em mais de 70% do município",
     "Possui Lei Municipal de Educação Empreendedora",
     "Possui Comitê Conjunto",
     "Parceria com Instituição de Ensino Superior",
     "Possui Empresa Simulada",
-    "Possui Sistema de Ensino / Escola do Sebrae"
+    "Possui Sistema de Ensino Escola do Sebrae"
   );
 
   // Build CSV rows
@@ -3202,6 +3248,13 @@ function performFilteredCSVExport() {
         row.push('""', '""', '""');
       }
     }
+
+    // Enterprise values
+    row.push(
+      escapeCSV(item.empresaNome || item.empresa_nome || ""),
+      escapeCSV(item.empresaTipo || item.empresa_tipo || ""),
+      escapeCSV(item.empresaDescricao || item.empresa_descricao || "")
+    );
 
     // Municipality indicators
     row.push(

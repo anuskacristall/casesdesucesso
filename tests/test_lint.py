@@ -236,6 +236,36 @@ class TestLint(unittest.TestCase):
         self.assertNotIn('if (e.target.id === "register-panel") closeRegisterPanel()', app_code)
         self.assertNotIn('if (e.target.id === "municipality-modal") closeMunicipalityModal()', app_code)
 
+    def test_new_form_fields_and_indicators_integrity(self):
+        """Valida que os novos campos de empreendimento e indicadores de educacao empreendedora estao presentes."""
+        with open(os.path.join(ROOT_DIR, "index.html"), "r", encoding="utf-8") as f:
+            index_content = f.read()
+
+        self.assertIn("Indicadores da Educação Empreendedora no Município", index_content)
+        self.assertIn("municipality-convenio-sebrae", index_content)
+        self.assertIn("municipality-parceria-superintendencia", index_content)
+        self.assertIn("form-empresa-nome", index_content)
+        self.assertIn("form-empresa-tipo", index_content)
+        self.assertIn("form-empresa-descricao", index_content)
+        self.assertIn("Sistema de Ensino Escola do Sebrae", index_content)
+        self.assertIn("Educação Empreendedora em mais de 70% do município", index_content)
+
+        with open(os.path.join(ROOT_DIR, "app.js"), "r", encoding="utf-8") as f:
+            app_code = f.read()
+
+        self.assertIn("municipality-convenio-sebrae", app_code)
+        self.assertIn("municipality-parceria-superintendencia", app_code)
+        self.assertIn("form-empresa-nome", app_code)
+        self.assertIn("details-empresa-box", app_code)
+
+        with open(os.path.join(ROOT_DIR, "admin.html"), "r", encoding="utf-8") as f:
+            admin_content = f.read()
+
+        self.assertIn("edit-mun-convenio", admin_content)
+        self.assertIn("edit-mun-superintendencia", admin_content)
+        self.assertIn("edit-case-empresa-nome", admin_content)
+        self.assertIn("Sistema de Ensino Escola do Sebrae", admin_content)
+
 
 if __name__ == "__main__":
     unittest.main()
