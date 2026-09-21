@@ -3198,7 +3198,7 @@ function performFilteredCSVExport() {
   headers.push(
     "Status JEPP",
     "Parceria com Cooperativa de Crédito",
-    "Educação Empreendedora em mais de 70% do município",
+    "Possui Educação Empreendedora em mais de 70% do município?",
     "Possui Lei Municipal de Educação Empreendedora",
     "Possui Comitê Conjunto",
     "Parceria com Instituição de Ensino Superior",

@@ -248,7 +248,8 @@ class TestLint(unittest.TestCase):
         self.assertIn("form-empresa-tipo", index_content)
         self.assertIn("form-empresa-descricao", index_content)
         self.assertIn("Sistema de Ensino Escola do Sebrae", index_content)
-        self.assertIn("Educação Empreendedora em mais de 70% do município", index_content)
+        self.assertIn("Possui Educação Empreendedora em mais de 70% do município?", index_content)
+        self.assertIn("Indicadores da Educação Empreendedora no município", index_content)
 
         with open(os.path.join(ROOT_DIR, "app.js"), "r", encoding="utf-8") as f:
             app_code = f.read()

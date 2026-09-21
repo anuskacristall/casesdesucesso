@@ -421,7 +421,7 @@ function renderMunicipalitiesTable() {
     // Todos os indicadores selecionados como SIM citados
     const isValSim = (v) => v === true || String(v || "").trim().toLowerCase() === "sim";
     const indBadges = [];
-    if (isValSim(item.municipio_ee_70)) indBadges.push(`<span class="mini-badge sim" title="Educação Empreendedora em mais de 70% do município">EE &gt; 70%</span>`);
+    if (isValSim(item.municipio_ee_70)) indBadges.push(`<span class="mini-badge sim" title="Possui Educação Empreendedora em mais de 70% do município?">EE &gt; 70%</span>`);
     if (isValSim(item.convenio_sebrae)) indBadges.push(`<span class="mini-badge sim" title="Convênio/termo de parceria com o Sebrae">Convênio Sebrae</span>`);
     if (isValSim(item.parceria_superintendencia)) indBadges.push(`<span class="mini-badge sim" title="Parceria com superintendência de ensino">Parceria Superintendência</span>`);
     if (isValSim(item.cooperativa_possui)) indBadges.push(`<span class="mini-badge sim" title="Cooperativa Escolar/Crédito">Cooperativa</span>`);
@@ -928,7 +928,7 @@ function openMunicipalityDetails(id) {
           ${getIndicatorBadge(item.status_jepp)}
         </div>
         <div class="indicator-check-row">
-          <span>Educação Empreendedora em mais de 70% do município</span>
+          <span>Possui Educação Empreendedora em mais de 70% do município?</span>
           ${getIndicatorBadge(item.municipio_ee_70)}
         </div>
         <div class="indicator-check-row">
