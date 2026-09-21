@@ -2205,43 +2205,71 @@ body.dark-theme .marker-cluster-custom {
 #case-type-modal .type-card-highlight {
   flex: 1 1 0;
   min-width: 0;
-  min-height: 205px;
+  min-height: 220px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #f8fafc;
-  border: 1.5px solid #dbe3ec;
-  border-radius: 14px;
-  padding: 22px 16px;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 28px 20px 24px;
   cursor: pointer;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.04);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#case-type-modal .type-card-highlight .type-icon-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px auto;
+  transition: transform 0.25s ease;
+}
+
+#case-type-modal .card-professor .type-icon-wrapper {
+  background: rgba(0, 84, 166, 0.08);
+  color: #0054a6;
+  border: 1.5px solid rgba(0, 84, 166, 0.2);
+}
+
+#case-type-modal .card-estudante .type-icon-wrapper {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border: 1.5px solid rgba(16, 185, 129, 0.25);
+}
+
+#case-type-modal .type-card-highlight:hover .type-icon-wrapper {
+  transform: scale(1.08);
 }
 
 #case-type-modal .type-card-highlight h3,
 #case-type-modal .type-card-title {
-  color: #172033 !important;
-  font-size: 1.15rem;
+  color: #0f172a !important;
+  font-size: 1.22rem;
   font-weight: 700;
-  margin: 0 0 8px 0;
+  margin: 0 0 10px 0;
   text-align: center;
-  line-height: 1.25;
-  min-height: 38px;
+  line-height: 1.28;
+  min-height: 52px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  white-space: nowrap;
 }
 
 #case-type-modal .type-card-highlight p,
 #case-type-modal .type-card-desc {
   color: #64748b !important;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   line-height: 1.45;
   margin: 0;
   text-align: center;
-  max-width: 290px;
-  min-height: 38px;
+  max-width: 280px;
+  min-height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2249,16 +2277,16 @@ body.dark-theme .marker-cluster-custom {
 
 #case-type-modal .card-professor:hover {
   border-color: #0054a6 !important;
-  background: #f0f7ff !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f0f7ff 100%) !important;
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px -6px rgba(0, 84, 166, 0.16) !important;
+  box-shadow: 0 16px 32px -6px rgba(0, 84, 166, 0.16) !important;
 }
 
 #case-type-modal .card-estudante:hover {
   border-color: #10b981 !important;
-  background: #f0fdf4 !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%) !important;
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px -6px rgba(16, 185, 129, 0.16) !important;
+  box-shadow: 0 16px 32px -6px rgba(16, 185, 129, 0.16) !important;
 }
 
 #case-type-modal .type-card-secondary-wrap {
