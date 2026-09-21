@@ -123,7 +123,7 @@
             <select id="export-select-type" class="export-select" title="Selecione quais dados exportar">
               <option value="all">Exportar Todos</option>
               <option value="professor">Apenas Professor</option>
-              <option value="estudante">Apenas Estudante</option>
+              <option value="estudante">Apenas Estudante Empreendedor</option>
             </select>
             <i data-lucide="chevron-down" class="export-select-chevron"></i>
           </div>
@@ -199,7 +199,7 @@
                 <select id="filter-type">
                   <option value="All">Todos os Tipos</option>
                   <option value="professor">Cases de Professor</option>
-                  <option value="estudante">Cases de Estudante</option>
+                  <option value="estudante">Cases de Estudante Empreendedor</option>
                 </select>
               </div>
             </div>
@@ -229,7 +229,7 @@
               <span class="stat-label">Cases Cadastrados (Total)</span>
             </div>
             
-            <!-- Sub-stats para Professor vs Estudante -->
+            <!-- Sub-stats para Professor vs Estudante Empreendedor -->
             <div class="stats-type-grid">
               <div class="stat-type-box prof-box">
                 <span id="stat-professor-count" class="count-num-prof">0</span>
@@ -237,7 +237,7 @@
               </div>
               <div class="stat-type-box est-box">
                 <span id="stat-estudante-count" class="count-num-est">0</span>
-                <span class="count-label">Estudante</span>
+                <span class="count-label">Estudante Empreendedor</span>
               </div>
             </div>
             
@@ -248,30 +248,6 @@
               <ul id="stats-regional-list" class="stats-regional-list">
                 <!-- Dynamically filled -->
               </ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- Legend Panel -->
-        <div class="panel glass-panel legend-panel">
-          <div class="panel-header">
-            <div class="panel-header-title">
-              <i data-lucide="layers"></i>
-              <h2>Legenda de Cores</h2>
-            </div>
-            <i data-lucide="chevron-down" class="panel-toggle-icon"></i>
-          </div>
-          <div class="panel-body">
-            <div class="legend-grid">
-              <div class="legend-item"><span class="color-dot bg-centro"></span> Centro</div>
-              <div class="legend-item"><span class="color-dot bg-centro-oeste"></span> Centro-Oeste e Sudoeste</div>
-              <div class="legend-item"><span class="color-dot bg-jequitinhonha-mucuri"></span> Jequitinhonha e Mucuri</div>
-              <div class="legend-item"><span class="color-dot bg-noroeste"></span> Noroeste e Alto Paranaíba</div>
-              <div class="legend-item"><span class="color-dot bg-norte"></span> Norte</div>
-              <div class="legend-item"><span class="color-dot bg-rio-doce"></span> Rio Doce e Vale do Aço</div>
-              <div class="legend-item"><span class="color-dot bg-sul"></span> Sul</div>
-              <div class="legend-item"><span class="color-dot bg-triangulo"></span> Triângulo</div>
-              <div class="legend-item"><span class="color-dot bg-zona-mata"></span> Zona da Mata e Vertentes</div>
             </div>
           </div>
         </div>
@@ -349,6 +325,27 @@
               <input type="text" id="form-escola" placeholder="Ex: Escola Estadual Sebrae" required>
             </div>
           </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="form-nivel-ensino">Nível de Ensino *</label>
+              <select id="form-nivel-ensino" required>
+                <option value="" disabled selected>Selecione o nível de ensino...</option>
+                <option value="Fundamental">Fundamental</option>
+                <option value="Médio">Médio</option>
+                <option value="Superior">Superior</option>
+                <option value="Técnico">Técnico</option>
+              </select>
+            </div>
+            <div class="form-group flex-1">
+              <label for="form-dependencia-adm">Dependência Administrativa *</label>
+              <select id="form-dependencia-adm" required>
+                <option value="" disabled selected>Selecione a dependência...</option>
+                <option value="Municipal">Municipal</option>
+                <option value="Estadual">Estadual</option>
+                <option value="Privado">Privado</option>
+              </select>
+            </div>
+          </div>
         </fieldset>
 
         <!-- Seção 2: Dados do Técnico Responsável -->
@@ -389,20 +386,20 @@
           </div>
         </fieldset>
 
-        <!-- Seção: Dados do Estudante (Condicional para Tipo: Estudante) -->
+        <!-- Seção: Dados do Estudante Empreendedor (Condicional para Tipo: Estudante Empreendedor) -->
         <fieldset id="student-details-fieldset" style="display: none; flex-direction: column; gap: 18px;">
-          <legend><i data-lucide="user-check"></i> Dados de Contato do Estudante</legend>
+          <legend><i data-lucide="user-check"></i> Dados de Contato do Estudante Empreendedor</legend>
           <div class="form-group" style="margin-bottom: 6px;">
-            <label for="form-estudante-nome">Nome Completo do Estudante</label>
+            <label for="form-estudante-nome">Nome Completo do Estudante Empreendedor</label>
             <input type="text" id="form-estudante-nome" placeholder="Ex: Lucas Silva">
           </div>
           <div class="form-row" style="margin-top: 4px;">
             <div class="form-group flex-1">
-              <label for="form-estudante-email">E-mail do Estudante</label>
+              <label for="form-estudante-email">E-mail do Estudante Empreendedor</label>
               <input type="email" id="form-estudante-email" placeholder="Ex: lucas@escola.com">
             </div>
             <div class="form-group flex-1">
-              <label for="form-estudante-contato">Telefone / WhatsApp do Estudante</label>
+              <label for="form-estudante-contato">Telefone / WhatsApp do Estudante Empreendedor</label>
               <input type="text" id="form-estudante-contato" placeholder="Ex: (31) 97777-7777">
             </div>
           </div>
@@ -474,17 +471,17 @@
             </div>
           </div>
 
-          <!-- Parcerias IES -->
+          <!-- Parceria com Instituição de Ensino Superior -->
           <div class="indicator-row">
             <div class="indicator-toggle">
-              <label>Tem Parceria com Instituições de Ensino Superior (IES) em conjunto com o SEBRAE?</label>
+              <label>Tem Parceria com Instituições de Ensino Superior em conjunto com o SEBRAE?</label>
               <label class="switch">
                 <input type="checkbox" id="has-ies">
                 <span class="slider round"></span>
               </label>
             </div>
             <div id="ies-fields" class="conditional-fields indicator-textarea">
-              <label for="form-ies-summary">Resumo da Parceria IES *</label>
+              <label for="form-ies-summary">Resumo da Parceria com Instituição de Ensino Superior *</label>
               <textarea id="form-ies-summary" placeholder="Quais faculdades apoiam e quais ações são feitas..."></textarea>
             </div>
           </div>
@@ -518,7 +515,12 @@
       <!-- Header -->
       <div class="modal-header">
         <div class="modal-title-area">
-          <span id="details-regional-badge" class="badge">Centro</span>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+            <span id="details-regional-badge" class="badge">Centro</span>
+            <span id="details-type-badge" class="badge" style="background: rgba(16, 185, 129, 0.15); color: #047857; border: 1px solid rgba(16, 185, 129, 0.3);">Case</span>
+            <span id="details-nivel-badge" class="badge" style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; display: none;"></span>
+            <span id="details-dep-badge" class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; display: none;"></span>
+          </div>
           <h2 id="details-titulo" style="font-size: 1.8rem; font-weight: 800; color: var(--accent-color); margin: 6px 0 2px 0; line-height: 1.25;">Nome do Case de Exemplo</h2>
           <div id="details-escola" style="font-size: 1.1rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Nome da Escola de Exemplo</div>
           <p id="details-location-text"><i data-lucide="map-pin"></i> Belo Horizonte - MR Belo Horizonte</p>
@@ -566,10 +568,10 @@
               </div>
             </div>
 
-            <!-- Box Case de Estudantes / Dados do Estudante -->
+            <!-- Box Case de Estudantes / Dados do Estudante Empreendedor -->
             <div id="details-student-box" class="detail-box glass-box" style="display: none; padding: 20px;">
               <div class="box-header-row" style="margin-bottom: 12px; border-bottom: 1px solid var(--border-glass); padding-bottom: 8px;">
-                <h3 style="margin: 0; color: #10b981; display: flex; align-items: center; gap: 8px;"><i data-lucide="user-check" style="width: 20px; height: 20px;"></i> Dados de Contato do Estudante</h3>
+                <h3 style="margin: 0; color: #10b981; display: flex; align-items: center; gap: 8px;"><i data-lucide="user-check" style="width: 20px; height: 20px;"></i> Dados de Contato do Estudante Empreendedor</h3>
               </div>
               <div class="box-content" style="display: flex; flex-direction: column; gap: 10px;">
                 <p style="margin: 0; font-size: 1rem; color: var(--text-primary);"><strong>Nome:</strong> <span id="details-student-nome">Lucas Silva</span></p>
@@ -598,7 +600,7 @@
               <div class="indicator-card glass-box">
                 <div class="card-icon"><i data-lucide="percent"></i></div>
                 <div class="card-info">
-                  <label>EE > 70% Município</label>
+                  <label>Educação Empreendedora > 70%</label>
                   <span id="details-edu-70" class="badge">Sim</span>
                 </div>
               </div>
@@ -616,7 +618,7 @@
               <div class="indicator-card glass-box">
                 <div class="card-icon"><i data-lucide="file-text"></i></div>
                 <div class="card-info">
-                  <label>Lei de EE</label>
+                  <label>Lei de Educação Empreendedora</label>
                   <span id="details-law-status" class="badge">Sim</span>
                 </div>
               </div>
@@ -634,7 +636,7 @@
               <div class="indicator-card glass-box">
                 <div class="card-icon"><i data-lucide="school"></i></div>
                 <div class="card-info">
-                  <label>Parceria com IES</label>
+                  <label>Parceria com Instituição de Ensino Superior</label>
                   <span id="details-ies-status" class="badge">Sim</span>
                 </div>
               </div>
@@ -686,8 +688,8 @@
           <div class="type-icon-wrapper" style="width: 60px; height: 60px; background: rgba(16, 185, 129, 0.1); color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; font-size: 1.8rem; border: 1px solid rgba(16, 185, 129, 0.2);">
             <i data-lucide="user-check" style="width: 32px; height: 32px;"></i>
           </div>
-          <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Case de Estudante</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; margin: 0;">Projetos empreendedores criados e liderados pelos alunos.</p>
+          <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Case de Estudante Empreendedor</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; margin: 0;">estudantes que empreenderam</p>
         </div>
       </div>
       <div class="type-card-secondary-wrap" style="display:flex !important; width:100% !important; justify-content:flex-end !important;">
@@ -728,7 +730,7 @@
             <span class="export-summary-label">
               <i data-lucide="filter" style="width: 13px; height: 13px;"></i> Segmentação de Cases:
             </span>
-            <span id="export-modal-type" class="export-summary-val">Todos os Cases (Professor e Estudante)</span>
+            <span id="export-modal-type" class="export-summary-val">Todos os Cases (Professor e Estudante Empreendedor)</span>
           </div>
         </div>
 
@@ -752,11 +754,11 @@
   <div id="confirm-code-modal" class="modal-wrapper" style="display: none;">
     <div class="modal-content glass-panel confirm-code-content">
       <div class="modal-header">
-        <h2>Solicitação enviada</h2>
+        <h2 id="confirm-code-title">Solicitação enviada</h2>
         <button id="btn-close-code-modal" class="btn-close">&times;</button>
       </div>
       <div class="confirm-code-body">
-        <p>Guarde este código para acompanhar sua solicitação:</p>
+        <p id="confirm-code-desc">Guarde este código para acompanhar sua solicitação:</p>
         <strong id="request-code-value">#000001</strong>
         <button id="btn-finish-code-modal" class="btn btn-primary" type="button">Concluir</button>
       </div>
@@ -805,6 +807,28 @@
             <div class="form-group flex-1">
               <label for="municipality-mr">Microrregião (MR) *</label>
               <input type="text" id="municipality-mr" required placeholder="Ex: MR Belo Horizonte">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="municipality-nivel-ensino">Nível de Ensino *</label>
+              <select id="municipality-nivel-ensino" required>
+                <option value="" disabled selected>Selecione o nível de ensino...</option>
+                <option value="Fundamental">Fundamental</option>
+                <option value="Médio">Médio</option>
+                <option value="Superior">Superior</option>
+                <option value="Técnico">Técnico</option>
+              </select>
+            </div>
+            <div class="form-group flex-1">
+              <label for="municipality-dependencia-adm">Dependência Administrativa *</label>
+              <select id="municipality-dependencia-adm" required>
+                <option value="" disabled selected>Selecione a dependência...</option>
+                <option value="Municipal">Municipal</option>
+                <option value="Estadual">Estadual</option>
+                <option value="Privado">Privado</option>
+              </select>
             </div>
           </div>
         </fieldset>
@@ -913,10 +937,10 @@
             </div>
           </div>
 
-          <!-- Parcerias IES -->
+          <!-- Parceria com Instituição de Ensino Superior -->
           <div class="indicator-row">
             <div class="indicator-toggle">
-              <label>Tem Parceria com Instituições de Ensino Superior (IES) em conjunto com o SEBRAE?</label>
+              <label>Tem Parceria com Instituições de Ensino Superior em conjunto com o SEBRAE?</label>
               <div class="radio-group">
                 <label class="radio-label">
                   <input type="radio" name="municipality-ies" value="sim">
@@ -997,6 +1021,6 @@
   <script src="config.js"></script>
 
   <!-- Script Principal -->
-  <script src="app.js?v=29"></script>
+  <script src="app.js?v=30"></script>
 </body>
 </html>

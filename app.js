@@ -695,6 +695,8 @@ function mapDatabaseToApp(dbItem) {
     iesSummary: dbItem.ies_resumo || "",
     hasEmpresaSimulada: dbItem.empresa_simulada_possui || false,
     hasEscolaSebrae: dbItem.escola_sebrae_possui || false,
+    nivel_ensino: dbItem.nivel_ensino || "",
+    dependencia_adm: dbItem.dependencia_adm || "",
     jeppStatus: dbItem.status_jepp || "Não",
     status: dbItem.status || "approved",
     request_code: dbItem.request_code || ""
@@ -719,6 +721,8 @@ function mapAppToDatabase(appItem) {
     regional: appItem.regional || "",
     microrregiao_mr: appItem.mr || "",
     escola_instituicao: appItem.escola || "",
+    nivel_ensino: appItem.nivel_ensino || "",
+    dependencia_adm: appItem.dependencia_adm || "",
     latitude: appItem.lat,
     longitude: appItem.lng,
     tecnico_nome: appItem.tecnicoNome || "",
@@ -1169,43 +1173,29 @@ function getAllLocationEntities() {
     }
   });
 
-  // 3. Municípios from MUNICIPALITIES_DATABASE + loaded cases
+  // 3. Municípios - Apenas os que possuem case cadastrado associado
   const seenMuns = new Set();
-  if (window.MUNICIPALITIES_DATABASE) {
-    Object.keys(window.MUNICIPALITIES_DATABASE).forEach(k => {
-      const m = window.MUNICIPALITIES_DATABASE[k];
-      const normKey = m.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      if (!seenMuns.has(normKey)) {
-        seenMuns.add(normKey);
-        const regLabel = (window.REGIONAL_NAMES && window.REGIONAL_NAMES[m.regional]) || m.regional || "";
-        list.push({
-          id: `mun:${normKey}`,
-          type: 'municipio',
-          name: m.name,
-          val: normKey,
-          lat: m.lat,
-          lng: m.lng,
-          regional: m.regional,
-          searchStr: `${m.name} municipio cidade ${regLabel}`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
-          sub: regLabel ? `Município • ${regLabel}` : "Município"
-        });
-      }
-    });
-  }
-
   cases.forEach(c => {
     if (c.municipio && c.municipio.trim()) {
       const normKey = c.municipio.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       if (!seenMuns.has(normKey)) {
         seenMuns.add(normKey);
         const regLabel = (window.REGIONAL_NAMES && window.REGIONAL_NAMES[c.regional]) || c.regional || "";
+        
+        let lat = c.lat;
+        let lng = c.lng;
+        if ((!lat || !lng) && window.MUNICIPALITIES_DATABASE && window.MUNICIPALITIES_DATABASE[normKey]) {
+          lat = window.MUNICIPALITIES_DATABASE[normKey].lat;
+          lng = window.MUNICIPALITIES_DATABASE[normKey].lng;
+        }
+
         list.push({
           id: `mun:${normKey}`,
           type: 'municipio',
           name: c.municipio.trim(),
           val: normKey,
-          lat: c.lat,
-          lng: c.lng,
+          lat: lat,
+          lng: lng,
           regional: c.regional,
           searchStr: `${c.municipio} municipio cidade ${regLabel}`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
           sub: regLabel ? `Município • ${regLabel}` : "Município"
@@ -1373,7 +1363,7 @@ function createQuickLookCard(item) {
   const desc = item.descricao || item.studentSummary || "Sem descrição cadastrada.";
   const descriptionSnippet = desc.substring(0, 100) + (desc.length > 100 ? "..." : "");
   
-  const typeLabelStr = item.tipoCase === "estudante" ? "Estudante" : "Professor";
+  const typeLabelStr = item.tipoCase === "estudante" ? "Estudante Empreendedor" : "Professor";
   const typeBadgeStyle = item.tipoCase === "estudante" 
     ? "background-color: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2);" 
     : "background-color: rgba(0, 84, 166, 0.1); color: var(--sebrae-blue); border: 1px solid rgba(0, 84, 166, 0.2);";
@@ -1571,6 +1561,46 @@ function openDetailsModal(id) {
   let badgeColorClass = getRegionalColorClass(item.regional);
   regionalBadge.classList.add(badgeColorClass);
 
+  // Set type badge
+  const typeBadge = document.getElementById("details-type-badge");
+  if (typeBadge) {
+    if (item.tipoCase === "estudante") {
+      typeBadge.innerText = "Estudante Empreendedor";
+      typeBadge.style.background = "rgba(16, 185, 129, 0.15)";
+      typeBadge.style.color = "#047857";
+      typeBadge.style.border = "1px solid rgba(16, 185, 129, 0.3)";
+    } else {
+      typeBadge.innerText = "Professor";
+      typeBadge.style.background = "rgba(0, 84, 166, 0.15)";
+      typeBadge.style.color = "#07549b";
+      typeBadge.style.border = "1px solid rgba(0, 84, 166, 0.3)";
+    }
+  }
+
+  // Set Nível de Ensino badge
+  const nivelBadge = document.getElementById("details-nivel-badge");
+  if (nivelBadge) {
+    const val = item.nivel_ensino || item.nivelEnsino;
+    if (val) {
+      nivelBadge.innerText = `Nível: ${val}`;
+      nivelBadge.style.display = "inline-flex";
+    } else {
+      nivelBadge.style.display = "none";
+    }
+  }
+
+  // Set Dependência Administrativa badge
+  const depBadge = document.getElementById("details-dep-badge");
+  if (depBadge) {
+    const val = item.dependencia_adm || item.dependenciaAdm;
+    if (val) {
+      depBadge.innerText = `Dependência: ${val}`;
+      depBadge.style.display = "inline-flex";
+    } else {
+      depBadge.style.display = "none";
+    }
+  }
+
   // Technical details
   document.getElementById("details-tecnico-nome").innerText = item.tecnicoNome;
   document.getElementById("details-tecnico-email").innerHTML = `<i data-lucide="mail"></i> ${item.tecnicoEmail}`;
@@ -1718,7 +1748,7 @@ function selectCaseType(type) {
       typeLabel.innerText = " | Professor";
       typeLabel.style.color = "var(--sebrae-blue)";
     } else {
-      typeLabel.innerText = " | Estudante";
+      typeLabel.innerText = " | Estudante Empreendedor";
       typeLabel.style.color = "#10b981";
     }
   }
@@ -1809,10 +1839,14 @@ function closeMunicipalityModal() {
   }
 }
 
-function openConfirmCodeModal(code) {
+function openConfirmCodeModal(code, title = "Solicitação enviada", desc = "Guarde este código para acompanhar sua solicitação:") {
   const modal = document.getElementById("confirm-code-modal");
   if (modal) {
+    const titleEl = document.getElementById("confirm-code-title");
+    const descEl = document.getElementById("confirm-code-desc");
     const codeEl = document.getElementById("request-code-value");
+    if (titleEl) titleEl.innerText = title;
+    if (descEl) descEl.innerText = desc;
     if (codeEl) codeEl.innerText = code;
     modal.classList.add("active");
     modal.style.display = "flex";
@@ -1874,6 +1908,11 @@ async function handleMunicipalitySubmit(e) {
   const contactEmail = document.getElementById("municipality-contact-email").value.trim();
   const contactPhone = document.getElementById("municipality-contact-phone").value.trim();
   const jeppStatus = document.getElementById("municipality-jepp-status").value;
+
+  const nivelEnsinoEl = document.getElementById("municipality-nivel-ensino");
+  const nivelEnsino = nivelEnsinoEl ? nivelEnsinoEl.value : "";
+  const dependenciaAdmEl = document.getElementById("municipality-dependencia-adm");
+  const dependenciaAdm = dependenciaAdmEl ? dependenciaAdmEl.value : "";
 
   // Space String validation on required fields
   const requiredFields = [
@@ -1950,6 +1989,8 @@ async function handleMunicipalitySubmit(e) {
       nome: name,
       regional,
       mr,
+      nivel_ensino: nivelEnsino,
+      dependencia_adm: dependenciaAdm,
       responsavel_nome: contactName,
       responsavel_email: contactEmail,
       responsavel_telefone: formatPhoneNumber(contactPhone),
@@ -2011,8 +2052,8 @@ async function handleMunicipalitySubmit(e) {
 
     hideSubmissionLoadingModal();
     closeMunicipalityModal();
-    openConfirmCodeModal(requestCode);
-    showToast(`Solicitação de cadastro de ${name} enviada com sucesso! Protocolo: ${requestCode}`);
+    openConfirmCodeModal(requestCode, "Cadastro de município enviado com sucesso!");
+    showToast("Município cadastrado com sucesso!");
     document.getElementById("municipality-form").reset();
   } catch (err) {
     console.error("Erro no processamento do município:", err);
@@ -2579,6 +2620,8 @@ async function handleFormSubmit(e) {
   const regional = document.getElementById("form-regional").value;
   const mr = document.getElementById("form-mr").value.trim();
   const escola = document.getElementById("form-escola").value.trim();
+  const nivelEnsino = (document.getElementById("form-nivel-ensino") ? document.getElementById("form-nivel-ensino").value : "").trim();
+  const dependenciaAdm = (document.getElementById("form-dependencia-adm") ? document.getElementById("form-dependencia-adm").value : "").trim();
   const titulo = document.getElementById("form-titulo").value.trim();
   const descricao = document.getElementById("form-descricao").value.trim();
   
@@ -2600,6 +2643,8 @@ async function handleFormSubmit(e) {
     { name: "Regional", val: regional, id: "form-regional" },
     { name: "Microrregião", val: mr, id: "form-mr" },
     { name: "Escola / Instituição", val: escola, id: "form-escola" },
+    { name: "Nível de Ensino", val: nivelEnsino, id: "form-nivel-ensino" },
+    { name: "Dependência Administrativa", val: dependenciaAdm, id: "form-dependencia-adm" },
     { name: "Título", val: titulo, id: "form-titulo" },
     { name: "Descrição", val: descricao, id: "form-descricao" },
     { name: "Nome do Técnico", val: tecnicoNome, id: "form-tecnico-nome" },
@@ -2610,7 +2655,7 @@ async function handleFormSubmit(e) {
     requiredFields.push({ name: "Nome do Professor", val: professorNome, id: "form-professor-nome" });
     requiredFields.push({ name: "E-mail do Professor", val: professorEmail, id: "form-professor-email" });
   } else if (currentRegisterType === 'estudante') {
-    requiredFields.push({ name: "Nome do Estudante", val: estudanteNome, id: "form-estudante-nome" });
+    requiredFields.push({ name: "Nome do Estudante Empreendedor", val: estudanteNome, id: "form-estudante-nome" });
   }
 
   for (const f of requiredFields) {
@@ -2663,7 +2708,7 @@ async function handleFormSubmit(e) {
 
   if (currentRegisterType === 'estudante') {
     if (estudanteTelefone && !isValidPhone(estudanteTelefone)) {
-      showToast("Telefone do estudante inválido. Use o formato com DDD: (XX) XXXXX-XXXX");
+      showToast("Telefone do estudante empreendedor inválido. Use o formato com DDD: (XX) XXXXX-XXXX");
       const el = document.getElementById("form-estudante-contato");
       if (el) { el.focus(); el.style.borderColor = "var(--danger, #ef4444)"; }
       if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = origText; }
@@ -2692,6 +2737,8 @@ async function handleFormSubmit(e) {
       regional,
       mr,
       escola,
+      nivel_ensino: nivelEnsino,
+      dependencia_adm: dependenciaAdm,
       titulo,
       descricao,
       tecnicoNome,
@@ -2786,8 +2833,9 @@ async function handleFormSubmit(e) {
     // Focus map on the newly added marker
     map.setView([coordsObj.lat, coordsObj.lng], 10);
     
-    // Custom toast notification of success
-    showToast(`Case de sucesso da ${escola} em ${municipio} foi cadastrado com sucesso!`);
+    // Custom popup & toast notification of success
+    openConfirmCodeModal(requestCode, "Case cadastrado com sucesso!");
+    showToast("Case cadastrado com sucesso!");
   } catch (err) {
     console.error("Erro no cadastro de case:", err);
     hideSubmissionLoadingModal();
@@ -3024,9 +3072,9 @@ function openExportConfirmModal() {
     if (effectiveType === "professor") {
       typeLabel.textContent = "Apenas Cases de Professor";
     } else if (effectiveType === "estudante") {
-      typeLabel.textContent = "Apenas Cases de Estudante";
+      typeLabel.textContent = "Apenas Cases de Estudante Empreendedor";
     } else {
-      typeLabel.textContent = "Todos os Cases (Professor e Estudante)";
+      typeLabel.textContent = "Todos os Cases (Professor e Estudante Empreendedor)";
     }
   }
 
@@ -3084,6 +3132,8 @@ function performFilteredCSVExport() {
     "Regional",
     "Microrregião (MR)",
     "Escola / Instituição",
+    "Nível de Ensino",
+    "Dependência Administrativa",
     "Nome do Técnico",
     "E-mail do Técnico",
     "Telefone do Técnico",
@@ -3095,7 +3145,7 @@ function performFilteredCSVExport() {
     headers.push("Nome do Professor", "E-mail do Professor", "Telefone do Professor");
   }
   if (hasEst) {
-    headers.push("Nome do Estudante", "E-mail do Estudante", "Contato do Estudante");
+    headers.push("Nome do Estudante Empreendedor", "E-mail do Estudante Empreendedor", "Contato do Estudante Empreendedor");
   }
 
   // Municipality Indicators
@@ -3103,9 +3153,9 @@ function performFilteredCSVExport() {
     "Status JEPP",
     "Parceria com Cooperativa de Crédito",
     "Educação Empreendedora > 70%",
-    "Possui Lei Municipal de EE",
+    "Possui Lei Municipal de Educação Empreendedora",
     "Possui Comitê Conjunto",
-    "Parceria com IES",
+    "Parceria com Instituição de Ensino Superior",
     "Possui Empresa Simulada",
     "Possui Sistema de Ensino / Escola do Sebrae"
   );
@@ -3121,10 +3171,12 @@ function performFilteredCSVExport() {
       escapeCSV(REGIONAL_NAMES[item.regional] || item.regional),
       escapeCSV(item.mr),
       escapeCSV(item.escola),
+      escapeCSV(item.nivel_ensino || ""),
+      escapeCSV(item.dependencia_adm || ""),
       escapeCSV(item.tecnicoNome),
       escapeCSV(item.tecnicoEmail),
       escapeCSV(item.tecnicoContato),
-      escapeCSV(item.tipoCase === "estudante" ? "Estudante" : "Professor")
+      escapeCSV(item.tipoCase === "estudante" ? "Estudante Empreendedor" : "Professor")
     ];
 
     if (hasProf) {
@@ -3174,7 +3226,7 @@ function performFilteredCSVExport() {
   if (pendingExportType === "professor") {
     filename = "Planilha_Cases_Professor.csv";
   } else if (pendingExportType === "estudante") {
-    filename = "Planilha_Cases_Estudante.csv";
+    filename = "Planilha_Cases_Estudante_Empreendedor.csv";
   }
 
   const link = document.createElement("a");

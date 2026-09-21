@@ -421,11 +421,11 @@ function renderMunicipalitiesTable() {
     // Todos os indicadores selecionados como SIM citados
     const isValSim = (v) => v === true || String(v || "").trim().toLowerCase() === "sim";
     const indBadges = [];
-    if (isValSim(item.municipio_ee_70)) indBadges.push(`<span class="mini-badge sim" title="EE em > 70% da Rede">EE &gt; 70%</span>`);
+    if (isValSim(item.municipio_ee_70)) indBadges.push(`<span class="mini-badge sim" title="Educação Empreendedora em > 70% da Rede">Educação Empreendedora &gt; 70%</span>`);
     if (isValSim(item.cooperativa_possui)) indBadges.push(`<span class="mini-badge sim" title="Cooperativa Escolar/Crédito">Cooperativa</span>`);
-    if (isValSim(item.lei_possui)) indBadges.push(`<span class="mini-badge sim" title="Lei Municipal de EE">Lei Municipal</span>`);
+    if (isValSim(item.lei_possui)) indBadges.push(`<span class="mini-badge sim" title="Lei Municipal de Educação Empreendedora">Lei Educação Empreendedora</span>`);
     if (isValSim(item.comite_possui)) indBadges.push(`<span class="mini-badge sim" title="Comitê Gestor Municipal">Comitê Gestor</span>`);
-    if (isValSim(item.ies_possui)) indBadges.push(`<span class="mini-badge sim" title="Parceria com IES">Parceria IES</span>`);
+    if (isValSim(item.ies_possui)) indBadges.push(`<span class="mini-badge sim" title="Parceria com Instituição de Ensino Superior">Parceria Inst. Ensino Superior</span>`);
     if (isValSim(item.empresa_simulada)) indBadges.push(`<span class="mini-badge sim" title="Empresa Simulada">Emp. Simulada</span>`);
     if (isValSim(item.escola_sebrae)) indBadges.push(`<span class="mini-badge sim" title="Sistema de Ensino / Escola Sebrae">Escola Sebrae</span>`);
 
@@ -533,7 +533,7 @@ function renderCasesTable() {
     const protocol = item.request_code || (item.id ? `#${String(item.id).slice(-6)}` : "#000000");
     const title = item.titulo_projeto || item.titulo || "Case sem título";
     const isEstudante = item.tipo_case === 'estudante' || item.tipoCase === 'estudante' || item.estudante_possui;
-    const typeLabel = isEstudante ? 'Estudante' : 'Professor';
+    const typeLabel = isEstudante ? 'Estudante Empreendedor' : 'Professor';
     const typeColor = isEstudante ? '#10b981' : '#0054a6';
     const place = `${escapeHtml(item.municipio || "-")} • <small style="color:#64748b;">${escapeHtml(item.escola_instituicao || item.escola || "")}</small>`;
 
@@ -926,7 +926,7 @@ function openMunicipalityDetails(id) {
           ${getIndicatorBadge(item.status_jepp)}
         </div>
         <div class="indicator-check-row">
-          <span>EE em &gt; 70% da Rede</span>
+          <span>Educação Empreendedora em &gt; 70% da Rede</span>
           ${getIndicatorBadge(item.municipio_ee_70)}
         </div>
         <div class="indicator-check-row">
@@ -934,7 +934,7 @@ function openMunicipalityDetails(id) {
           ${getIndicatorBadge(item.cooperativa_possui)}
         </div>
         <div class="indicator-check-row">
-          <span>Lei Municipal de EE</span>
+          <span>Lei Municipal de Educação Empreendedora</span>
           ${getIndicatorBadge(item.lei_possui)}
         </div>
         <div class="indicator-check-row">
@@ -942,7 +942,7 @@ function openMunicipalityDetails(id) {
           ${getIndicatorBadge(item.comite_possui)}
         </div>
         <div class="indicator-check-row">
-          <span>Parceria com IES</span>
+          <span>Parceria com Instituição de Ensino Superior</span>
           ${getIndicatorBadge(item.ies_possui)}
         </div>
         <div class="indicator-check-row">
@@ -1010,7 +1010,7 @@ function openCaseDetails(id) {
         </div>
         <div class="detail-item">
           <span class="detail-label">Modalidade</span>
-          <span class="detail-value" style="color: ${isEstudante ? '#10b981' : '#0054a6'}; font-weight:700;">${isEstudante ? 'Estudante' : 'Professor'}</span>
+          <span class="detail-value" style="color: ${isEstudante ? '#10b981' : '#0054a6'}; font-weight:700;">${isEstudante ? 'Estudante Empreendedor' : 'Professor'}</span>
         </div>
         <div class="detail-item">
           <span class="detail-label">Município</span>
@@ -1020,6 +1020,16 @@ function openCaseDetails(id) {
           <span class="detail-label">Escola / Instituição</span>
           <span class="detail-value">${escapeHtml(item.escola_instituicao || item.escola || "-")}</span>
         </div>
+        ${item.nivel_ensino ? `
+        <div class="detail-item">
+          <span class="detail-label">Nível de Ensino</span>
+          <span class="detail-value">${escapeHtml(item.nivel_ensino)}</span>
+        </div>` : ""}
+        ${item.dependencia_adm ? `
+        <div class="detail-item">
+          <span class="detail-label">Dependência Administrativa</span>
+          <span class="detail-value">${escapeHtml(item.dependencia_adm)}</span>
+        </div>` : ""}
       </div>
     </div>
 
