@@ -168,33 +168,38 @@ class TestSecurity(unittest.TestCase):
         self.assertEqual(responses[-1][0], 400)
 
     def test_prevent_duplicate_form_submissions(self):
-        handler = server.SecureBackendHandler.__new__(server.SecureBackendHandler)
-        handler.client_address = ("192.168.1.75", 12345)
-        responses = []
-        handler.send_json_response = lambda status, data: responses.append((status, data))
-        admin_token = server.generate_jwt("a1", "admin@sebraemg.com.br", "admin")
+        original_save = server.save_data_store
+        server.save_data_store = lambda store: None
+        try:
+            handler = server.SecureBackendHandler.__new__(server.SecureBackendHandler)
+            handler.client_address = ("192.168.1.75", 12345)
+            responses = []
+            handler.send_json_response = lambda status, data: responses.append((status, data))
+            admin_token = server.generate_jwt("a1", "admin@sebraemg.com.br", "admin")
 
-        server.recent_form_submissions.clear()
+            server.recent_form_submissions.clear()
 
-        body = json.dumps({
-            "nome": "Ouro Preto",
-            "regional": "Centro",
-            "mr": "MR Central"
-        }).encode("utf-8")
+            body = json.dumps({
+                "nome": "Ouro Preto",
+                "regional": "Centro",
+                "mr": "MR Central"
+            }).encode("utf-8")
 
-        handler.headers = {
-            "Authorization": f"Bearer {admin_token}",
-            "Content-Length": str(len(body))
-        }
-        handler.rfile = io.BytesIO(body)
-        handler.handle_post_municipality()
-        self.assertEqual(responses[-1][0], 201)
+            handler.headers = {
+                "Authorization": f"Bearer {admin_token}",
+                "Content-Length": str(len(body))
+            }
+            handler.rfile = io.BytesIO(body)
+            handler.handle_post_municipality()
+            self.assertEqual(responses[-1][0], 201)
 
-        # Immediate duplicate submission from same IP should be blocked with 429
-        handler.rfile = io.BytesIO(body)
-        handler.handle_post_municipality()
-        self.assertEqual(responses[-1][0], 429)
-        self.assertIn("já foi enviada", responses[-1][1]["error"])
+            # Immediate duplicate submission from same IP should be blocked with 429
+            handler.rfile = io.BytesIO(body)
+            handler.handle_post_municipality()
+            self.assertEqual(responses[-1][0], 429)
+            self.assertIn("já foi enviada", responses[-1][1]["error"])
+        finally:
+            server.save_data_store = original_save
 
 if __name__ == '__main__':
     unittest.main()

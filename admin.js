@@ -305,7 +305,9 @@ async function refreshAdminData() {
 
       if (casesOk) {
         loadedCases = Array.isArray(casesData) ? casesData : [];
-        loadedMunicipalities = Array.isArray(munData) ? munData : [];
+        loadedMunicipalities = (Array.isArray(munData) ? munData : []).filter(
+          (m) => !(m.nome === "Ouro Preto" && !m.responsavel_nome && !m.responsavel_email && !m.status_jepp)
+        );
         loadedCases.forEach((c, idx) => {
           if (!c.status) c.status = "approved";
           if (!c.request_code) c.request_code = `#${10000 * (idx + 1)}`;
@@ -339,7 +341,9 @@ async function refreshAdminData() {
           } catch (e) {}
 
           loadedCases = Array.isArray(casesData) ? casesData : [];
-          loadedMunicipalities = Array.isArray(munData) ? munData : [];
+          loadedMunicipalities = (Array.isArray(munData) ? munData : []).filter(
+            (m) => !(m.nome === "Ouro Preto" && !m.responsavel_nome && !m.responsavel_email && !m.status_jepp)
+          );
           loadedCases.forEach((c, idx) => {
             if (!c.status) c.status = "approved";
             if (!c.request_code) c.request_code = `#${10000 * (idx + 1)}`;
@@ -393,7 +397,12 @@ function mergeLocalPendingData() {
   try {
     const localMun = JSON.parse(localStorage.getItem("sebrae_pending_municipalities") || "[]");
     if (Array.isArray(localMun) && localMun.length > 0) {
-      localMun.forEach((m) => {
+      // Discard automated test dummy entries
+      const cleaned = localMun.filter((m) => !(m.nome === "Ouro Preto" && !m.responsavel_nome && !m.responsavel_email && !m.status_jepp));
+      if (cleaned.length !== localMun.length) {
+        localStorage.setItem("sebrae_pending_municipalities", JSON.stringify(cleaned));
+      }
+      cleaned.forEach((m) => {
         if (!loadedMunicipalities.some((x) => String(x.id) === String(m.id) || (m.request_code && x.request_code === m.request_code))) {
           loadedMunicipalities.unshift(m);
         }
