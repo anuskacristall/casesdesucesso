@@ -2937,7 +2937,7 @@ async function handleFormSubmit(e) {
     requiredFields.push({ name: "Nome do Professor", val: professorNome, id: "form-professor-nome" });
     requiredFields.push({ name: "E-mail do Professor", val: professorEmail, id: "form-professor-email" });
   } else if (currentRegisterType === 'estudante') {
-    requiredFields.push({ name: "Nome do Estudante Empreendedor", val: estudanteNome, id: "form-estudante-nome" });
+    requiredFields.push({ name: "Nome do Estudante", val: estudanteNome, id: "form-estudante-nome" });
   }
 
   for (const f of requiredFields) {
@@ -2990,7 +2990,7 @@ async function handleFormSubmit(e) {
 
   if (currentRegisterType === 'estudante') {
     if (estudanteTelefone && !isValidPhone(estudanteTelefone)) {
-      showToast("Telefone do estudante empreendedor inválido. Use o formato com DDD: (XX) XXXXX-XXXX");
+      showToast("Telefone do estudante inválido. Use o formato com DDD: (XX) XXXXX-XXXX");
       const el = document.getElementById("form-estudante-contato");
       if (el) { el.focus(); el.style.borderColor = "var(--danger, #ef4444)"; }
       if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = origText; }
