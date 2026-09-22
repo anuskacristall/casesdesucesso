@@ -19,7 +19,7 @@
   </script>
 
   <!-- Base App Styles -->
-  <link rel="stylesheet" href="style.css?v=11">
+  <link rel="stylesheet" href="style.css?v=18">
 
   <!-- Admin Dedicated Styles -->
   <style>
@@ -679,6 +679,11 @@
       animation: zoomIn 0.2s ease;
     }
 
+    #modal-case-details .admin-modal-card,
+    #modal-municipality-details .admin-modal-card {
+      max-width: 780px;
+    }
+
     .admin-modal-header {
       padding: 18px 24px;
       border-bottom: 1px solid #e2e8f0;
@@ -1207,6 +1212,7 @@
                 <th>Título do Case</th>
                 <th>Modalidade</th>
                 <th>Município / Escola</th>
+                <th>Índice do Município</th>
                 <th>Autor / Responsável</th>
                 <th>Status</th>
                 <th style="text-align: right;">Ações</th>
@@ -1214,7 +1220,7 @@
             </thead>
             <tbody id="admin-cases-tbody">
               <tr>
-                <td colspan="7">
+                <td colspan="8">
                   <div class="admin-state-box">
                     <i data-lucide="loader" class="animate-spin"></i>
                     <h4>Carregando cases...</h4>
@@ -1354,8 +1360,22 @@
               </select>
             </div>
             <div class="indicator-check-row">
-              <label for="edit-mun-ee70" style="margin:0; font-weight:600; color:#334155;">EE em &gt; 70% da Rede</label>
+              <label for="edit-mun-ee70" style="margin:0; font-weight:600; color:#334155;">Possui Educação Empreendedora em mais de 70% do município?</label>
               <select id="edit-mun-ee70" class="form-input" style="width: auto; padding: 4px 8px;">
+                <option value="sim">Sim</option>
+                <option value="nao">Não</option>
+              </select>
+            </div>
+            <div class="indicator-check-row">
+              <label for="edit-mun-convenio" style="margin:0; font-weight:600; color:#334155;">Convênio/contrato/termo de parceria com o Sebrae</label>
+              <select id="edit-mun-convenio" class="form-input" style="width: auto; padding: 4px 8px;">
+                <option value="sim">Sim</option>
+                <option value="nao">Não</option>
+              </select>
+            </div>
+            <div class="indicator-check-row">
+              <label for="edit-mun-superintendencia" style="margin:0; font-weight:600; color:#334155;">Parceria com superintendência de ensino</label>
+              <select id="edit-mun-superintendencia" class="form-input" style="width: auto; padding: 4px 8px;">
                 <option value="sim">Sim</option>
                 <option value="nao">Não</option>
               </select>
@@ -1368,7 +1388,7 @@
               </select>
             </div>
             <div class="indicator-check-row">
-              <label for="edit-mun-lei" style="margin:0; font-weight:600; color:#334155;">Lei Municipal de EE</label>
+              <label for="edit-mun-lei" style="margin:0; font-weight:600; color:#334155;">Lei Municipal de Educação Empreendedora</label>
               <select id="edit-mun-lei" class="form-input" style="width: auto; padding: 4px 8px;">
                 <option value="sim">Sim</option>
                 <option value="nao">Não</option>
@@ -1382,7 +1402,7 @@
               </select>
             </div>
             <div class="indicator-check-row">
-              <label for="edit-mun-ies" style="margin:0; font-weight:600; color:#334155;">Parceria com IES</label>
+              <label for="edit-mun-ies" style="margin:0; font-weight:600; color:#334155;">Parceria com Instituição de Ensino Superior</label>
               <select id="edit-mun-ies" class="form-input" style="width: auto; padding: 4px 8px;">
                 <option value="sim">Sim</option>
                 <option value="nao">Não</option>
@@ -1396,7 +1416,7 @@
               </select>
             </div>
             <div class="indicator-check-row">
-              <label for="edit-mun-esc-seb" style="margin:0; font-weight:600; color:#334155;">Escola Sebrae</label>
+              <label for="edit-mun-esc-seb" style="margin:0; font-weight:600; color:#334155;">Sistema de Ensino Escola do Sebrae</label>
               <select id="edit-mun-esc-seb" class="form-input" style="width: auto; padding: 4px 8px;">
                 <option value="sim">Sim</option>
                 <option value="nao">Não</option>
@@ -1444,7 +1464,7 @@
               <label for="edit-case-modalidade">Modalidade</label>
               <select id="edit-case-modalidade" class="form-input">
                 <option value="professor">Professor</option>
-                <option value="estudante">Estudante</option>
+                <option value="estudante">Estudante Empreendedor</option>
               </select>
             </div>
             <div class="form-group">
@@ -1472,6 +1492,22 @@
           <div class="modal-section-title">Descrição Geral do Case</div>
           <div class="form-group">
             <textarea id="edit-case-descricao" rows="4" class="form-input" style="resize: vertical; font-family: inherit;"></textarea>
+          </div>
+
+          <div class="modal-section-title">Dados do Empreendimento</div>
+          <div class="modal-grid-2">
+            <div class="form-group">
+              <label for="edit-case-empresa-nome">Nome da Empresa</label>
+              <input type="text" id="edit-case-empresa-nome" class="form-input" placeholder="Ex: EcoHorta Sustentável" />
+            </div>
+            <div class="form-group">
+              <label for="edit-case-empresa-tipo">Tipo de Negócio</label>
+              <input type="text" id="edit-case-empresa-tipo" class="form-input" placeholder="Ex: Cooperativa, Tecnologia..." />
+            </div>
+            <div class="form-group" style="grid-column: span 2;">
+              <label for="edit-case-empresa-descricao">Descrição da Empresa</label>
+              <textarea id="edit-case-empresa-descricao" rows="3" class="form-input" style="resize: vertical; font-family: inherit;" placeholder="Produtos/serviços e modelo de atuação..."></textarea>
+            </div>
           </div>
 
           <div class="modal-section-title">Autor / Responsável</div>
@@ -1526,6 +1562,6 @@
   <script src="config.js"></script>
 
   <!-- Admin Controller -->
-  <script src="admin.js?v=2"></script>
+  <script src="admin.js?v=18"></script>
 </body>
 </html>

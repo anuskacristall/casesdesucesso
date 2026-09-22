@@ -19,7 +19,7 @@
   </script>
 
   <!-- Base App Styles -->
-  <link rel="stylesheet" href="style.css?v=11">
+  <link rel="stylesheet" href="style.css?v=18">
 
   <!-- Admin Dedicated Styles -->
   <style>
@@ -679,6 +679,11 @@
       animation: zoomIn 0.2s ease;
     }
 
+    #modal-case-details .admin-modal-card,
+    #modal-municipality-details .admin-modal-card {
+      max-width: 780px;
+    }
+
     .admin-modal-header {
       padding: 18px 24px;
       border-bottom: 1px solid #e2e8f0;
@@ -1207,6 +1212,7 @@
                 <th>Título do Case</th>
                 <th>Modalidade</th>
                 <th>Município / Escola</th>
+                <th>Índice do Município</th>
                 <th>Autor / Responsável</th>
                 <th>Status</th>
                 <th style="text-align: right;">Ações</th>
@@ -1214,7 +1220,7 @@
             </thead>
             <tbody id="admin-cases-tbody">
               <tr>
-                <td colspan="7">
+                <td colspan="8">
                   <div class="admin-state-box">
                     <i data-lucide="loader" class="animate-spin"></i>
                     <h4>Carregando cases...</h4>
@@ -1556,6 +1562,6 @@
   <script src="config.js"></script>
 
   <!-- Admin Controller -->
-  <script src="admin.js?v=5"></script>
+  <script src="admin.js?v=18"></script>
 </body>
 </html>

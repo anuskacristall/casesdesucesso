@@ -941,7 +941,12 @@ function mapDatabaseToApp(dbItem) {
     dependencia_adm: dbItem.dependencia_adm || "",
     jeppStatus: dbItem.status_jepp || "Não",
     status: dbItem.status || "approved",
-    request_code: dbItem.request_code || ""
+    request_code: dbItem.request_code || "",
+    indice_desenvolvimento: dbItem.indice_desenvolvimento || null,
+    indice_pontuacao: dbItem.indice_pontuacao ?? null,
+    indice_percentual: dbItem.indice_percentual ?? null,
+    indice_classificacao: dbItem.indice_classificacao || "",
+    indice_classificacao_key: dbItem.indice_classificacao_key || ""
   };
 }
 
@@ -1602,6 +1607,142 @@ function getCaseCoordinates(item) {
   return { lat: -19.9191, lng: -43.9378 }; // Belo Horizonte default fallback
 }
 
+function calculateMunicipioDevelopmentIndex(item) {
+  if (!item) return null;
+  // If precalculated from API with all criteria, return it
+  if (item.indice_desenvolvimento && Array.isArray(item.indice_desenvolvimento.criterios)) {
+    return item.indice_desenvolvimento;
+  }
+
+  const isAffirmative = (v) => {
+    if (v === true || v === 1) return true;
+    const s = String(v || "").trim().toLowerCase();
+    return s === "sim" || s === "true" || s === "1" || s === "total" || s === "sim (total)" || s === "parcial";
+  };
+
+  const isJeppAttended = (v) => {
+    const s = String(v || "").trim().toLowerCase();
+    return s === "sim" || s === "true" || s === "1" || s === "total" || s === "sim (total)" || s === "parcial";
+  };
+
+  const criteriaDefs = [
+    {
+      ordem: 1,
+      ordem_str: "1º",
+      nome: "Possui Educação Empreendedora em mais de 70% do município",
+      identificador: "educacao_70_porcento",
+      peso: 10,
+      atendido: isAffirmative(item.educacao_70_porcento) || isAffirmative(item.municipio_ee_70) || isAffirmative(item.edu70)
+    },
+    {
+      ordem: 2,
+      ordem_str: "2º",
+      nome: "JEPP no município",
+      identificador: "jepp_municipio",
+      peso: 9,
+      atendido: isJeppAttended(item.jepp_municipio) || isJeppAttended(item.status_jepp) || isJeppAttended(item.jeppStatus)
+    },
+    {
+      ordem: 3,
+      ordem_str: "3º",
+      nome: "Convênio / termo de parceria",
+      identificador: "convenio_parceria",
+      peso: 8,
+      atendido: isAffirmative(item.convenio_parceria) || isAffirmative(item.convenio_sebrae) || isAffirmative(item.hasConvenioSebrae)
+    },
+    {
+      ordem: 4,
+      ordem_str: "4º",
+      nome: "Comitê e ações conjuntas",
+      identificador: "comite_acoes_conjuntas",
+      peso: 7,
+      atendido: isAffirmative(item.comite_acoes_conjuntas) || isAffirmative(item.comite_possui) || isAffirmative(item.hasCommittee)
+    },
+    {
+      ordem: 5,
+      ordem_str: "5º",
+      nome: "Parceria com instituição de ensino superior",
+      identificador: "parceria_ies",
+      peso: 6,
+      atendido: isAffirmative(item.parceria_ies) || isAffirmative(item.ies_possui) || isAffirmative(item.hasIes)
+    },
+    {
+      ordem: 6,
+      ordem_str: "6º",
+      nome: "Empresa simulada",
+      identificador: "empresa_simulada",
+      peso: 5,
+      atendido: isAffirmative(item.empresa_simulada) || isAffirmative(item.empresa_simulada_possui) || isAffirmative(item.hasEmpresaSimulada)
+    },
+    {
+      ordem: 7,
+      ordem_str: "7º",
+      nome: "Sistema de ensino Escola do Sebrae",
+      identificador: "escola_sebrae",
+      peso: 4,
+      atendido: isAffirmative(item.escola_sebrae) || isAffirmative(item.escola_sebrae_possui) || isAffirmative(item.hasEscolaSebrae)
+    },
+    {
+      ordem: 8,
+      ordem_str: "8º",
+      nome: "Cooperativa de crédito",
+      identificador: "cooperativa_credito",
+      peso: 3,
+      atendido: isAffirmative(item.cooperativa_credito) || isAffirmative(item.cooperativa_possui) || isAffirmative(item.hasCoop)
+    },
+    {
+      ordem: 9,
+      ordem_str: "9º",
+      nome: "Parceria com superintendência de ensino",
+      identificador: "parceria_superintendencia",
+      peso: 2,
+      atendido: isAffirmative(item.parceria_superintendencia) || isAffirmative(item.hasParceriaSuperintendencia)
+    },
+    {
+      ordem: 10,
+      ordem_str: "10º",
+      nome: "Lei da educação empreendedora",
+      identificador: "lei_educacao_empreendedora",
+      peso: 1,
+      atendido: isAffirmative(item.lei_educacao_empreendedora) || isAffirmative(item.lei_possui) || isAffirmative(item.hasLaw)
+    }
+  ];
+
+  let pontuacaoBruta = 0;
+  const criterios = criteriaDefs.map(c => {
+    const pontos = c.atendido ? c.peso : 0;
+    pontuacaoBruta += pontos;
+    return {
+      ...c,
+      pontos
+    };
+  });
+
+  const percentual = Math.round((pontuacaoBruta / 55.0) * 1000) / 10;
+  let classificacao = "Início";
+  let classificacaoKey = "inicio";
+
+  if (pontuacaoBruta <= 21) {
+    classificacao = "Início";
+    classificacaoKey = "inicio";
+  } else if (pontuacaoBruta <= 38) {
+    classificacao = "Em Desenvolvimento";
+    classificacaoKey = "em_desenvolvimento";
+  } else {
+    classificacao = "Desenvolvido";
+    classificacaoKey = "desenvolvido";
+  }
+
+  return {
+    pontuacao: pontuacaoBruta,
+    pontuacao_maxima: 55,
+    percentual,
+    classificacao,
+    classificacao_key: classificacaoKey,
+    criterios
+  };
+}
+
 function createQuickLookCard(item) {
   const container = document.createElement("div");
   container.className = "popup-card";
@@ -1615,10 +1756,21 @@ function createQuickLookCard(item) {
     ? "background-color: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2);" 
     : "background-color: rgba(0, 84, 166, 0.1); color: var(--sebrae-blue); border: 1px solid rgba(0, 84, 166, 0.2);";
     
+  const devIdx = calculateMunicipioDevelopmentIndex(item);
+  const devBadgeStyle = devIdx.classificacao_key === 'inicio'
+    ? 'background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a;'
+    : (devIdx.classificacao_key === 'em_desenvolvimento'
+      ? 'background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;'
+      : 'background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;');
+
   container.innerHTML = `
     <div class="popup-header">
-      <div style="margin-bottom: 6px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px;">
         <span class="badge" style="font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; ${typeBadgeStyle}">${typeLabelStr}</span>
+        <div class="dev-index-badge dev-index-${devIdx.classificacao_key}" title="Pontuação: ${devIdx.pontuacao}/55 (${devIdx.percentual}%)" style="text-align: right;">
+          <span class="dev-index-sub" style="font-size: 0.60rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); line-height: 1; letter-spacing: 0.2px;">Índice do Município</span>
+          <span class="dev-index-val" style="font-size: 0.72rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; ${devBadgeStyle}">${devIdx.classificacao}</span>
+        </div>
       </div>
       <h3 class="popup-school" style="font-size: 1.05rem; font-weight: 700; color: var(--accent-color); margin-bottom: 2px;">${item.titulo || item.escola}</h3>
       ${item.titulo ? `<h4 class="popup-school-sub" style="font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px;">${item.escola}</h4>` : ''}
@@ -1846,6 +1998,31 @@ function openDetailsModal(id) {
     } else {
       depBadge.style.display = "none";
     }
+  }
+
+  // Development Index badge in modal header
+  const devIdx = calculateMunicipioDevelopmentIndex(item);
+  const devBadge = document.getElementById("details-dev-index-badge");
+  const devScore = document.getElementById("details-dev-index-score");
+  if (devBadge && devIdx) {
+    devBadge.innerText = devIdx.classificacao;
+    devBadge.className = "badge";
+    if (devIdx.classificacao_key === "inicio") {
+      devBadge.style.background = "#fef3c7";
+      devBadge.style.color = "#92400e";
+      devBadge.style.border = "1px solid #fde68a";
+    } else if (devIdx.classificacao_key === "em_desenvolvimento") {
+      devBadge.style.background = "#e0f2fe";
+      devBadge.style.color = "#0369a1";
+      devBadge.style.border = "1px solid #bae6fd";
+    } else {
+      devBadge.style.background = "#dcfce7";
+      devBadge.style.color = "#15803d";
+      devBadge.style.border = "1px solid #bbf7d0";
+    }
+  }
+  if (devScore && devIdx) {
+    devScore.innerText = `(${devIdx.pontuacao}/55 pts • ${devIdx.percentual}%)`;
   }
 
   // Technical details

@@ -43,6 +43,141 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function calculateMunicipioDevelopmentIndex(item) {
+  if (!item) return null;
+  if (item.indice_desenvolvimento && Array.isArray(item.indice_desenvolvimento.criterios)) {
+    return item.indice_desenvolvimento;
+  }
+
+  const isAffirmative = (v) => {
+    if (v === true || v === 1) return true;
+    const s = String(v || "").trim().toLowerCase();
+    return s === "sim" || s === "true" || s === "1" || s === "total" || s === "sim (total)" || s === "parcial";
+  };
+
+  const isJeppAttended = (v) => {
+    const s = String(v || "").trim().toLowerCase();
+    return s === "sim" || s === "true" || s === "1" || s === "total" || s === "sim (total)" || s === "parcial";
+  };
+
+  const criteriaDefs = [
+    {
+      ordem: 1,
+      ordem_str: "1º",
+      nome: "Possui Educação Empreendedora em mais de 70% do município",
+      identificador: "educacao_70_porcento",
+      peso: 10,
+      atendido: isAffirmative(item.educacao_70_porcento) || isAffirmative(item.municipio_ee_70) || isAffirmative(item.edu70)
+    },
+    {
+      ordem: 2,
+      ordem_str: "2º",
+      nome: "JEPP no município",
+      identificador: "jepp_municipio",
+      peso: 9,
+      atendido: isJeppAttended(item.jepp_municipio) || isJeppAttended(item.status_jepp) || isJeppAttended(item.jeppStatus)
+    },
+    {
+      ordem: 3,
+      ordem_str: "3º",
+      nome: "Convênio / termo de parceria",
+      identificador: "convenio_parceria",
+      peso: 8,
+      atendido: isAffirmative(item.convenio_parceria) || isAffirmative(item.convenio_sebrae) || isAffirmative(item.hasConvenioSebrae)
+    },
+    {
+      ordem: 4,
+      ordem_str: "4º",
+      nome: "Comitê e ações conjuntas",
+      identificador: "comite_acoes_conjuntas",
+      peso: 7,
+      atendido: isAffirmative(item.comite_acoes_conjuntas) || isAffirmative(item.comite_possui) || isAffirmative(item.hasCommittee)
+    },
+    {
+      ordem: 5,
+      ordem_str: "5º",
+      nome: "Parceria com instituição de ensino superior",
+      identificador: "parceria_ies",
+      peso: 6,
+      atendido: isAffirmative(item.parceria_ies) || isAffirmative(item.ies_possui) || isAffirmative(item.hasIes)
+    },
+    {
+      ordem: 6,
+      ordem_str: "6º",
+      nome: "Empresa simulada",
+      identificador: "empresa_simulada",
+      peso: 5,
+      atendido: isAffirmative(item.empresa_simulada) || isAffirmative(item.empresa_simulada_possui) || isAffirmative(item.hasEmpresaSimulada)
+    },
+    {
+      ordem: 7,
+      ordem_str: "7º",
+      nome: "Sistema de ensino Escola do Sebrae",
+      identificador: "escola_sebrae",
+      peso: 4,
+      atendido: isAffirmative(item.escola_sebrae) || isAffirmative(item.escola_sebrae_possui) || isAffirmative(item.hasEscolaSebrae)
+    },
+    {
+      ordem: 8,
+      ordem_str: "8º",
+      nome: "Cooperativa de crédito",
+      identificador: "cooperativa_credito",
+      peso: 3,
+      atendido: isAffirmative(item.cooperativa_credito) || isAffirmative(item.cooperativa_possui) || isAffirmative(item.hasCoop)
+    },
+    {
+      ordem: 9,
+      ordem_str: "9º",
+      nome: "Parceria com superintendência de ensino",
+      identificador: "parceria_superintendencia",
+      peso: 2,
+      atendido: isAffirmative(item.parceria_superintendencia) || isAffirmative(item.hasParceriaSuperintendencia)
+    },
+    {
+      ordem: 10,
+      ordem_str: "10º",
+      nome: "Lei da educação empreendedora",
+      identificador: "lei_educacao_empreendedora",
+      peso: 1,
+      atendido: isAffirmative(item.lei_educacao_empreendedora) || isAffirmative(item.lei_possui) || isAffirmative(item.hasLaw)
+    }
+  ];
+
+  let pontuacaoBruta = 0;
+  const criterios = criteriaDefs.map(c => {
+    const pontos = c.atendido ? c.peso : 0;
+    pontuacaoBruta += pontos;
+    return {
+      ...c,
+      pontos
+    };
+  });
+
+  const percentual = Math.round((pontuacaoBruta / 55.0) * 1000) / 10;
+  let classificacao = "Início";
+  let classificacaoKey = "inicio";
+
+  if (pontuacaoBruta <= 21) {
+    classificacao = "Início";
+    classificacaoKey = "inicio";
+  } else if (pontuacaoBruta <= 38) {
+    classificacao = "Em Desenvolvimento";
+    classificacaoKey = "em_desenvolvimento";
+  } else {
+    classificacao = "Desenvolvido";
+    classificacaoKey = "desenvolvido";
+  }
+
+  return {
+    pontuacao: pontuacaoBruta,
+    pontuacao_maxima: 55,
+    percentual,
+    classificacao,
+    classificacao_key: classificacaoKey,
+    criterios
+  };
+}
+
 // ============================================================================
 // 1. ADMIN AUTHENTICATION MANAGEMENT
 // ============================================================================
@@ -516,7 +651,7 @@ function renderCasesTable() {
   if (items.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7">
+        <td colspan="8">
           <div class="admin-state-box">
             <i data-lucide="award"></i>
             <h4>Nenhum case de sucesso encontrado</h4>
@@ -541,6 +676,14 @@ function renderCasesTable() {
 
     let authorName = isEstudante ? (item.estudante_nome || item.estudanteNome) : (item.professor_nome || item.professorNome);
     if (!authorName) authorName = item.tecnico_nome || item.tecnicoNome || "Não informado";
+
+    const devIndex = calculateMunicipioDevelopmentIndex(item);
+    const indexBadge = devIndex ? `
+      <div class="dev-index-badge ${devIndex.classificacao_key}" style="align-items: flex-start; text-align: left;">
+        <span class="dev-index-val ${devIndex.classificacao_key}" style="font-size: 0.75rem;">${escapeHtml(devIndex.classificacao)}</span>
+        <span class="dev-index-sub" style="color: #64748b; font-size: 0.68rem;">${devIndex.pontuacao}/55 pts (${devIndex.percentual}%)</span>
+      </div>
+    ` : `<span style="color: #94a3b8;">-</span>`;
 
     const actions = `
       <div class="row-actions" style="justify-content: flex-end;">
@@ -575,6 +718,7 @@ function renderCasesTable() {
         <td><strong style="color: #1e293b;">${escapeHtml(title)}</strong></td>
         <td><span style="font-weight:700; color: ${typeColor}; background: ${isEstudante ? '#ecfdf5' : '#e0f2fe'}; padding: 3px 8px; border-radius: 4px; font-size: 0.76rem;">${typeLabel}</span></td>
         <td>${place}</td>
+        <td>${indexBadge}</td>
         <td><strong>${escapeHtml(authorName)}</strong></td>
         <td><span class="badge-status ${statusCfg.class}">${statusCfg.label}</span></td>
         <td style="text-align: right;">${actions}</td>
@@ -859,6 +1003,95 @@ function getIndicatorBadge(val) {
   return `<span class="indicator-tag nao">Não</span>`;
 }
 
+function renderDevIndexCalculationMemory(item) {
+  const devIndex = calculateMunicipioDevelopmentIndex(item);
+  if (!devIndex) return "";
+
+  const { pontuacao, pontuacao_maxima, percentual, classificacao, classificacao_key, criterios } = devIndex;
+
+  const isInicio = classificacao_key === "inicio";
+  const isEmDesenv = classificacao_key === "em_desenvolvimento";
+  const isDesenvolvido = classificacao_key === "desenvolvido";
+
+  return `
+    <div style="margin-top: 10px;">
+      <div class="modal-section-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <span>Índice de Desenvolvimento do Município — Memória de Cálculo</span>
+        <span class="dev-index-val ${classificacao_key}" style="font-size: 0.78rem; padding: 3px 8px;">${escapeHtml(classificacao)}</span>
+      </div>
+
+      <!-- Card Consolidado e Faixas -->
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;">
+          <div>
+            <div style="font-size: 0.74rem; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.4px;">Pontuação Consolidada</div>
+            <div style="font-size: 1.35rem; font-weight: 800; color: #0f172a; line-height: 1.2; margin-top: 2px;">
+              ${pontuacao} <span style="font-size: 0.92rem; font-weight: 600; color: #64748b;">/ ${pontuacao_maxima} pontos</span>
+              <span style="font-size: 0.98rem; font-weight: 700; color: #0054a6; margin-left: 6px;">(${percentual}%)</span>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <div style="padding: 6px 10px; border-radius: 6px; font-size: 0.73rem; font-weight: 700; display: flex; flex-direction: column; gap: 1px; ${isInicio ? 'background: #fef3c7; color: #92400e; border: 2px solid #f59e0b; box-shadow: 0 1px 4px rgba(245, 158, 11, 0.2);' : 'background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; opacity: 0.75;'}">
+              <span>Início</span>
+              <small style="font-weight: 600; font-size: 0.68rem;">0 a 21 pts (0% - 39%)</small>
+            </div>
+            <div style="padding: 6px 10px; border-radius: 6px; font-size: 0.73rem; font-weight: 700; display: flex; flex-direction: column; gap: 1px; ${isEmDesenv ? 'background: #e0f2fe; color: #0369a1; border: 2px solid #0284c7; box-shadow: 0 1px 4px rgba(2, 132, 199, 0.2);' : 'background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; opacity: 0.75;'}">
+              <span>Em Desenvolvimento</span>
+              <small style="font-weight: 600; font-size: 0.68rem;">22 a 38 pts (40% - 69%)</small>
+            </div>
+            <div style="padding: 6px 10px; border-radius: 6px; font-size: 0.73rem; font-weight: 700; display: flex; flex-direction: column; gap: 1px; ${isDesenvolvido ? 'background: #dcfce7; color: #15803d; border: 2px solid #22c55e; box-shadow: 0 1px 4px rgba(34, 197, 94, 0.2);' : 'background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; opacity: 0.75;'}">
+              <span>Desenvolvido</span>
+              <small style="font-weight: 600; font-size: 0.68rem;">39 a 55 pts (70% - 100%)</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabela com as 5 Colunas -->
+        <div style="overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; background: #ffffff;">
+            <thead>
+              <tr style="background: #f1f5f9; color: #475569; text-transform: uppercase; font-size: 0.71rem; letter-spacing: 0.5px;">
+                <th style="padding: 8px 10px; text-align: center; border-bottom: 1px solid #e2e8f0; width: 50px;">Ordem</th>
+                <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">Critério</th>
+                <th style="padding: 8px 10px; text-align: center; border-bottom: 1px solid #e2e8f0; width: 65px;">Peso</th>
+                <th style="padding: 8px 10px; text-align: center; border-bottom: 1px solid #e2e8f0; width: 95px;">Atendido?</th>
+                <th style="padding: 8px 12px; text-align: right; border-bottom: 1px solid #e2e8f0; width: 110px;">Pontos Obtidos</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${criterios.map(c => `
+                <tr style="border-bottom: 1px solid #f1f5f9; ${c.atendido ? 'background: rgba(240, 253, 244, 0.45);' : ''}">
+                  <td style="padding: 7px 10px; text-align: center; font-weight: 700; color: #64748b;">${escapeHtml(c.ordem_str)}</td>
+                  <td style="padding: 7px 12px; color: #1e293b; font-weight: 500;">${escapeHtml(c.nome)}</td>
+                  <td style="padding: 7px 10px; text-align: center; font-weight: 700; color: #0054a6;">${c.peso}</td>
+                  <td style="padding: 7px 10px; text-align: center;">
+                    ${c.atendido
+                      ? `<span style="display: inline-flex; align-items: center; gap: 3px; color: #15803d; font-weight: 700; background: #dcfce7; padding: 2px 7px; border-radius: 4px; font-size: 0.75rem;"><i data-lucide="check" style="width: 12px; height: 12px;"></i> Sim</span>`
+                      : `<span style="display: inline-flex; align-items: center; gap: 3px; color: #94a3b8; font-weight: 600; background: #f1f5f9; padding: 2px 7px; border-radius: 4px; font-size: 0.75rem;"><i data-lucide="x" style="width: 12px; height: 12px;"></i> Não</span>`
+                    }
+                  </td>
+                  <td style="padding: 7px 12px; text-align: right; font-weight: 800; color: ${c.pontos > 0 ? '#15803d' : '#94a3b8'};">
+                    ${c.pontos > 0 ? `+${c.pontos} pts` : `0 pts`}
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+            <tfoot>
+              <tr style="background: #f8fafc; border-top: 2px solid #cbd5e1; font-weight: 800;">
+                <td colspan="2" style="padding: 10px 12px; color: #1e293b;">Total Consolidado</td>
+                <td style="padding: 10px; text-align: center; color: #0054a6;">55</td>
+                <td style="padding: 10px; text-align: center; color: #64748b;">${criterios.filter(c => c.atendido).length} / 10</td>
+                <td style="padding: 10px 12px; text-align: right; color: #0054a6; font-size: 0.95rem;">${pontuacao} pts (${percentual}%)</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 // ============================================================================
 // 8. MODALS: DETALHES DE MUNICÍPIO E CASE
 // ============================================================================
@@ -965,6 +1198,7 @@ function openMunicipalityDetails(id) {
         </div>
       </div>
     </div>
+    ${renderDevIndexCalculationMemory(item)}
   `;
 
   actions.innerHTML = `
@@ -1089,6 +1323,7 @@ function openCaseDetails(id) {
         </div>
       </div>
     </div>
+    ${renderDevIndexCalculationMemory(item)}
   `;
 
   actions.innerHTML = `

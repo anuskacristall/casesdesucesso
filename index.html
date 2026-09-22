@@ -45,7 +45,7 @@
   <script src="lib/lucide.min.js"></script>
   
   <!-- Style Sheet -->
-  <link rel="stylesheet" href="style.css?v=17">
+  <link rel="stylesheet" href="style.css?v=18">
 </head>
 <body class="light-theme">
   <!-- Login View -->
@@ -544,7 +544,16 @@
           <div id="details-escola" style="font-size: 1.1rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Nome da Escola de Exemplo</div>
           <p id="details-location-text"><i data-lucide="map-pin"></i> Belo Horizonte - MR Belo Horizonte</p>
         </div>
-        <button id="btn-close-details" class="btn-close">&times;</button>
+        <div style="display: flex; align-items: flex-start; gap: 16px;">
+          <div id="details-dev-index-container" class="dev-index-badge-large" style="display: flex; flex-direction: column; align-items: flex-end; background: rgba(0,0,0,0.02); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-glass);">
+            <span class="dev-index-sub" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 3px;">Índice de Desenvolvimento do Município</span>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span id="details-dev-index-badge" class="badge" style="font-size: 0.82rem; font-weight: 700; padding: 3px 10px;">Em Desenvolvimento</span>
+              <span id="details-dev-index-score" style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">(35/55 pts)</span>
+            </div>
+          </div>
+          <button id="btn-close-details" class="btn-close">&times;</button>
+        </div>
       </div>
 
       <!-- Scrollable Body -->
@@ -1118,6 +1127,6 @@
   <script src="config.js"></script>
 
   <!-- Script Principal -->
-  <script src="app.js?v=35"></script>
+  <script src="app.js?v=36"></script>
 </body>
 </html>

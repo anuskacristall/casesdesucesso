@@ -247,6 +247,158 @@ USER_DEFAULT_PASSWORD = os.getenv('USER_DEFAULT_PASSWORD', 'teste123')
 ADMIN_DEFAULT_EMAIL = os.getenv('ADMIN_DEFAULT_EMAIL', 'admin@sebraemg.com.br')
 ADMIN_DEFAULT_PASSWORD = os.getenv('ADMIN_DEFAULT_PASSWORD', 'admin123')
 
+def calculate_municipio_development_index(item: dict) -> dict:
+    """
+    Calcula o Índice de Desenvolvimento do Município baseado em 10 critérios:
+    1º educacao_70_porcento: peso 10
+    2º jepp_municipio: peso 9
+    3º convenio_parceria: peso 8
+    4º comite_acoes_conjuntas: peso 7
+    5º parceria_ies: peso 6
+    6º empresa_simulada: peso 5
+    7º escola_sebrae: peso 4
+    8º cooperativa_credito: peso 3
+    9º parceria_superintendencia: peso 2
+    10º lei_educacao_empreendedora: peso 1
+    Total de pesos = 55
+    Faixas:
+    0 a 21: Início
+    22 a 38: Em Desenvolvimento
+    39 a 55: Desenvolvido
+    """
+    def is_affirmative(v):
+        if v is True:
+            return True
+        if isinstance(v, (int, float)) and v > 0:
+            return True
+        s = str(v or "").strip().lower()
+        return s in ("sim", "true", "1", "total", "sim (total)", "parcial")
+
+    def is_jepp_attended(v):
+        s = str(v or "").strip().lower()
+        return s in ("sim", "true", "1", "total", "sim (total)", "parcial")
+
+    criteria_defs = [
+        {
+            "ordem": 1,
+            "ordem_str": "1º",
+            "nome": "Possui Educação Empreendedora em mais de 70% do município",
+            "identificador": "educacao_70_porcento",
+            "peso": 10,
+            "atendido": is_affirmative(item.get("educacao_70_porcento")) or is_affirmative(item.get("municipio_ee_70")) or is_affirmative(item.get("edu70"))
+        },
+        {
+            "ordem": 2,
+            "ordem_str": "2º",
+            "nome": "JEPP no município",
+            "identificador": "jepp_municipio",
+            "peso": 9,
+            "atendido": is_jepp_attended(item.get("jepp_municipio")) or is_jepp_attended(item.get("status_jepp")) or is_jepp_attended(item.get("jeppStatus"))
+        },
+        {
+            "ordem": 3,
+            "ordem_str": "3º",
+            "nome": "Convênio / termo de parceria",
+            "identificador": "convenio_parceria",
+            "peso": 8,
+            "atendido": is_affirmative(item.get("convenio_parceria")) or is_affirmative(item.get("convenio_sebrae")) or is_affirmative(item.get("hasConvenioSebrae"))
+        },
+        {
+            "ordem": 4,
+            "ordem_str": "4º",
+            "nome": "Comitê e ações conjuntas",
+            "identificador": "comite_acoes_conjuntas",
+            "peso": 7,
+            "atendido": is_affirmative(item.get("comite_acoes_conjuntas")) or is_affirmative(item.get("comite_possui")) or is_affirmative(item.get("hasCommittee"))
+        },
+        {
+            "ordem": 5,
+            "ordem_str": "5º",
+            "nome": "Parceria com instituição de ensino superior",
+            "identificador": "parceria_ies",
+            "peso": 6,
+            "atendido": is_affirmative(item.get("parceria_ies")) or is_affirmative(item.get("ies_possui")) or is_affirmative(item.get("hasIes"))
+        },
+        {
+            "ordem": 6,
+            "ordem_str": "6º",
+            "nome": "Empresa simulada",
+            "identificador": "empresa_simulada",
+            "peso": 5,
+            "atendido": is_affirmative(item.get("empresa_simulada")) or is_affirmative(item.get("empresa_simulada_possui")) or is_affirmative(item.get("hasEmpresaSimulada"))
+        },
+        {
+            "ordem": 7,
+            "ordem_str": "7º",
+            "nome": "Sistema de ensino Escola do Sebrae",
+            "identificador": "escola_sebrae",
+            "peso": 4,
+            "atendido": is_affirmative(item.get("escola_sebrae")) or is_affirmative(item.get("escola_sebrae_possui")) or is_affirmative(item.get("hasEscolaSebrae"))
+        },
+        {
+            "ordem": 8,
+            "ordem_str": "8º",
+            "nome": "Cooperativa de crédito",
+            "identificador": "cooperativa_credito",
+            "peso": 3,
+            "atendido": is_affirmative(item.get("cooperativa_credito")) or is_affirmative(item.get("cooperativa_possui")) or is_affirmative(item.get("hasCoop"))
+        },
+        {
+            "ordem": 9,
+            "ordem_str": "9º",
+            "nome": "Parceria com superintendência de ensino",
+            "identificador": "parceria_superintendencia",
+            "peso": 2,
+            "atendido": is_affirmative(item.get("parceria_superintendencia")) or is_affirmative(item.get("hasParceriaSuperintendencia"))
+        },
+        {
+            "ordem": 10,
+            "ordem_str": "10º",
+            "nome": "Lei da educação empreendedora",
+            "identificador": "lei_educacao_empreendedora",
+            "peso": 1,
+            "atendido": is_affirmative(item.get("lei_educacao_empreendedora")) or is_affirmative(item.get("lei_possui")) or is_affirmative(item.get("hasLaw"))
+        }
+    ]
+
+    criterios = []
+    pontuacao_bruta = 0
+
+    for c in criteria_defs:
+        status_num = 1 if c["atendido"] else 0
+        pontos = c["peso"] * status_num
+        pontuacao_bruta += pontos
+        criterios.append({
+            "ordem": c["ordem"],
+            "ordem_str": c["ordem_str"],
+            "nome": c["nome"],
+            "identificador": c["identificador"],
+            "peso": c["peso"],
+            "atendido": bool(c["atendido"]),
+            "pontos": pontos
+        })
+
+    percentual = round((pontuacao_bruta / 55.0) * 100, 1)
+
+    if pontuacao_bruta <= 21:
+        classificacao = "Início"
+        classificacao_key = "inicio"
+    elif pontuacao_bruta <= 38:
+        classificacao = "Em Desenvolvimento"
+        classificacao_key = "em_desenvolvimento"
+    else:
+        classificacao = "Desenvolvido"
+        classificacao_key = "desenvolvido"
+
+    return {
+        "pontuacao": pontuacao_bruta,
+        "pontuacao_maxima": 55,
+        "percentual": percentual,
+        "classificacao": classificacao,
+        "classificacao_key": classificacao_key,
+        "criterios": criterios
+    }
+
 class SecureBackendHandler(SimpleHTTPRequestHandler):
     def end_headers(self):
         # Prevent caching of JS/CSS during development
@@ -383,6 +535,14 @@ class SecureBackendHandler(SimpleHTTPRequestHandler):
             if cid in cases_overrides:
                 c.update(cases_overrides[cid])
 
+            # Calcula Índice de Desenvolvimento do Município
+            dev_idx = calculate_municipio_development_index(c)
+            c["indice_desenvolvimento"] = dev_idx
+            c["indice_pontuacao"] = dev_idx["pontuacao"]
+            c["indice_percentual"] = dev_idx["percentual"]
+            c["indice_classificacao"] = dev_idx["classificacao"]
+            c["indice_classificacao_key"] = dev_idx["classificacao_key"]
+
         if needs_save:
             save_data_store(store)
 
@@ -390,7 +550,15 @@ class SecureBackendHandler(SimpleHTTPRequestHandler):
 
     def handle_get_municipalities(self):
         store = load_data_store()
-        self.send_json_response(200, store.get("municipalities", []))
+        muns = store.get("municipalities", [])
+        for m in muns:
+            dev_idx = calculate_municipio_development_index(m)
+            m["indice_desenvolvimento"] = dev_idx
+            m["indice_pontuacao"] = dev_idx["pontuacao"]
+            m["indice_percentual"] = dev_idx["percentual"]
+            m["indice_classificacao"] = dev_idx["classificacao"]
+            m["indice_classificacao_key"] = dev_idx["classificacao_key"]
+        self.send_json_response(200, muns)
 
     def handle_post_case(self):
         user = self.get_auth_token_payload()
