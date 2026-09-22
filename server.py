@@ -12,6 +12,7 @@ import hashlib
 import base64
 import time
 import re
+import unicodedata
 from urllib.parse import urlsplit
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
@@ -687,6 +688,42 @@ class SecureBackendHandler(SimpleHTTPRequestHandler):
             return
 
         store = load_data_store()
+
+        # Verifica se o município pai do case está rejeitado
+        case_item = None
+        for ec in store.get("extra_cases", []):
+            if str(ec.get("id")) == str(case_id):
+                case_item = ec
+                break
+
+        if not case_item and SUPABASE_URL and SUPABASE_KEY:
+            try:
+                url = f"{SUPABASE_URL}/rest/v1/cases?id=eq.{case_id}&select=*"
+                headers = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}", "User-Agent": "Mozilla/5.0"}
+                req = urllib.request.Request(url, headers=headers)
+                with open_remote(req) as resp:
+                    items = json.loads(resp.read().decode("utf-8"))
+                    if items:
+                        case_item = items[0]
+                        overrides = store.get("cases_overrides", {}).get(str(case_id), {})
+                        case_item.update(overrides)
+            except Exception:
+                pass
+
+        if case_item:
+            mun_name = str(case_item.get("municipio") or "").strip()
+            if mun_name:
+                norm_c_mun = unicodedata.normalize('NFKD', mun_name).encode('ascii', 'ignore').decode('utf-8').strip().lower()
+                for m in store.get("municipalities", []):
+                    norm_m_mun = unicodedata.normalize('NFKD', m.get("nome", "")).encode('ascii', 'ignore').decode('utf-8').strip().lower()
+                    if norm_c_mun == norm_m_mun:
+                        if m.get("status") == "rejected":
+                            self.send_json_response(400, {
+                                "error": f"Não é possível aprovar este case porque o município '{m.get('nome')}' está com status REJEITADO. O município é a entidade pai de seus cases; aprove o município primeiro no painel administrativo."
+                            })
+                            return
+                        break
+
         store.setdefault("cases_status", {})[str(case_id)] = "approved"
         for c in store.get("extra_cases", []):
             if str(c.get("id")) == str(case_id):

@@ -1174,6 +1174,7 @@ async function init() {
   
   // Load data
   await initData();
+  await loadMunicipalitiesData();
   
   // Initialize Map
   initMap();
@@ -3111,6 +3112,43 @@ function bindEvents() {
 
   // Logout Button handler
   document.getElementById("btn-logout").addEventListener("click", handleLogout);
+
+  // Botão e Modais de Municípios de Referência (Desenvolvidos)
+  const btnOpenRef = document.getElementById("btn-open-referencia-muns");
+  if (btnOpenRef) {
+    btnOpenRef.addEventListener("click", openReferenciaMunicipalitiesModal);
+  }
+
+  const btnCloseRefModal = document.getElementById("btn-close-referencia-modal");
+  if (btnCloseRefModal) {
+    btnCloseRefModal.addEventListener("click", closeReferenciaMunicipalitiesModal);
+  }
+
+  const refModal = document.getElementById("modal-municipios-referencia");
+  if (refModal) {
+    refModal.addEventListener("click", (e) => {
+      if (e.target.id === "modal-municipios-referencia") closeReferenciaMunicipalitiesModal();
+    });
+  }
+
+  const searchRefInput = document.getElementById("input-search-referencia-muns");
+  if (searchRefInput) {
+    searchRefInput.addEventListener("input", (e) => {
+      renderReferenciaMunicipalitiesTable(e.target.value);
+    });
+  }
+
+  const btnCloseRefDetails = document.getElementById("btn-close-ref-mun-details");
+  if (btnCloseRefDetails) {
+    btnCloseRefDetails.addEventListener("click", closeReferenciaMunDetails);
+  }
+
+  const refDetailsModal = document.getElementById("modal-referencia-mun-details");
+  if (refDetailsModal) {
+    refDetailsModal.addEventListener("click", (e) => {
+      if (e.target.id === "modal-referencia-mun-details") closeReferenciaMunDetails();
+    });
+  }
 }
 
 // ==========================================================================
@@ -3775,3 +3813,471 @@ function performFilteredCSVExport() {
   closeExportConfirmModal();
   showToast(`Planilha baixada com sucesso! (${casesToExport.length} cases)`);
 }
+
+// ==========================================================================
+// MUNICÍPIOS DE REFERÊNCIA & DESENVOLVIDOS (CONTROLLER & CALCULATION MEMORY)
+// ==========================================================================
+
+let allMunicipalities = [];
+let developedMunicipalities = [];
+
+function calculateMunicipioDevelopmentIndex(item) {
+  if (!item) return null;
+  if (item.indice_desenvolvimento && Array.isArray(item.indice_desenvolvimento.criterios)) {
+    return item.indice_desenvolvimento;
+  }
+
+  const isAffirmative = (v) => {
+    if (v === true || v === 1) return true;
+    const s = String(v || "").trim().toLowerCase();
+    return s === "sim" || s === "true" || s === "1" || s === "total" || s === "sim (total)" || s === "parcial";
+  };
+
+  const isJeppAttended = (v) => {
+    const s = String(v || "").trim().toLowerCase();
+    return s === "sim" || s === "true" || s === "1" || s === "total" || s === "sim (total)" || s === "parcial";
+  };
+
+  const criteriaDefs = [
+    {
+      ordem: 1,
+      ordem_str: "1º",
+      nome: "Possui Educação Empreendedora em mais de 70% do município",
+      identificador: "educacao_70_porcento",
+      peso: 10,
+      atendido: isAffirmative(item.educacao_70_porcento) || isAffirmative(item.municipio_ee_70) || isAffirmative(item.edu70)
+    },
+    {
+      ordem: 2,
+      ordem_str: "2º",
+      nome: "JEPP no município",
+      identificador: "jepp_municipio",
+      peso: 9,
+      atendido: isJeppAttended(item.jepp_municipio) || isJeppAttended(item.status_jepp) || isJeppAttended(item.jeppStatus)
+    },
+    {
+      ordem: 3,
+      ordem_str: "3º",
+      nome: "Convênio / termo de parceria",
+      identificador: "convenio_parceria",
+      peso: 8,
+      atendido: isAffirmative(item.convenio_parceria) || isAffirmative(item.convenio_sebrae) || isAffirmative(item.hasConvenioSebrae)
+    },
+    {
+      ordem: 4,
+      ordem_str: "4º",
+      nome: "Comitê e ações conjuntas",
+      identificador: "comite_acoes_conjuntas",
+      peso: 7,
+      atendido: isAffirmative(item.comite_acoes_conjuntas) || isAffirmative(item.comite_possui) || isAffirmative(item.hasCommittee)
+    },
+    {
+      ordem: 5,
+      ordem_str: "5º",
+      nome: "Parceria com instituição de ensino superior",
+      identificador: "parceria_ies",
+      peso: 6,
+      atendido: isAffirmative(item.parceria_ies) || isAffirmative(item.ies_possui) || isAffirmative(item.hasIes)
+    },
+    {
+      ordem: 6,
+      ordem_str: "6º",
+      nome: "Empresa simulada",
+      identificador: "empresa_simulada",
+      peso: 5,
+      atendido: isAffirmative(item.empresa_simulada) || isAffirmative(item.empresa_simulada_possui) || isAffirmative(item.hasEmpresaSimulada)
+    },
+    {
+      ordem: 7,
+      ordem_str: "7º",
+      nome: "Sistema de ensino Escola do Sebrae",
+      identificador: "escola_sebrae",
+      peso: 4,
+      atendido: isAffirmative(item.escola_sebrae) || isAffirmative(item.escola_sebrae_possui) || isAffirmative(item.hasEscolaSebrae)
+    },
+    {
+      ordem: 8,
+      ordem_str: "8º",
+      nome: "Cooperativa de crédito",
+      identificador: "cooperativa_credito",
+      peso: 3,
+      atendido: isAffirmative(item.cooperativa_credito) || isAffirmative(item.cooperativa_possui) || isAffirmative(item.hasCoop)
+    },
+    {
+      ordem: 9,
+      ordem_str: "9º",
+      nome: "Parceria com superintendência de ensino",
+      identificador: "parceria_superintendencia",
+      peso: 2,
+      atendido: isAffirmative(item.parceria_superintendencia) || isAffirmative(item.hasParceriaSuperintendencia)
+    },
+    {
+      ordem: 10,
+      ordem_str: "10º",
+      nome: "Lei da educação empreendedora",
+      identificador: "lei_educacao_empreendedora",
+      peso: 1,
+      atendido: isAffirmative(item.lei_educacao_empreendedora) || isAffirmative(item.lei_possui) || isAffirmative(item.hasLaw)
+    }
+  ];
+
+  let pontuacao = 0;
+  const criterios = criteriaDefs.map(c => {
+    const pontos = c.atendido ? c.peso : 0;
+    pontuacao += pontos;
+    return { ...c, pontos };
+  });
+
+  const pontuacao_maxima = 55;
+  const percentual = Math.round((pontuacao / pontuacao_maxima) * 1000) / 10;
+
+  let classificacao = "Início";
+  let classificacao_key = "inicio";
+  if (pontuacao >= 39) {
+    classificacao = "Desenvolvido";
+    classificacao_key = "desenvolvido";
+  } else if (pontuacao >= 22) {
+    classificacao = "Em Desenvolvimento";
+    classificacao_key = "em_desenvolvimento";
+  }
+
+  return {
+    pontuacao,
+    pontuacao_maxima,
+    percentual,
+    classificacao,
+    classificacao_key,
+    criterios
+  };
+}
+
+function renderDevIndexCalculationMemory(item) {
+  const devIndex = calculateMunicipioDevelopmentIndex(item);
+  if (!devIndex) return "";
+
+  const { pontuacao, pontuacao_maxima, percentual, classificacao, classificacao_key, criterios } = devIndex;
+
+  const isInicio = classificacao_key === "inicio";
+  const isEmDesenv = classificacao_key === "em_desenvolvimento";
+  const isDesenvolvido = classificacao_key === "desenvolvido";
+
+  return `
+    <div class="admin-detail-card card-indicators" style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 18px; margin-top: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+      <div class="admin-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">
+        <div class="admin-card-title" style="display: flex; align-items: center; gap: 8px; font-weight: 800; color: #0054a6; font-size: 1.05rem;">
+          <i data-lucide="bar-chart-2" style="width: 20px; height: 20px;"></i>
+          <span>Índice de Desenvolvimento do Município — Memória de Cálculo</span>
+        </div>
+        <span class="dev-index-val ${classificacao_key}" style="font-size: 0.8rem; padding: 4px 10px; font-weight: 800; border-radius: 6px; ${isDesenvolvido ? 'background: #dcfce7; color: #15803d; border: 1.5px solid #22c55e;' : ''}">${escapeHtml(classificacao)}</span>
+      </div>
+
+      <!-- Card Consolidado e Faixas -->
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 14px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;">
+          <div>
+            <div style="font-size: 0.74rem; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.4px;">Pontuação Consolidada</div>
+            <div style="font-size: 1.45rem; font-weight: 800; color: #0f172a; line-height: 1.2; margin-top: 2px;">
+              ${pontuacao} <span style="font-size: 0.95rem; font-weight: 600; color: #64748b;">/ ${pontuacao_maxima} pontos</span>
+              <span style="font-size: 1.05rem; font-weight: 800; color: #0054a6; margin-left: 8px;">(${percentual}%)</span>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <div style="padding: 6px 10px; border-radius: 6px; font-size: 0.73rem; font-weight: 700; display: flex; flex-direction: column; gap: 1px; ${isInicio ? 'background: #fef3c7; color: #92400e; border: 2px solid #f59e0b; box-shadow: 0 1px 4px rgba(245, 158, 11, 0.2);' : 'background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; opacity: 0.75;'}">
+              <span>Início</span>
+              <small style="font-weight: 600; font-size: 0.68rem;">0 a 21 pts (0% - 39%)</small>
+            </div>
+            <div style="padding: 6px 10px; border-radius: 6px; font-size: 0.73rem; font-weight: 700; display: flex; flex-direction: column; gap: 1px; ${isEmDesenv ? 'background: #e0f2fe; color: #0369a1; border: 2px solid #0284c7; box-shadow: 0 1px 4px rgba(2, 132, 199, 0.2);' : 'background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; opacity: 0.75;'}">
+              <span>Em Desenvolvimento</span>
+              <small style="font-weight: 600; font-size: 0.68rem;">22 a 38 pts (40% - 69%)</small>
+            </div>
+            <div style="padding: 6px 10px; border-radius: 6px; font-size: 0.73rem; font-weight: 700; display: flex; flex-direction: column; gap: 1px; ${isDesenvolvido ? 'background: #dcfce7; color: #15803d; border: 2px solid #22c55e; box-shadow: 0 1px 4px rgba(34, 197, 94, 0.2);' : 'background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; opacity: 0.75;'}">
+              <span>Desenvolvido</span>
+              <small style="font-weight: 600; font-size: 0.68rem;">39 a 55 pts (70% - 100%)</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabela com as 5 Colunas -->
+        <div style="overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; background: #ffffff;">
+            <thead>
+              <tr style="background: #f1f5f9; color: #475569; text-transform: uppercase; font-size: 0.71rem; letter-spacing: 0.5px;">
+                <th style="padding: 8px 10px; text-align: center; border-bottom: 1px solid #e2e8f0; width: 50px;">Ordem</th>
+                <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">Critério</th>
+                <th style="padding: 8px 10px; text-align: center; border-bottom: 1px solid #e2e8f0; width: 65px;">Peso</th>
+                <th style="padding: 8px 10px; text-align: center; border-bottom: 1px solid #e2e8f0; width: 95px;">Atendido?</th>
+                <th style="padding: 8px 12px; text-align: right; border-bottom: 1px solid #e2e8f0; width: 110px;">Pontos Obtidos</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${criterios.map(c => `
+                <tr style="border-bottom: 1px solid #f1f5f9; ${c.atendido ? 'background: rgba(240, 253, 244, 0.45);' : ''}">
+                  <td style="padding: 7px 10px; text-align: center; font-weight: 700; color: #64748b;">${escapeHtml(c.ordem_str)}</td>
+                  <td style="padding: 7px 12px; color: #1e293b; font-weight: 500;">${escapeHtml(c.nome)}</td>
+                  <td style="padding: 7px 10px; text-align: center; font-weight: 700; color: #0054a6;">${c.peso}</td>
+                  <td style="padding: 7px 10px; text-align: center;">
+                    ${c.atendido
+                      ? `<span style="display: inline-flex; align-items: center; gap: 3px; color: #15803d; font-weight: 700; background: #dcfce7; padding: 2px 7px; border-radius: 4px; font-size: 0.75rem;"><i data-lucide="check" style="width: 12px; height: 12px;"></i> Sim</span>`
+                      : `<span style="display: inline-flex; align-items: center; gap: 3px; color: #94a3b8; font-weight: 600; background: #f1f5f9; padding: 2px 7px; border-radius: 4px; font-size: 0.75rem;"><i data-lucide="x" style="width: 12px; height: 12px;"></i> Não</span>`
+                    }
+                  </td>
+                  <td style="padding: 7px 12px; text-align: right; font-weight: 800; color: ${c.pontos > 0 ? '#15803d' : '#94a3b8'};">
+                    ${c.pontos > 0 ? `+${c.pontos} pts` : `0 pts`}
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+            <tfoot>
+              <tr style="background: #f8fafc; border-top: 2px solid #cbd5e1; font-weight: 800;">
+                <td colspan="2" style="padding: 10px 12px; color: #1e293b;">Total Consolidado</td>
+                <td style="padding: 10px; text-align: center; color: #0054a6;">55</td>
+                <td style="padding: 10px; text-align: center; color: #64748b;">${criterios.filter(c => c.atendido).length} / 10</td>
+                <td style="padding: 10px 12px; text-align: right; color: #0054a6; font-size: 0.95rem;">${pontuacao} pts (${percentual}%)</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function loadMunicipalitiesData() {
+  try {
+    const res = await fetch(getApiUrl("/api/municipalities"));
+    if (res.ok) {
+      allMunicipalities = await res.json();
+    }
+  } catch (e) {
+    try {
+      allMunicipalities = JSON.parse(localStorage.getItem("sebrae_approved_municipalities") || "[]");
+    } catch (err) {
+      allMunicipalities = [];
+    }
+  }
+
+  // Filtrar municípios desenvolvidos aprovados (pontuação >= 39 ou classificacao desenvolvida)
+  developedMunicipalities = (Array.isArray(allMunicipalities) ? allMunicipalities : []).filter(m => {
+    if (m.status !== "approved") return false;
+    const devIdx = calculateMunicipioDevelopmentIndex(m);
+    return devIdx && devIdx.pontuacao >= 39;
+  });
+
+  // Ordena alfabeticamente por município
+  developedMunicipalities.sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || "")));
+
+  // Atualiza contadores visuais
+  const btnCountBadge = document.getElementById("badge-referencia-muns-count");
+  if (btnCountBadge) {
+    btnCountBadge.textContent = developedMunicipalities.length;
+  }
+  const totalModalBadge = document.getElementById("referencia-muns-total-badge");
+  if (totalModalBadge) {
+    totalModalBadge.textContent = `${developedMunicipalities.length} município${developedMunicipalities.length === 1 ? '' : 's'}`;
+  }
+}
+
+function renderReferenciaMunicipalitiesTable(filterQuery = "") {
+  const tbody = document.getElementById("referencia-muns-tbody");
+  if (!tbody) return;
+
+  const q = filterQuery.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  let items = [...developedMunicipalities];
+
+  if (q) {
+    items = items.filter(m => {
+      const nome = String(m.nome || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const reg = String(m.regional || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const mr = String(m.mr || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const resp = String(m.responsavel_nome || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      return nome.includes(q) || reg.includes(q) || mr.includes(q) || resp.includes(q);
+    });
+  }
+
+  if (items.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align: center; padding: 36px 20px; color: #64748b;">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+            <i data-lucide="search-x" style="width: 32px; height: 32px; color: #94a3b8;"></i>
+            <strong style="font-size: 1rem; color: #1e293b;">Nenhum município de referência encontrado</strong>
+            <span style="font-size: 0.85rem;">Tente buscar com outro termo ou limpe a caixa de pesquisa.</span>
+          </div>
+        </td>
+      </tr>
+    `;
+    if (typeof lucide !== "undefined") lucide.createIcons({ root: tbody });
+    return;
+  }
+
+  tbody.innerHTML = items.map(item => {
+    const munName = item.nome || item.municipio || "-";
+    const regional = item.regional || "-";
+    const mr = item.mr ? (item.mr.startsWith("MR ") ? item.mr : `MR ${item.mr}`) : "-";
+    const respNome = item.responsavel_nome || "Equipe Sebrae";
+    const respEmail = item.responsavel_email || "";
+    const respTel = item.responsavel_telefone || "";
+
+    const devIdx = calculateMunicipioDevelopmentIndex(item);
+    const score = devIdx ? devIdx.pontuacao : 0;
+    const percent = devIdx ? devIdx.percentual : 0;
+
+    const contactHtml = `
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <strong style="color: #1e293b; font-size: 0.88rem;">${escapeHtml(respNome)}</strong>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.76rem; color: #64748b; margin-top: 2px;">
+          ${respEmail ? `<a href="mailto:${escapeHtml(respEmail)}" style="color: #0054a6; text-decoration: none; display: inline-flex; align-items: center; gap: 3px;"><i data-lucide="mail" style="width: 11px; height: 11px;"></i> ${escapeHtml(respEmail)}</a>` : ""}
+          ${respTel ? `<a href="tel:${escapeHtml(respTel.replace(/[^0-9+]/g, ''))}" style="color: #64748b; text-decoration: none; display: inline-flex; align-items: center; gap: 3px;"><i data-lucide="phone" style="width: 11px; height: 11px;"></i> ${escapeHtml(respTel)}</a>` : ""}
+        </div>
+      </div>
+    `;
+
+    return `
+      <tr class="ref-table-row">
+        <td style="padding: 12px 14px;">
+          <span style="display: inline-block; font-weight: 600; color: #0054a6; background: #e0f2fe; padding: 3px 8px; border-radius: 4px; font-size: 0.78rem;">${escapeHtml(regional)}</span>
+        </td>
+        <td style="padding: 12px 14px; color: #475569; font-size: 0.85rem; font-weight: 500;">${escapeHtml(mr)}</td>
+        <td style="padding: 12px 14px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <i data-lucide="map-pin" style="width: 15px; height: 15px; color: #0054a6; flex-shrink: 0;"></i>
+            <strong style="color: #0f172a; font-size: 0.95rem;">${escapeHtml(munName)}</strong>
+          </div>
+        </td>
+        <td style="padding: 12px 14px;">${contactHtml}</td>
+        <td style="padding: 12px 14px; text-align: right;">
+          <div style="display: inline-flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap;">
+            <div class="ref-badge-score" title="Pontuação no Índice de Desenvolvimento: ${score}/55 pontos (${percent}%)">
+              <i data-lucide="check-circle" style="width: 13px; height: 13px; color: #15803d;"></i>
+              <span>${score}/55 pts</span>
+            </div>
+            <button type="button" class="ref-table-btn-ver-mais" onclick="openReferenciaMunDetails('${escapeHtml(item.id)}')">
+              <i data-lucide="eye" style="width: 13px; height: 13px;"></i>
+              <span>Ver mais</span>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  if (typeof lucide !== "undefined") lucide.createIcons({ root: tbody });
+}
+
+function openReferenciaMunicipalitiesModal() {
+  const modal = document.getElementById("modal-municipios-referencia");
+  if (!modal) return;
+  const input = document.getElementById("input-search-referencia-muns");
+  if (input) input.value = "";
+  renderReferenciaMunicipalitiesTable("");
+  modal.classList.add("active");
+  if (typeof lucide !== "undefined") lucide.createIcons({ root: modal });
+}
+
+function closeReferenciaMunicipalitiesModal() {
+  const modal = document.getElementById("modal-municipios-referencia");
+  if (modal) modal.classList.remove("active");
+}
+
+function openReferenciaMunDetails(id) {
+  const item = (developedMunicipalities || []).find(m => String(m.id) === String(id)) || (allMunicipalities || []).find(m => String(m.id) === String(id));
+  if (!item) return;
+
+  const modal = document.getElementById("modal-referencia-mun-details");
+  if (!modal) return;
+
+  const regBadge = document.getElementById("ref-mun-detail-regional-badge");
+  if (regBadge) {
+    regBadge.textContent = item.regional || "Minas Gerais";
+    regBadge.className = "badge " + getRegionalColorClass(item.regional);
+  }
+
+  const titleEl = document.getElementById("ref-mun-detail-title");
+  if (titleEl) titleEl.textContent = item.nome || item.municipio || "Município";
+
+  const mrText = item.mr ? (item.mr.startsWith("MR ") ? item.mr : `MR ${item.mr}`) : "";
+  const subEl = document.getElementById("ref-mun-detail-subtitle");
+  if (subEl) subEl.innerHTML = `<i data-lucide="map-pin"></i> ${escapeHtml(item.nome || "")} • ${escapeHtml(item.regional || "")} ${mrText ? ` • ${escapeHtml(mrText)}` : ""}`;
+
+  const body = document.getElementById("ref-mun-detail-body");
+  if (body) {
+    const protocol = item.request_code || `#${String(item.id).slice(-6)}`;
+    const respNome = item.responsavel_nome || "Equipe Sebrae";
+    const respEmail = item.responsavel_email || "";
+    const respTel = item.responsavel_telefone || "";
+
+    body.innerHTML = `
+      <div class="admin-detail-card card-project" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+        <div class="admin-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
+          <div class="admin-card-title" style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #0054a6;">
+            <i data-lucide="map-pin" style="width: 18px; height: 18px;"></i>
+            <span>Dados Gerais do Município</span>
+          </div>
+          <span class="badge" style="background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; font-weight: 700;">Aprovado</span>
+        </div>
+        <div class="modal-grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+          <div class="detail-item">
+            <span class="detail-label" style="display: block; font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Protocolo</span>
+            <span class="detail-value" style="font-weight: 700; color: #1e293b;">${escapeHtml(protocol)}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label" style="display: block; font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Município</span>
+            <span class="detail-value" style="font-weight: 800; color: #0054a6; font-size: 1.05rem;">${escapeHtml(item.nome || item.municipio || "-")}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label" style="display: block; font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Regional</span>
+            <span class="detail-value" style="font-weight: 600; color: #334155;">${escapeHtml(item.regional || "-")}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label" style="display: block; font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Microrregião (MR)</span>
+            <span class="detail-value" style="font-weight: 600; color: #334155;">${escapeHtml(item.mr || "-")}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-detail-card card-technician" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+        <div class="admin-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
+          <div class="admin-card-title" style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #0369a1;">
+            <i data-lucide="user-check" style="width: 18px; height: 18px;"></i>
+            <span>Responsável pelo Município</span>
+          </div>
+        </div>
+        <div class="modal-grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+          <div class="detail-item">
+            <span class="detail-label" style="display: block; font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Nome</span>
+            <span class="detail-value" style="font-weight: 700; color: #1e293b;">${escapeHtml(respNome)}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label" style="display: block; font-size: 0.75rem; color: #64748b; text-transform: uppercase;">E-mail</span>
+            <span class="detail-value">
+              ${respEmail ? `<a href="mailto:${escapeHtml(respEmail)}" style="color: #0054a6; font-weight: 600; text-decoration: none;"><i data-lucide="mail" style="width: 13px; height: 13px; vertical-align: -2px;"></i> ${escapeHtml(respEmail)}</a>` : "Não informado"}
+            </span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label" style="display: block; font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Telefone / WhatsApp</span>
+            <span class="detail-value">
+              ${respTel ? `<a href="tel:${escapeHtml(respTel.replace(/[^0-9+]/g, ''))}" style="color: #1e293b; font-weight: 600; text-decoration: none;"><i data-lucide="phone" style="width: 13px; height: 13px; vertical-align: -2px;"></i> ${escapeHtml(respTel)}</a>` : "Não informado"}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      ${renderDevIndexCalculationMemory(item)}
+    `;
+  }
+
+  modal.classList.add("active");
+  if (typeof lucide !== "undefined") lucide.createIcons({ root: modal });
+}
+
+function closeReferenciaMunDetails() {
+  const modal = document.getElementById("modal-referencia-mun-details");
+  if (modal) modal.classList.remove("active");
+}
+
+window.openReferenciaMunDetails = openReferenciaMunDetails;
+window.closeReferenciaMunDetails = closeReferenciaMunDetails;
+window.openReferenciaMunicipalitiesModal = openReferenciaMunicipalitiesModal;
+window.closeReferenciaMunicipalitiesModal = closeReferenciaMunicipalitiesModal;
+

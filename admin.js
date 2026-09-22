@@ -43,6 +43,15 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function findParentMunicipality(munName) {
+  if (!munName) return null;
+  const norm = String(munName).normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+  return loadedMunicipalities.find(m => {
+    const mNorm = String(m.nome || m.municipio || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+    return mNorm === norm;
+  }) || null;
+}
+
 function calculateMunicipioDevelopmentIndex(item) {
   if (!item) return null;
   if (item.indice_desenvolvimento && Array.isArray(item.indice_desenvolvimento.criterios)) {
@@ -684,18 +693,32 @@ function renderCasesTable() {
       </div>
     ` : `<span style="color: #94a3b8;">-</span>`;
 
+    const parentMun = findParentMunicipality(item.municipio);
+    const isParentRejected = parentMun && parentMun.status === "rejected";
+
     const actions = `
       <div class="row-actions" style="justify-content: flex-end;">
-        ${status === "pending" ? `
-          <button class="btn-action btn-approve" onclick="approveCase('${escapeHtml(item.id)}')" title="Aprovar Case">
-            <i data-lucide="check" style="width: 14px; height: 14px;"></i>
-            <span>Aprovar</span>
-          </button>
-          <button class="btn-action btn-reject" onclick="rejectCase('${escapeHtml(item.id)}')" title="Rejeitar Case">
-            <i data-lucide="x" style="width: 14px; height: 14px;"></i>
-            <span>Rejeitar</span>
-          </button>
-        ` : ""}
+        ${status === "pending" ? (
+          isParentRejected ? `
+            <button class="btn-action disabled" disabled title="Aprovação Bloqueada: O município '${escapeHtml(parentMun.nome)}' está REJEITADO. Aprove o município primeiro." style="opacity: 0.55; cursor: not-allowed; background: #fef2f2; border-color: #fca5a5; color: #b91c1c;">
+              <i data-lucide="shield-alert" style="width: 14px; height: 14px; color: #ef4444;"></i>
+              <span>Bloqueado</span>
+            </button>
+            <button class="btn-action btn-reject" onclick="rejectCase('${escapeHtml(item.id)}')" title="Rejeitar Case">
+              <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+              <span>Rejeitar</span>
+            </button>
+          ` : `
+            <button class="btn-action btn-approve" onclick="approveCase('${escapeHtml(item.id)}')" title="Aprovar Case">
+              <i data-lucide="check" style="width: 14px; height: 14px;"></i>
+              <span>Aprovar</span>
+            </button>
+            <button class="btn-action btn-reject" onclick="rejectCase('${escapeHtml(item.id)}')" title="Rejeitar Case">
+              <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+              <span>Rejeitar</span>
+            </button>
+          `
+        ) : ""}
         <button class="btn-action btn-edit" onclick="openEditCaseModal('${escapeHtml(item.id)}')" title="Editar Case">
           <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i>
           <span>Editar</span>
@@ -719,7 +742,10 @@ function renderCasesTable() {
         <td>${place}</td>
         <td>${indexBadge}</td>
         <td><strong>${escapeHtml(authorName)}</strong></td>
-        <td><span class="badge-status ${statusCfg.class}">${statusCfg.label}</span></td>
+        <td>
+          <span class="badge-status ${statusCfg.class}">${statusCfg.label}</span>
+          ${isParentRejected ? `<div style="margin-top: 4px;"><span class="badge-status rejected" style="font-size: 0.65rem; padding: 2px 6px; display: inline-flex; align-items: center; gap: 3px;" title="Município Pai '${escapeHtml(parentMun.nome)}' está REJEITADO"><i data-lucide="shield-alert" style="width: 10px; height: 10px;"></i> Mun. Rejeitado</span></div>` : ""}
+        </td>
         <td style="text-align: right;">${actions}</td>
       </tr>
     `;
@@ -917,6 +943,15 @@ async function updateMunicipalityStatus(id, newStatus, successMsg) {
 }
 
 function approveCase(id) {
+  const item = loadedCases.find((c) => String(c.id) === String(id));
+  if (item) {
+    const parentMun = findParentMunicipality(item.municipio);
+    if (parentMun && parentMun.status === "rejected") {
+      showAdminToast(`Não é possível aprovar este case: o município '${parentMun.nome}' está REJEITADO. O município é a entidade pai e deve ser aprovado primeiro.`, "error");
+      return;
+    }
+  }
+
   showConfirmModal({
     title: "Aprovar Case de Sucesso",
     message: "Deseja aprovar este case de sucesso para publicação no mapa da rede?",
@@ -938,9 +973,33 @@ function rejectCase(id) {
 
 async function updateCaseStatus(id, newStatus, successMsg) {
   const item = loadedCases.find((c) => String(c.id) === String(id));
+  if (newStatus === "approved" && item) {
+    const parentMun = findParentMunicipality(item.municipio);
+    if (parentMun && parentMun.status === "rejected") {
+      showAdminToast(`Não é possível aprovar este case: o município '${parentMun.nome}' está REJEITADO. Aprove o município primeiro.`, "error");
+      return;
+    }
+  }
+
+  // 1. Try Server backend PATCH first if online
+  const action = newStatus === "approved" ? "approve" : "reject";
+  try {
+    const res = await fetch(getApiUrl(`/api/cases/${action}/${encodeURIComponent(id)}`), {
+      method: "PATCH",
+      headers: getAdminAuthHeaders()
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      showAdminToast(errData.error || "Erro ao processar alteração de status do case.", "error");
+      return;
+    }
+  } catch (err) {
+    // Offline / direct fallback
+  }
+
   if (item) item.status = newStatus;
 
-  // 1. Update in local storage
+  // 2. Update in local storage
   try {
     const localCases = JSON.parse(localStorage.getItem("sebrae_success_cases") || "[]");
     const idx = localCases.findIndex((c) => String(c.id) === String(id));
@@ -952,31 +1011,22 @@ async function updateCaseStatus(id, newStatus, successMsg) {
     console.error("Erro no localStorage:", e);
   }
 
-  // 2. Try Server backend PATCH
-  const action = newStatus === "approved" ? "approve" : "reject";
-  try {
-    await fetch(getApiUrl(`/api/cases/${action}/${encodeURIComponent(id)}`), {
-      method: "PATCH",
-      headers: getAdminAuthHeaders()
-    });
-  } catch (err) {
-    // 3. Try Supabase REST Direct PATCH
-    const supabaseUrl = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_URL) || "";
-    const supabaseKey = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_KEY) || "";
-    if (supabaseUrl && supabaseKey) {
-      try {
-        await fetch(`${supabaseUrl}/rest/v1/cases?id=eq.${encodeURIComponent(id)}`, {
-          method: "PATCH",
-          headers: {
-            "apikey": supabaseKey,
-            "Authorization": `Bearer ${supabaseKey}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ status: newStatus })
-        });
-      } catch (sbErr) {
-        console.warn("Falha no PATCH direto Supabase:", sbErr);
-      }
+  // 3. Try Supabase REST Direct PATCH
+  const supabaseUrl = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_URL) || "";
+  const supabaseKey = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_KEY) || "";
+  if (supabaseUrl && supabaseKey) {
+    try {
+      await fetch(`${supabaseUrl}/rest/v1/cases?id=eq.${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        headers: {
+          "apikey": supabaseKey,
+          "Authorization": `Bearer ${supabaseKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+    } catch (sbErr) {
+      console.warn("Falha no PATCH direto Supabase:", sbErr);
     }
   }
 
@@ -1368,9 +1418,23 @@ function openCaseDetails(id) {
   const authorData = getCaseAuthorData(item);
   const isEstudante = authorData.isEstudante;
 
+  const parentMun = findParentMunicipality(item.municipio);
+  const isParentRejected = parentMun && parentMun.status === "rejected";
+
   titleEl.textContent = title;
 
   body.innerHTML = `
+    ${isParentRejected ? `
+      <div style="background: #fef2f2; border: 1.5px solid #fca5a5; border-radius: 10px; padding: 14px 18px; margin-bottom: 18px; display: flex; align-items: center; gap: 14px; box-shadow: 0 2px 6px rgba(239, 68, 68, 0.08);">
+        <i data-lucide="shield-alert" style="width: 24px; height: 24px; color: #dc2626; flex-shrink: 0;"></i>
+        <div>
+          <strong style="color: #991b1b; font-size: 0.95rem; display: block; margin-bottom: 2px;">Aprovação Bloqueada — Município Pai Rejeitado</strong>
+          <span style="color: #b91c1c; font-size: 0.86rem; line-height: 1.4;">
+            O município correspondente <strong>${escapeHtml(parentMun.nome)}</strong> está com status <strong>REJEITADO</strong>. Por regra de negócio hierárquica, cases só podem ser aprovados se seu município pai estiver aprovado.
+          </span>
+        </div>
+      </div>
+    ` : ""}
     <div class="admin-detail-card card-project">
       <div class="admin-card-header">
         <div class="admin-card-title">
@@ -1544,14 +1608,23 @@ function openCaseDetails(id) {
   `;
 
   actions.innerHTML = `
-    ${status === "pending" ? `
-      <button class="btn-action btn-reject" onclick="rejectCase('${escapeHtml(item.id)}')" style="padding: 8px 16px; font-size: 0.9rem;">
-        <i data-lucide="x"></i> Rejeitar
-      </button>
-      <button class="btn-action btn-approve" onclick="approveCase('${escapeHtml(item.id)}')" style="padding: 8px 16px; font-size: 0.9rem;">
-        <i data-lucide="check"></i> Aprovar Case
-      </button>
-    ` : ""}
+    ${status === "pending" ? (
+      isParentRejected ? `
+        <button class="btn-action btn-reject" onclick="rejectCase('${escapeHtml(item.id)}')" style="padding: 8px 16px; font-size: 0.9rem;">
+          <i data-lucide="x"></i> Rejeitar
+        </button>
+        <button class="btn-action disabled" disabled title="Município pai rejeitado. Aprovação bloqueada." style="padding: 8px 16px; font-size: 0.9rem; opacity: 0.55; cursor: not-allowed; background: #fef2f2; color: #b91c1c; border-color: #fca5a5;">
+          <i data-lucide="shield-alert" style="color: #ef4444;"></i> Aprovação Bloqueada
+        </button>
+      ` : `
+        <button class="btn-action btn-reject" onclick="rejectCase('${escapeHtml(item.id)}')" style="padding: 8px 16px; font-size: 0.9rem;">
+          <i data-lucide="x"></i> Rejeitar
+        </button>
+        <button class="btn-action btn-approve" onclick="approveCase('${escapeHtml(item.id)}')" style="padding: 8px 16px; font-size: 0.9rem;">
+          <i data-lucide="check"></i> Aprovar Case
+        </button>
+      `
+    ) : ""}
     <button class="btn-action btn-edit" onclick="openEditCaseModal('${escapeHtml(item.id)}')" style="padding: 8px 16px; font-size: 0.9rem;">
       <i data-lucide="edit-3"></i> Editar
     </button>
