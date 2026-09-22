@@ -267,6 +267,44 @@ class TestLint(unittest.TestCase):
         self.assertIn("edit-case-empresa-nome", admin_content)
         self.assertIn("Sistema de Ensino Escola do Sebrae", admin_content)
 
+    def test_details_modal_indicators_and_enriched_seed_cases(self):
+        """Valida que os novos indicadores do modal, estilo do titulo e dados completos dos cases existem."""
+        with open(os.path.join(ROOT_DIR, "index.html"), "r", encoding="utf-8") as f:
+            index_content = f.read()
+
+        self.assertIn("indicators-section-title", index_content)
+        self.assertIn("details-convenio-status", index_content)
+        self.assertIn("details-superintendencia-status", index_content)
+
+        with open(os.path.join(ROOT_DIR, "style.css"), "r", encoding="utf-8") as f:
+            style_content = f.read()
+
+        self.assertIn("indicators-section-title", style_content)
+        self.assertIn("width: 1180px;", style_content)
+
+        with open(os.path.join(ROOT_DIR, "app.js"), "r", encoding="utf-8") as f:
+            app_code = f.read()
+
+        self.assertIn("details-convenio-status", app_code)
+        self.assertIn("details-superintendencia-status", app_code)
+
+        import json
+        with open(os.path.join(ROOT_DIR, "data_store.json"), "r", encoding="utf-8") as f:
+            store = json.load(f)
+
+        overrides = store.get("cases_overrides", {})
+        self.assertGreaterEqual(len(overrides), 22)
+        # Verify seed-4 has all required fields
+        s4 = overrides.get("seed-4")
+        self.assertIsNotNone(s4)
+        self.assertEqual(s4.get("tipo_case"), "professor")
+        self.assertTrue(s4.get("professor_nome"))
+        self.assertTrue(s4.get("empresa_nome"))
+        self.assertTrue(s4.get("nivel_ensino"))
+        self.assertTrue(s4.get("dependencia_adm"))
+        self.assertTrue(s4.get("convenio_sebrae"))
+        self.assertTrue(s4.get("parceria_superintendencia"))
+
 
 if __name__ == "__main__":
     unittest.main()

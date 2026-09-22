@@ -45,7 +45,7 @@
   <script src="lib/lucide.min.js"></script>
   
   <!-- Style Sheet -->
-  <link rel="stylesheet" href="style.css?v=16">
+  <link rel="stylesheet" href="style.css?v=17">
 </head>
 <body class="light-theme">
   <!-- Login View -->
@@ -625,8 +625,8 @@
           <!-- Coluna da Direita (Indicadores e Parcerias) -->
           <div class="details-col flex-3">
             <div class="box-header-row" style="margin-bottom: 4px; border-bottom: 1px solid var(--border-glass); padding-bottom: 8px;">
-              <h3 style="margin: 0; color: var(--accent-color); display: flex; align-items: center; gap: 8px; font-size: 1.15rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
-                <i data-lucide="check-square" style="width: 20px; height: 20px;"></i> Indicadores da Educação Empreendedora no município
+              <h3 class="indicators-section-title" style="margin: 0; color: var(--accent-color); display: flex; align-items: center; gap: 8px; font-size: 0.96rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2px;">
+                <i data-lucide="check-square" style="width: 18px; height: 18px; flex-shrink: 0;"></i> Indicadores da Educação Empreendedora no município
               </h3>
             </div>
             <!-- Grid de Indicadores de Educação Empreendedora -->
@@ -645,7 +645,7 @@
               <div class="indicator-card glass-box">
                 <div class="card-icon"><i data-lucide="percent"></i></div>
                 <div class="card-info">
-                  <label>Educação Empreendedora em mais de 70%</label>
+                  <label>Possui Educação Empreendedora em mais de 70% do município?</label>
                   <span id="details-edu-70" class="badge">Sim</span>
                 </div>
               </div>
@@ -701,6 +701,24 @@
                 <div class="card-info">
                   <label>Sistema de Ensino Escola do Sebrae</label>
                   <span id="details-escola-sebrae-status" class="badge">Sim</span>
+                </div>
+              </div>
+
+              <!-- Convênio / Termo de Parceria com o Sebrae -->
+              <div class="indicator-card glass-box">
+                <div class="card-icon"><i data-lucide="handshake"></i></div>
+                <div class="card-info">
+                  <label>Convênio / Parceria com Sebrae</label>
+                  <span id="details-convenio-status" class="badge">Sim</span>
+                </div>
+              </div>
+
+              <!-- Parceria com Superintendência de Ensino -->
+              <div class="indicator-card glass-box">
+                <div class="card-icon"><i data-lucide="building-2"></i></div>
+                <div class="card-info">
+                  <label>Parceria com Superintendência</label>
+                  <span id="details-superintendencia-status" class="badge">Sim</span>
                 </div>
               </div>
 
@@ -1100,6 +1118,6 @@
   <script src="config.js"></script>
 
   <!-- Script Principal -->
-  <script src="app.js?v=32"></script>
+  <script src="app.js?v=33"></script>
 </body>
 </html>
