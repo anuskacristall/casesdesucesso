@@ -185,6 +185,22 @@
       "status": "pending",
       "request_code": "#40000",
       "id": "mun-6e2d216f"
+    },
+    {
+      "nome": "Ouro Preto",
+      "regional": "Centro",
+      "mr": "MR Central",
+      "status": "pending",
+      "request_code": "#40000",
+      "id": "mun-f3cd73f3"
+    },
+    {
+      "nome": "Ouro Preto",
+      "regional": "Centro",
+      "mr": "MR Central",
+      "status": "pending",
+      "request_code": "#40000",
+      "id": "mun-121177ab"
     }
   ],
   "cases_overrides": {

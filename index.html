@@ -45,7 +45,7 @@
   <script src="lib/lucide.min.js"></script>
   
   <!-- Style Sheet -->
-  <link rel="stylesheet" href="style.css?v=18">
+  <link rel="stylesheet" href="style.css?v=19">
 </head>
 <body class="light-theme">
   <!-- Login View -->
@@ -544,13 +544,11 @@
           <div id="details-escola" style="font-size: 1.1rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Nome da Escola de Exemplo</div>
           <p id="details-location-text"><i data-lucide="map-pin"></i> Belo Horizonte - MR Belo Horizonte</p>
         </div>
-        <div style="display: flex; align-items: flex-start; gap: 16px;">
-          <div id="details-dev-index-container" class="dev-index-badge-large" style="display: flex; flex-direction: column; align-items: flex-end; background: rgba(0,0,0,0.02); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-glass);">
-            <span class="dev-index-sub" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 3px;">Índice de Desenvolvimento do Município</span>
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span id="details-dev-index-badge" class="badge" style="font-size: 0.82rem; font-weight: 700; padding: 3px 10px;">Em Desenvolvimento</span>
-              <span id="details-dev-index-score" style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">(35/55 pts)</span>
-            </div>
+        <div style="display: flex; align-items: flex-start; gap: 14px;">
+          <div id="details-dev-index-container" class="dev-index-modal-card">
+            <span class="dev-index-modal-label"><i data-lucide="award" style="width: 13px; height: 13px; color: #64748b;"></i> Índice de Desenvolvimento do Município</span>
+            <span id="details-dev-index-badge" class="dev-index-modal-badge">Desenvolvido</span>
+            <span id="details-dev-index-score" style="display: none;"></span>
           </div>
           <button id="btn-close-details" class="btn-close">&times;</button>
         </div>
@@ -624,7 +622,7 @@
                 </p>
                 <div style="margin-top: 4px;">
                   <strong style="font-size: 0.95rem; color: var(--text-primary);">Descrição da Empresa:</strong>
-                  <p id="details-empresa-descricao" style="margin: 4px 0 0 0; font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; background: rgba(0,0,0,0.02); padding: 10px; border-radius: 8px; border: 1px solid var(--border-glass); white-space: pre-line;">-</p>
+                  <p id="details-empresa-descricao" style="margin: 6px 0 0 0; font-size: 0.92rem; font-weight: 500; color: #1e293b; line-height: 1.55; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; white-space: pre-line;">-</p>
                 </div>
               </div>
             </div>
@@ -646,7 +644,7 @@
                 <div class="card-icon"><i data-lucide="award"></i></div>
                 <div class="card-info">
                   <label>Status JEPP</label>
-                  <span id="details-jepp" class="badge">Total</span>
+                  <span id="details-jepp" class="badge">Totalmente implantado</span>
                 </div>
               </div>
 
@@ -1127,6 +1125,6 @@
   <script src="config.js"></script>
 
   <!-- Script Principal -->
-  <script src="app.js?v=36"></script>
+  <script src="app.js?v=37"></script>
 </body>
 </html>

@@ -168,6 +168,28 @@ class TestIndiceDesenvolvimento(unittest.TestCase):
             admin_html = f.read()
         self.assertIn("<th>Índice do Município</th>", admin_html)
 
+    def test_jepp_labels_and_public_modal_aesthetic(self):
+        """Valida que o JEPP no modal exibe os rótulos solicitados e o score foi removido da visão pública."""
+        with open(os.path.join(ROOT_DIR, "app.js"), "r", encoding="utf-8") as f:
+            app_js = f.read()
+        self.assertIn("Totalmente implantado", app_js)
+        self.assertIn("Em implantação", app_js)
+        self.assertIn("Não implantado", app_js)
+        self.assertIn('devScore.style.display = "none"', app_js)
+
+        with open(os.path.join(ROOT_DIR, "index.html"), "r", encoding="utf-8") as f:
+            index_html = f.read()
+        self.assertIn("dev-index-modal-card", index_html)
+        self.assertIn("details-empresa-descricao", index_html)
+        # Font color of description is dark and prominent
+        self.assertIn("#1e293b", index_html)
+
+        with open(os.path.join(ROOT_DIR, "style.css"), "r", encoding="utf-8") as f:
+            style_css = f.read()
+        self.assertIn(".dev-index-modal-card", style_css)
+        self.assertIn(".dev-index-modal-badge", style_css)
+        self.assertIn(".indicator-toggle > label", style_css)
+
 
 if __name__ == "__main__":
     unittest.main()

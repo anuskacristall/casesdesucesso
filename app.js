@@ -2006,23 +2006,24 @@ function openDetailsModal(id) {
   const devScore = document.getElementById("details-dev-index-score");
   if (devBadge && devIdx) {
     devBadge.innerText = devIdx.classificacao;
-    devBadge.className = "badge";
+    devBadge.className = `dev-index-modal-badge ${devIdx.classificacao_key}`;
     if (devIdx.classificacao_key === "inicio") {
       devBadge.style.background = "#fef3c7";
       devBadge.style.color = "#92400e";
-      devBadge.style.border = "1px solid #fde68a";
+      devBadge.style.border = "1.5px solid #fde68a";
     } else if (devIdx.classificacao_key === "em_desenvolvimento") {
       devBadge.style.background = "#e0f2fe";
       devBadge.style.color = "#0369a1";
-      devBadge.style.border = "1px solid #bae6fd";
+      devBadge.style.border = "1.5px solid #bae6fd";
     } else {
       devBadge.style.background = "#dcfce7";
       devBadge.style.color = "#15803d";
-      devBadge.style.border = "1px solid #bbf7d0";
+      devBadge.style.border = "1.5px solid #bbf7d0";
     }
   }
-  if (devScore && devIdx) {
-    devScore.innerText = `(${devIdx.pontuacao}/55 pts • ${devIdx.percentual}%)`;
+  if (devScore) {
+    devScore.innerText = "";
+    devScore.style.display = "none";
   }
 
   // Technical details
@@ -2108,14 +2109,14 @@ function openDetailsModal(id) {
   const jeppBadge = document.getElementById("details-jepp");
   if (jeppBadge) {
     const jeppVal = String(item.jeppStatus || item.status_jepp || "").trim().toLowerCase();
-    if (jeppVal === "sim" || jeppVal === "sim (total)" || jeppVal === "total") {
-      jeppBadge.innerText = "Total";
+    if (jeppVal === "sim" || jeppVal === "sim (total)" || jeppVal === "total" || jeppVal === "totalmente implantado" || jeppVal.includes("total")) {
+      jeppBadge.innerText = "Totalmente implantado";
       jeppBadge.className = "badge bg-centro";
-    } else if (jeppVal === "parcial") {
-      jeppBadge.innerText = "Parcial";
+    } else if (jeppVal === "parcial" || jeppVal === "em implantação" || jeppVal === "em implantacao" || jeppVal.includes("parcial") || jeppVal.includes("implantação") || jeppVal.includes("implantacao")) {
+      jeppBadge.innerText = "Em implantação";
       jeppBadge.className = "badge bg-centro-oeste";
     } else {
-      jeppBadge.innerText = "Não";
+      jeppBadge.innerText = "Não implantado";
       jeppBadge.className = "badge bg-rio-doce";
     }
   }
