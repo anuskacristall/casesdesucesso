@@ -616,6 +616,8 @@ class SecureBackendHandler(SimpleHTTPRequestHandler):
             store.setdefault("cases_status", {})[rec_id] = record["status"]
             store.setdefault("case_codes", {})[rec_id] = record["request_code"]
             store.setdefault("extra_cases", []).append(record)
+            overrides = store.setdefault("cases_overrides", {})
+            overrides[rec_id] = {k: v for k, v in record.items() if v is not None}
 
         save_data_store(store)
         self.send_json_response(201, records[0] if len(records) == 1 else records)

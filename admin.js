@@ -277,8 +277,40 @@ async function refreshAdminData() {
 
   let success = false;
 
-  // 1. Direct Supabase Cloud REST
-  if (supabaseUrl && supabaseKey) {
+  // 1. Server Python API (supports port 8001 and relative /api, connecting directly to Supabase and merging overrides)
+  const endpoints = [
+    { mun: getApiUrl("/api/municipalities"), cases: getApiUrl("/api/cases") },
+    { mun: "http://localhost:8001/api/municipalities", cases: "http://localhost:8001/api/cases" },
+    { mun: "/api/municipalities", cases: "/api/cases" }
+  ];
+
+  for (const ep of endpoints) {
+    try {
+      const casesRes = await fetch(ep.cases);
+      if (casesRes.ok) {
+        const casesData = await casesRes.json();
+        let munData = [];
+        try {
+          const muniRes = await fetch(ep.mun);
+          if (muniRes.ok) munData = await muniRes.json();
+        } catch (e) {}
+
+        loadedCases = (Array.isArray(casesData) ? casesData : []).map(normalizeCaseItem);
+        loadedMunicipalities = (Array.isArray(munData) ? munData : []).filter(
+          (m) => !(m.nome === "Ouro Preto" && !m.responsavel_nome && !m.responsavel_email && !m.status_jepp)
+        );
+        connectionMode = "cloud"; // conectado ao Supabase via proxy
+        updateAdminConnectionBadge("cloud");
+        success = true;
+        break;
+      }
+    } catch (err) {
+      // Tenta o próximo endpoint
+    }
+  }
+
+  // 2. Direct Supabase Cloud REST (fallback se o backend local/servidor não responder)
+  if (!success && supabaseUrl && supabaseKey) {
     try {
       let munData = [];
       let casesData = [];
@@ -304,58 +336,16 @@ async function refreshAdminData() {
       } catch (e) {}
 
       if (casesOk) {
-        loadedCases = Array.isArray(casesData) ? casesData : [];
+        loadedCases = (Array.isArray(casesData) ? casesData : []).map(normalizeCaseItem);
         loadedMunicipalities = (Array.isArray(munData) ? munData : []).filter(
           (m) => !(m.nome === "Ouro Preto" && !m.responsavel_nome && !m.responsavel_email && !m.status_jepp)
         );
-        loadedCases.forEach((c, idx) => {
-          if (!c.status) c.status = "approved";
-          if (!c.request_code) c.request_code = `#${10000 * (idx + 1)}`;
-        });
         connectionMode = "cloud";
         updateAdminConnectionBadge("cloud");
         success = true;
       }
     } catch (err) {
       console.warn("Supabase direto indisponível, tentando proxy local/remoto...", err);
-    }
-  }
-
-  // 2. Server Python API (supports port 8001 and relative /api, connecting directly to Supabase)
-  if (!success) {
-    const endpoints = [
-      { mun: getApiUrl("/api/municipalities"), cases: getApiUrl("/api/cases") },
-      { mun: "http://localhost:8001/api/municipalities", cases: "http://localhost:8001/api/cases" },
-      { mun: "/api/municipalities", cases: "/api/cases" }
-    ];
-
-    for (const ep of endpoints) {
-      try {
-        const casesRes = await fetch(ep.cases);
-        if (casesRes.ok) {
-          const casesData = await casesRes.json();
-          let munData = [];
-          try {
-            const muniRes = await fetch(ep.mun);
-            if (muniRes.ok) munData = await muniRes.json();
-          } catch (e) {}
-
-          loadedCases = Array.isArray(casesData) ? casesData : [];
-          loadedMunicipalities = (Array.isArray(munData) ? munData : []).filter(
-            (m) => !(m.nome === "Ouro Preto" && !m.responsavel_nome && !m.responsavel_email && !m.status_jepp)
-          );
-          loadedCases.forEach((c, idx) => {
-            if (!c.status) c.status = "approved";
-            if (!c.request_code) c.request_code = `#${10000 * (idx + 1)}`;
-          });
-          connectionMode = "cloud"; // conectado ao Supabase via proxy
-          updateAdminConnectionBadge("cloud");
-          success = true;
-          break;
-        }
-      } catch (err) {
-        // Tenta o próximo endpoint
-      }
     }
   }
 
@@ -1236,6 +1226,95 @@ function closeMunicipalityDetailsModal() {
   if (modal) modal.classList.remove("active");
 }
 
+function normalizeCaseItem(c, idx) {
+  if (!c) return c;
+  if (!c.status) c.status = "approved";
+  if (!c.request_code) c.request_code = `#${10000 * ((idx || 0) + 1)}`;
+  
+  const isEstudante = c.tipo_case === 'estudante' || c.tipoCase === 'estudante' || c.estudante_possui;
+  c.tipo_case = isEstudante ? 'estudante' : 'professor';
+  c.tipoCase = isEstudante ? 'estudante' : 'professor';
+  
+  // Extrai dados do professor se salvos em estudante_resumo legado
+  let profNome = c.professor_nome || c.professorNome || "";
+  let profEmail = c.professor_email || c.professorEmail || "";
+  let profTel = c.professor_telefone || c.professorTelefone || "";
+  if (!isEstudante && !profNome && c.estudante_resumo && c.estudante_resumo.startsWith("Professor:")) {
+    const match = c.estudante_resumo.match(/^Professor:\s*([^(]+)(?:\(([^ -]+)?\s*-\s*([^)]+)?\))?/);
+    if (match) {
+      profNome = match[1] ? match[1].trim() : "";
+      profEmail = match[2] ? match[2].trim() : "";
+      profTel = match[3] ? match[3].trim() : "";
+    }
+  }
+
+  let studNome = c.estudante_nome || c.estudanteNome || "";
+  let studEmail = c.estudante_email || c.estudanteEmail || "";
+  let studTel = c.estudante_telefone || c.estudanteTelefone || c.estudante_contato || "";
+
+  c.professor_nome = profNome;
+  c.professorNome = profNome;
+  c.professor_email = profEmail;
+  c.professorEmail = profEmail;
+  c.professor_telefone = profTel;
+  c.professorTelefone = profTel;
+
+  c.estudante_nome = studNome;
+  c.estudanteNome = studNome;
+  c.estudante_email = studEmail;
+  c.estudanteEmail = studEmail;
+  c.estudante_telefone = studTel;
+  c.estudanteTelefone = studTel;
+
+  c.empresa_nome = c.empresa_nome || c.empresaNome || "";
+  c.empresaNome = c.empresa_nome;
+  c.empresa_tipo = c.empresa_tipo || c.empresaTipo || "";
+  c.empresaTipo = c.empresa_tipo;
+  c.empresa_descricao = c.empresa_descricao || c.empresaDescricao || "";
+  c.empresaDescricao = c.empresa_descricao;
+
+  return c;
+}
+
+function getCaseAuthorData(item) {
+  if (!item) return { isEstudante: false, nome: "", email: "", telefone: "" };
+  const isEstudante = item.tipo_case === 'estudante' || item.tipoCase === 'estudante' || item.estudante_possui;
+  
+  let profNome = item.professor_nome || item.professorNome || "";
+  let profEmail = item.professor_email || item.professorEmail || "";
+  let profTel = item.professor_telefone || item.professorTelefone || "";
+  
+  let studNome = item.estudante_nome || item.estudanteNome || "";
+  let studEmail = item.estudante_email || item.estudanteEmail || "";
+  let studTel = item.estudante_telefone || item.estudanteTelefone || item.estudante_contato || "";
+
+  if (!isEstudante && !profNome && item.estudante_resumo && item.estudante_resumo.startsWith("Professor:")) {
+    const match = item.estudante_resumo.match(/^Professor:\s*([^(]+)(?:\(([^ -]+)?\s*-\s*([^)]+)?\))?/);
+    if (match) {
+      profNome = match[1] ? match[1].trim() : "";
+      profEmail = match[2] ? match[2].trim() : "";
+      profTel = match[3] ? match[3].trim() : "";
+    }
+  }
+
+  if (isEstudante && !studNome && item.estudante_resumo && !item.estudante_resumo.startsWith("Professor:")) {
+    studNome = item.estudante_resumo.trim();
+  }
+
+  return {
+    isEstudante,
+    nome: isEstudante ? studNome : profNome,
+    email: isEstudante ? studEmail : profEmail,
+    telefone: isEstudante ? studTel : profTel,
+    profNome,
+    profEmail,
+    profTel,
+    studNome,
+    studEmail,
+    studTel
+  };
+}
+
 function openCaseDetails(id) {
   const item = loadedCases.find((c) => String(c.id) === String(id));
   if (!item) return;
@@ -1249,7 +1328,8 @@ function openCaseDetails(id) {
   const protocol = item.request_code || `#${String(item.id).slice(-6)}`;
   const status = item.status || "pending";
   const statusCfg = STATUS_CONFIG[status] || STATUS_CONFIG.pending;
-  const isEstudante = item.tipo_case === 'estudante' || item.tipoCase === 'estudante' || item.estudante_possui;
+  const authorData = getCaseAuthorData(item);
+  const isEstudante = authorData.isEstudante;
 
   titleEl.textContent = title;
 
@@ -1316,19 +1396,37 @@ function openCaseDetails(id) {
     ` : ""}
 
     <div>
-      <div class="modal-section-title">Autor / Responsável</div>
+      <div class="modal-section-title">Técnico Responsável (Sebrae)</div>
+      <div class="modal-grid-2">
+        <div class="detail-item">
+          <span class="detail-label">Nome do Técnico</span>
+          <span class="detail-value">${escapeHtml(item.tecnico_nome || item.tecnicoNome || "Não informado")}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">E-mail Corporativo</span>
+          <span class="detail-value">${escapeHtml(item.tecnico_email || item.tecnicoEmail || "Não informado")}</span>
+        </div>
+        <div class="detail-item" style="grid-column: span 2;">
+          <span class="detail-label">Telefone / WhatsApp</span>
+          <span class="detail-value">${escapeHtml(item.tecnico_telefone || item.tecnicoContato || "Não informado")}</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="modal-section-title">${isEstudante ? 'Dados do Estudante Empreendedor' : 'Dados do Professor'}</div>
       <div class="modal-grid-2">
         <div class="detail-item">
           <span class="detail-label">Nome</span>
-          <span class="detail-value">${escapeHtml((isEstudante ? (item.estudante_nome || item.estudanteNome) : (item.professor_nome || item.professorNome)) || item.tecnico_nome || item.tecnicoNome || "Não informado")}</span>
+          <span class="detail-value"><strong>${escapeHtml(authorData.nome || "Não informado")}</strong></span>
         </div>
         <div class="detail-item">
           <span class="detail-label">E-mail</span>
-          <span class="detail-value">${escapeHtml((isEstudante ? (item.estudante_email || item.estudanteEmail) : (item.professor_email || item.professorEmail)) || item.tecnico_email || item.tecnicoEmail || "Não informado")}</span>
+          <span class="detail-value">${escapeHtml(authorData.email || "Não informado")}</span>
         </div>
-        <div class="detail-item">
+        <div class="detail-item" style="grid-column: span 2;">
           <span class="detail-label">Telefone / Contato</span>
-          <span class="detail-value">${escapeHtml((isEstudante ? (item.estudante_telefone || item.estudanteTelefone || item.estudante_contato) : (item.professor_telefone || item.professorTelefone)) || item.tecnico_telefone || item.tecnicoContato || "Não informado")}</span>
+          <span class="detail-value">${escapeHtml(authorData.telefone || "Não informado")}</span>
         </div>
       </div>
     </div>
@@ -1633,13 +1731,10 @@ function openEditCaseModal(id) {
     document.getElementById("edit-case-empresa-descricao").value = item.empresa_descricao || item.empresaDescricao || "";
   }
 
-  const authorName = isEstudante ? (item.estudante_nome || item.estudanteNome) : (item.professor_nome || item.professorNome);
-  const authorEmail = isEstudante ? (item.estudante_email || item.estudanteEmail) : (item.professor_email || item.professorEmail);
-  const authorTel = isEstudante ? (item.estudante_telefone || item.estudanteTelefone || item.estudante_contato) : (item.professor_telefone || item.professorTelefone);
-
-  document.getElementById("edit-case-autor-nome").value = authorName || item.tecnico_nome || item.tecnicoNome || "";
-  document.getElementById("edit-case-autor-email").value = authorEmail || item.tecnico_email || item.tecnicoEmail || "";
-  document.getElementById("edit-case-autor-tel").value = authorTel || item.tecnico_telefone || item.tecnicoContato || "";
+  const authorData = getCaseAuthorData(item);
+  document.getElementById("edit-case-autor-nome").value = authorData.nome || "";
+  document.getElementById("edit-case-autor-email").value = authorData.email || "";
+  document.getElementById("edit-case-autor-tel").value = authorData.telefone || "";
 
   const modal = document.getElementById("modal-edit-case");
   if (modal) modal.classList.add("active");

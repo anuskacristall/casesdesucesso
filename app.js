@@ -869,9 +869,9 @@ function mapDatabaseToApp(dbItem) {
   const isEstudante = dbItem.tipo_case === 'estudante' || (dbItem.tipo_case !== 'professor' && (dbItem.estudante_possui === true || (!('estudante_possui' in dbItem) && dbItem.estudante_resumo && dbItem.estudante_resumo.trim() && !dbItem.estudante_resumo.startsWith("Professor:"))));
   const inferredType = isEstudante ? 'estudante' : 'professor';
   
-  let profNome = dbItem.professor_nome || "";
-  let profEmail = dbItem.professor_email || "";
-  let profTel = dbItem.professor_telefone || "";
+  let profNome = dbItem.professor_nome || dbItem.professorNome || "";
+  let profEmail = dbItem.professor_email || dbItem.professorEmail || "";
+  let profTel = dbItem.professor_telefone || dbItem.professorTelefone || "";
   
   if (!profNome && dbItem.estudante_resumo && dbItem.estudante_resumo.startsWith("Professor:")) {
     const match = dbItem.estudante_resumo.match(/^Professor:\s*([^(]+)(?:\(([^ -]+)?\s*-\s*([^)]+)?\))?/);
@@ -880,6 +880,26 @@ function mapDatabaseToApp(dbItem) {
       profEmail = match[2] ? match[2].trim() : "";
       profTel = match[3] ? match[3].trim() : "";
     }
+  }
+
+  let studNome = dbItem.estudante_nome || dbItem.estudanteNome || "";
+  let studEmail = dbItem.estudante_email || dbItem.estudanteEmail || "";
+  let studTel = dbItem.estudante_telefone || dbItem.estudanteTelefone || dbItem.estudante_contato || "";
+
+  // Seed enrichment fallback
+  const seedMatch = typeof SEED_CASES !== "undefined" ? SEED_CASES.find(s => String(s.id) === String(dbItem.id)) : null;
+  if (seedMatch) {
+    if (!profNome && seedMatch.professorNome) profNome = seedMatch.professorNome;
+    if (!profEmail && seedMatch.professorEmail) profEmail = seedMatch.professorEmail;
+    if (!profTel && seedMatch.professorTelefone) profTel = seedMatch.professorTelefone;
+    if (!studNome && seedMatch.estudanteNome) studNome = seedMatch.estudanteNome;
+    if (!studEmail && seedMatch.estudanteEmail) studEmail = seedMatch.estudanteEmail;
+    if (!studTel && seedMatch.estudanteTelefone) studTel = seedMatch.estudanteTelefone;
+    if (!dbItem.empresa_nome && seedMatch.empresaNome) dbItem.empresa_nome = seedMatch.empresaNome;
+    if (!dbItem.empresa_tipo && seedMatch.empresaTipo) dbItem.empresa_tipo = seedMatch.empresaTipo;
+    if (!dbItem.empresa_descricao && seedMatch.empresaDescricao) dbItem.empresa_descricao = seedMatch.empresaDescricao;
+    if (!dbItem.nivel_ensino && seedMatch.nivel_ensino) dbItem.nivel_ensino = seedMatch.nivel_ensino;
+    if (!dbItem.dependencia_adm && seedMatch.dependencia_adm) dbItem.dependencia_adm = seedMatch.dependencia_adm;
   }
 
   const normCityKey = (dbItem.municipio || "").trim().toLowerCase().replace(/-/g, " ").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -892,32 +912,39 @@ function mapDatabaseToApp(dbItem) {
 
   return {
     id: dbItem.id,
-    titulo: dbItem.titulo_projeto || "",
-    descricao: dbItem.descricao_geral || "",
+    titulo: dbItem.titulo_projeto || dbItem.titulo || "",
+    descricao: dbItem.descricao_geral || dbItem.descricao || "",
     municipio: dbItem.municipio || (officialCity ? officialCity.name : ""),
     regional: resolvedRegional,
     mr: resolvedMr,
-    escola: dbItem.escola_instituicao || "",
+    escola: dbItem.escola_instituicao || dbItem.escola || "",
     lat: resolvedLat,
     lng: resolvedLng,
-    tecnicoNome: dbItem.tecnico_nome || "",
-    tecnicoEmail: dbItem.tecnico_email || "",
-    tecnicoContato: dbItem.tecnico_telefone || "",
+    tecnicoNome: dbItem.tecnico_nome || dbItem.tecnicoNome || "",
+    tecnicoEmail: dbItem.tecnico_email || dbItem.tecnicoEmail || "",
+    tecnicoContato: dbItem.tecnico_telefone || dbItem.tecnicoContato || "",
     
     // Legacy compatibility
     hasStudentCase: inferredType === 'estudante',
     studentSummary: dbItem.estudante_resumo || "",
     studentContact: dbItem.estudante_contato || "",
     
-    // Type and contact fields
+    // Type and contact fields (dual casing)
     tipoCase: inferredType,
-    estudanteNome: dbItem.estudante_nome || "",
-    estudanteEmail: dbItem.estudante_email || "",
-    estudanteTelefone: dbItem.estudante_telefone || dbItem.estudante_contato || "",
+    tipo_case: inferredType,
+    estudanteNome: studNome,
+    estudante_nome: studNome,
+    estudanteEmail: studEmail,
+    estudante_email: studEmail,
+    estudanteTelefone: studTel,
+    estudante_telefone: studTel,
     
     professorNome: profNome,
+    professor_nome: profNome,
     professorEmail: profEmail,
+    professor_email: profEmail,
     professorTelefone: profTel,
+    professor_telefone: profTel,
     
     hasCoop: dbItem.cooperativa_possui || false,
     coopSummary: dbItem.cooperativa_resumo || "",
@@ -928,15 +955,18 @@ function mapDatabaseToApp(dbItem) {
     committeeSummary: dbItem.comite_resumo || "",
     hasIes: dbItem.ies_possui || false,
     iesSummary: dbItem.ies_resumo || "",
-    hasEmpresaSimulada: dbItem.empresa_simulada_possui || false,
-    hasEscolaSebrae: dbItem.escola_sebrae_possui || false,
-    convenio_sebrae: dbItem.convenio_sebrae || false,
-    hasConvenioSebrae: dbItem.convenio_sebrae || false,
-    parceria_superintendencia: dbItem.parceria_superintendencia || false,
-    hasParceriaSuperintendencia: dbItem.parceria_superintendencia || false,
-    empresaNome: dbItem.empresa_nome || "",
-    empresaTipo: dbItem.empresa_tipo || "",
-    empresaDescricao: dbItem.empresa_descricao || "",
+    hasEmpresaSimulada: dbItem.empresa_simulada || dbItem.empresa_simulada_possui || false,
+    hasEscolaSebrae: dbItem.escola_sebrae || dbItem.escola_sebrae_possui || false,
+    convenio_sebrae: dbItem.convenio_sebrae || dbItem.hasConvenioSebrae || false,
+    hasConvenioSebrae: dbItem.convenio_sebrae || dbItem.hasConvenioSebrae || false,
+    parceria_superintendencia: dbItem.parceria_superintendencia || dbItem.hasParceriaSuperintendencia || false,
+    hasParceriaSuperintendencia: dbItem.parceria_superintendencia || dbItem.hasParceriaSuperintendencia || false,
+    empresaNome: dbItem.empresa_nome || dbItem.empresaNome || "",
+    empresa_nome: dbItem.empresa_nome || dbItem.empresaNome || "",
+    empresaTipo: dbItem.empresa_tipo || dbItem.empresaTipo || "",
+    empresa_tipo: dbItem.empresa_tipo || dbItem.empresaTipo || "",
+    empresaDescricao: dbItem.empresa_descricao || dbItem.empresaDescricao || "",
+    empresa_descricao: dbItem.empresa_descricao || dbItem.empresaDescricao || "",
     nivel_ensino: dbItem.nivel_ensino || "",
     dependencia_adm: dbItem.dependencia_adm || "",
     jeppStatus: dbItem.status_jepp || "Não",
@@ -952,47 +982,74 @@ function mapDatabaseToApp(dbItem) {
 
 function mapAppToDatabase(appItem) {
   if (!appItem) return null;
-  const isEstudante = appItem.tipoCase === 'estudante';
-  let resumo = appItem.studentSummary || "";
-  let contato = isEstudante ? (appItem.studentContact || appItem.estudanteTelefone || "") : (appItem.professorTelefone || "");
+  const isEstudante = appItem.tipoCase === 'estudante' || appItem.tipo_case === 'estudante' || appItem.estudante_possui;
+  let resumo = appItem.studentSummary || appItem.estudante_resumo || "";
+  let contato = isEstudante ? (appItem.studentContact || appItem.estudanteTelefone || appItem.estudante_telefone || "") : (appItem.professorTelefone || appItem.professor_telefone || "");
   
-  if (!isEstudante && (appItem.professorNome || appItem.professorEmail || appItem.professorTelefone)) {
-    resumo = `Professor: ${appItem.professorNome || ''} (${appItem.professorEmail || ''} - ${appItem.professorTelefone || ''})`;
+  const profNome = appItem.professorNome || appItem.professor_nome || "";
+  const profEmail = appItem.professorEmail || appItem.professor_email || "";
+  const profTel = appItem.professorTelefone || appItem.professor_telefone || "";
+
+  const studNome = appItem.estudanteNome || appItem.estudante_nome || "";
+  const studEmail = appItem.estudanteEmail || appItem.estudante_email || "";
+  const studTel = appItem.estudanteTelefone || appItem.estudante_telefone || appItem.studentContact || "";
+
+  if (!isEstudante && (profNome || profEmail || profTel)) {
+    resumo = `Professor: ${profNome} (${profEmail} - ${profTel})`;
   }
   
   return {
     id: appItem.id,
-    titulo_projeto: appItem.titulo || "",
-    descricao_geral: appItem.descricao || "",
+    titulo_projeto: appItem.titulo || appItem.titulo_projeto || "",
+    descricao_geral: appItem.descricao || appItem.descricao_geral || "",
     municipio: appItem.municipio || "",
     regional: appItem.regional || "",
-    microrregiao_mr: appItem.mr || "",
-    escola_instituicao: appItem.escola || "",
+    microrregiao_mr: appItem.mr || appItem.microrregiao_mr || "",
+    escola_instituicao: appItem.escola || appItem.escola_instituicao || "",
     nivel_ensino: appItem.nivel_ensino || "",
     dependencia_adm: appItem.dependencia_adm || "",
-    latitude: appItem.lat,
-    longitude: appItem.lng,
-    tecnico_nome: appItem.tecnicoNome || "",
-    tecnico_email: appItem.tecnicoEmail || "",
-    tecnico_telefone: appItem.tecnicoContato || "",
+    latitude: appItem.lat || appItem.latitude,
+    longitude: appItem.lng || appItem.longitude,
+    tecnico_nome: appItem.tecnicoNome || appItem.tecnico_nome || "",
+    tecnico_email: appItem.tecnicoEmail || appItem.tecnico_email || "",
+    tecnico_telefone: appItem.tecnicoContato || appItem.tecnico_telefone || "",
+    tipo_case: isEstudante ? 'estudante' : 'professor',
+    tipoCase: isEstudante ? 'estudante' : 'professor',
+    professor_nome: profNome,
+    professor_email: profEmail,
+    professor_telefone: profTel,
+    professorNome: profNome,
+    professorEmail: profEmail,
+    professorTelefone: profTel,
+    estudante_nome: studNome,
+    estudante_email: studEmail,
+    estudante_telefone: studTel,
+    estudanteNome: studNome,
+    estudanteEmail: studEmail,
+    estudanteTelefone: studTel,
     estudante_possui: isEstudante,
     estudante_resumo: resumo,
     estudante_contato: contato,
     empresa_nome: appItem.empresaNome || appItem.empresa_nome || "",
     empresa_tipo: appItem.empresaTipo || appItem.empresa_tipo || "",
     empresa_descricao: appItem.empresaDescricao || appItem.empresa_descricao || "",
+    empresaNome: appItem.empresaNome || appItem.empresa_nome || "",
+    empresaTipo: appItem.empresaTipo || appItem.empresa_tipo || "",
+    empresaDescricao: appItem.empresaDescricao || appItem.empresa_descricao || "",
     convenio_sebrae: appItem.convenio_sebrae || appItem.hasConvenioSebrae || false,
     parceria_superintendencia: appItem.parceria_superintendencia || appItem.hasParceriaSuperintendencia || false,
-    cooperativa_possui: appItem.hasCoop || false,
-    cooperativa_resumo: appItem.coopSummary || "",
-    municipio_ee_70: appItem.edu70 || "nao",
-    lei_possui: appItem.hasLaw || false,
-    lei_resumo: appItem.lawSummary || "",
-    comite_possui: appItem.hasCommittee || false,
-    comite_resumo: appItem.committeeSummary || "",
-    ies_possui: appItem.hasIes || false,
-    ies_resumo: appItem.iesSummary || "",
-    status_jepp: appItem.jeppStatus || "Não"
+    cooperativa_possui: appItem.hasCoop || appItem.cooperativa_possui || false,
+    cooperativa_resumo: appItem.coopSummary || appItem.cooperativa_resumo || "",
+    municipio_ee_70: appItem.edu70 || appItem.municipio_ee_70 || "nao",
+    lei_possui: appItem.hasLaw || appItem.lei_possui || false,
+    lei_resumo: appItem.lawSummary || appItem.lei_resumo || "",
+    comite_possui: appItem.hasCommittee || appItem.comite_possui || false,
+    comite_resumo: appItem.committeeSummary || appItem.comite_resumo || "",
+    ies_possui: appItem.hasIes || appItem.ies_possui || false,
+    ies_resumo: appItem.iesSummary || appItem.ies_resumo || "",
+    empresa_simulada: appItem.hasEmpresaSimulada || appItem.empresa_simulada || false,
+    escola_sebrae: appItem.hasEscolaSebrae || appItem.escola_sebrae || false,
+    status_jepp: appItem.jeppStatus || appItem.status_jepp || "Não"
   };
 }
 
@@ -1146,32 +1203,7 @@ async function initData() {
   const supabaseUrl = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_URL) || "";
   const supabaseKey = (window.SEBRAE_CONFIG && window.SEBRAE_CONFIG.SUPABASE_KEY) || "";
 
-  // 1. First attempt direct connection to Supabase Cloud REST API
-  if (supabaseUrl && supabaseKey) {
-    try {
-      const res = await fetch(`${supabaseUrl}/rest/v1/cases?select=*`, {
-        headers: {
-          "apikey": supabaseKey,
-          "Authorization": `Bearer ${supabaseKey}`
-        }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        isCloudMode = true;
-        if (Array.isArray(data) && data.length > 0) {
-          cases = data.map(mapDatabaseToApp);
-        } else {
-          cases = [...SEED_CASES];
-        }
-        updateDbStatus("online");
-        return;
-      }
-    } catch (err) {
-      console.warn("Conexão direta com o Supabase falhou, tentando backend proxy...", err);
-    }
-  }
-
-  // 2. Next attempt via local/remote server proxy (which handles Supabase Cloud SSL bypass)
+  // 1. First attempt via server API proxy (which consolidates Supabase, enriched overrides, index, and extra cases)
   const proxyEndpoints = [
     getApiUrl("/api/cases"),
     "http://localhost:8001/api/cases",
@@ -1194,6 +1226,31 @@ async function initData() {
       }
     } catch (e) {
       // Try next endpoint
+    }
+  }
+
+  // 2. Next attempt direct connection to Supabase Cloud REST API
+  if (supabaseUrl && supabaseKey) {
+    try {
+      const res = await fetch(`${supabaseUrl}/rest/v1/cases?select=*`, {
+        headers: {
+          "apikey": supabaseKey,
+          "Authorization": `Bearer ${supabaseKey}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        isCloudMode = true;
+        if (Array.isArray(data) && data.length > 0) {
+          cases = data.map(mapDatabaseToApp);
+        } else {
+          cases = [...SEED_CASES];
+        }
+        updateDbStatus("online");
+        return;
+      }
+    } catch (err) {
+      console.warn("Conexão direta com o Supabase falhou, tentando fallback local...", err);
     }
   }
 
