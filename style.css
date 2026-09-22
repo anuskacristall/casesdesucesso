@@ -1681,13 +1681,15 @@ body.light-theme .municipality-form-body .indicator-toggle > label,
 .dev-index-modal-card {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   background: #ffffff;
-  padding: 8px 14px;
+  padding: 8px 16px;
   border-radius: 10px;
   border: 1px solid #e2e8f0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  gap: 3px;
+  gap: 4px;
 }
 
 body.light-theme .dev-index-modal-card {
@@ -1696,26 +1698,33 @@ body.light-theme .dev-index-modal-card {
 }
 
 .dev-index-modal-label {
-  font-size: 0.64rem;
+  font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: #64748b;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  gap: 5px;
   line-height: 1;
+  text-align: center;
 }
 
 .dev-index-modal-badge {
   font-size: 0.82rem;
   font-weight: 800;
-  padding: 4px 12px;
+  padding: 4px 14px;
   border-radius: 6px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
   line-height: 1.2;
   width: max-content;
+  margin: 0 auto;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .dev-index-modal-badge.inicio {

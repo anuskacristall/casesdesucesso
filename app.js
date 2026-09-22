@@ -1824,7 +1824,7 @@ function createQuickLookCard(item) {
     <div class="popup-header">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px;">
         <span class="badge" style="font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; ${typeBadgeStyle}">${typeLabelStr}</span>
-        <div class="dev-index-badge dev-index-${devIdx.classificacao_key}" title="Pontuação: ${devIdx.pontuacao}/55 (${devIdx.percentual}%)" style="text-align: right;">
+        <div class="dev-index-badge dev-index-${devIdx.classificacao_key}" title="Pontuação: ${devIdx.pontuacao}/55 (${devIdx.percentual}%)" style="text-align: center; align-items: center; display: inline-flex; flex-direction: column;">
           <span class="dev-index-sub" style="font-size: 0.60rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); line-height: 1; letter-spacing: 0.2px;">Índice do Município</span>
           <span class="dev-index-val" style="font-size: 0.72rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; ${devBadgeStyle}">${devIdx.classificacao}</span>
         </div>
