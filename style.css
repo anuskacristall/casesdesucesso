@@ -3000,7 +3000,7 @@ body.dark-theme .export-menu-item:hover {
   min-height: 36px;
 }
 
-.municipality-form-body .indicators-section .indicator-toggle label {
+.municipality-form-body .indicators-section .indicator-toggle > label {
   margin: 0 !important;
   padding: 0 16px 0 0 !important;
   font-size: 0.96rem !important;
@@ -3017,6 +3017,13 @@ body.dark-theme .export-menu-item:hover {
   display: inline-flex !important;
   align-items: center !important;
   flex-shrink: 0 !important;
+}
+
+.municipality-form-body .indicators-section .indicator-toggle .radio-group .radio-label {
+  margin: 0 !important;
+  padding: 0 !important;
+  flex: none !important;
+  display: inline-flex !important;
 }
 
 
