@@ -1013,9 +1013,12 @@ function renderDevIndexCalculationMemory(item) {
   const isDesenvolvido = classificacao_key === "desenvolvido";
 
   return `
-    <div style="margin-top: 10px;">
-      <div class="modal-section-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <span>Índice de Desenvolvimento do Município — Memória de Cálculo</span>
+    <div class="admin-detail-card card-indicators">
+      <div class="admin-card-header">
+        <div class="admin-card-title">
+          <i data-lucide="bar-chart-2"></i>
+          <span>Índice de Desenvolvimento do Município — Memória de Cálculo</span>
+        </div>
         <span class="dev-index-val ${classificacao_key}" style="font-size: 0.78rem; padding: 3px 8px;">${escapeHtml(classificacao)}</span>
       </div>
 
@@ -1108,8 +1111,17 @@ function openMunicipalityDetails(id) {
   const statusCfg = STATUS_CONFIG[status] || STATUS_CONFIG.pending;
 
   body.innerHTML = `
-    <div>
-      <div class="modal-section-title">Dados Gerais do Município</div>
+    <div class="admin-detail-card card-project">
+      <div class="admin-card-header">
+        <div class="admin-card-title">
+          <i data-lucide="map-pin"></i>
+          <span>Dados Gerais do Município</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="badge-status ${statusCfg.class}">${statusCfg.label}</span>
+          <span class="admin-card-tag">Município</span>
+        </div>
+      </div>
       <div class="modal-grid-2">
         <div class="detail-item">
           <span class="detail-label">Protocolo</span>
@@ -1121,7 +1133,7 @@ function openMunicipalityDetails(id) {
         </div>
         <div class="detail-item">
           <span class="detail-label">Município</span>
-          <span class="detail-value" style="color: #0054a6;">${escapeHtml(item.nome || item.municipio || "-")}</span>
+          <span class="detail-value" style="color: #0054a6; font-weight: 700; font-size: 1.05rem;">${escapeHtml(item.nome || item.municipio || "-")}</span>
         </div>
         <div class="detail-item">
           <span class="detail-label">Regional / MR</span>
@@ -1130,20 +1142,40 @@ function openMunicipalityDetails(id) {
       </div>
     </div>
 
-    <div>
-      <div class="modal-section-title">Responsável pelo Cadastro</div>
+    <div class="admin-detail-card card-technician">
+      <div class="admin-card-header">
+        <div class="admin-card-title">
+          <i data-lucide="user-check"></i>
+          <span>Responsável pelo Cadastro</span>
+        </div>
+        <span class="admin-card-tag">Cadastrador</span>
+      </div>
       <div class="modal-grid-2">
         <div class="detail-item">
           <span class="detail-label">Nome Completo</span>
-          <span class="detail-value">${escapeHtml(item.responsavel_nome || item.solicitante_nome || item.tecnico_nome || "Não informado")}</span>
+          <span class="detail-value" style="font-weight: 700; color: #0369a1;">${escapeHtml(item.responsavel_nome || item.solicitante_nome || item.tecnico_nome || "Não informado")}</span>
         </div>
         <div class="detail-item">
           <span class="detail-label">E-mail Corporativo</span>
-          <span class="detail-value">${escapeHtml(item.responsavel_email || item.solicitante_email || item.tecnico_email || "Não informado")}</span>
+          <span class="detail-value">
+            ${item.responsavel_email || item.solicitante_email || item.tecnico_email ? `
+              <a href="mailto:${escapeHtml(item.responsavel_email || item.solicitante_email || item.tecnico_email)}" class="contact-link">
+                <i data-lucide="mail"></i>
+                <span>${escapeHtml(item.responsavel_email || item.solicitante_email || item.tecnico_email)}</span>
+              </a>
+            ` : "Não informado"}
+          </span>
         </div>
         <div class="detail-item">
           <span class="detail-label">Telefone / WhatsApp</span>
-          <span class="detail-value">${escapeHtml(item.responsavel_telefone || item.solicitante_telefone || item.tecnico_telefone || "Não informado")}</span>
+          <span class="detail-value">
+            ${item.responsavel_telefone || item.solicitante_telefone || item.tecnico_telefone ? `
+              <a href="tel:${escapeHtml((item.responsavel_telefone || item.solicitante_telefone || item.tecnico_telefone).replace(/[^0-9+]/g, ''))}" class="contact-link">
+                <i data-lucide="phone"></i>
+                <span>${escapeHtml(item.responsavel_telefone || item.solicitante_telefone || item.tecnico_telefone)}</span>
+              </a>
+            ` : "Não informado"}
+          </span>
         </div>
         <div class="detail-item">
           <span class="detail-label">Data de Envio</span>
@@ -1152,8 +1184,13 @@ function openMunicipalityDetails(id) {
       </div>
     </div>
 
-    <div>
-      <div class="modal-section-title">Indicadores de Educação Empreendedora</div>
+    <div class="admin-detail-card card-indicators">
+      <div class="admin-card-header">
+        <div class="admin-card-title">
+          <i data-lucide="check-circle-2"></i>
+          <span>Indicadores de Educação Empreendedora</span>
+        </div>
+      </div>
       <div class="indicators-summary-list">
         <div class="indicator-check-row">
           <span>Programa JEPP</span>
@@ -1334,8 +1371,17 @@ function openCaseDetails(id) {
   titleEl.textContent = title;
 
   body.innerHTML = `
-    <div>
-      <div class="modal-section-title">Identificação do Projeto</div>
+    <div class="admin-detail-card card-project">
+      <div class="admin-card-header">
+        <div class="admin-card-title">
+          <i data-lucide="info"></i>
+          <span>Identificação do Projeto</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="badge-status ${statusCfg.class}">${statusCfg.label}</span>
+          <span class="admin-card-tag">${isEstudante ? 'Estudante' : 'Professor'}</span>
+        </div>
+      </div>
       <div class="modal-grid-2">
         <div class="detail-item">
           <span class="detail-label">Protocolo</span>
@@ -1343,15 +1389,19 @@ function openCaseDetails(id) {
         </div>
         <div class="detail-item">
           <span class="detail-label">Modalidade</span>
-          <span class="detail-value" style="color: ${isEstudante ? '#10b981' : '#0054a6'}; font-weight:700;">${isEstudante ? 'Estudante Empreendedor' : 'Professor'}</span>
+          <span class="detail-value" style="color: ${isEstudante ? '#16a34a' : '#7c3aed'}; font-weight:700;">
+            ${isEstudante ? 'Estudante Empreendedor' : 'Professor'}
+          </span>
         </div>
         <div class="detail-item">
           <span class="detail-label">Município</span>
-          <span class="detail-value">${escapeHtml(item.municipio || "-")} (${escapeHtml(item.regional || "-")})</span>
+          <span class="detail-value" style="color: #0054a6; font-weight: 700;">
+            ${escapeHtml(item.municipio || "-")} ${item.regional ? `<span style="font-size: 0.85rem; font-weight: 500; color: #64748b;">(${escapeHtml(item.regional)})</span>` : ""}
+          </span>
         </div>
         <div class="detail-item">
           <span class="detail-label">Escola / Instituição</span>
-          <span class="detail-value">${escapeHtml(item.escola_instituicao || item.escola || "-")}</span>
+          <span class="detail-value" style="font-weight: 600;">${escapeHtml(item.escola_instituicao || item.escola || "-")}</span>
         </div>
         ${item.nivel_ensino ? `
         <div class="detail-item">
@@ -1366,67 +1416,127 @@ function openCaseDetails(id) {
       </div>
     </div>
 
-    <div>
-      <div class="modal-section-title">Descrição Geral do Case</div>
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-size: 0.9rem; color: #334155; line-height: 1.5;">
+    <div class="admin-detail-card card-description">
+      <div class="admin-card-header">
+        <div class="admin-card-title">
+          <i data-lucide="file-text"></i>
+          <span>Descrição Geral do Case</span>
+        </div>
+      </div>
+      <div style="font-size: 0.92rem; color: #334155; line-height: 1.6; white-space: pre-line;">
         ${escapeHtml(item.descricao_geral || item.descricao || "Nenhuma descrição fornecida.")}
       </div>
     </div>
 
     ${(item.empresa_nome || item.empresaNome || item.empresa_tipo || item.empresaTipo || item.empresa_descricao || item.empresaDescricao) ? `
-    <div>
-      <div class="modal-section-title">Dados do Empreendimento</div>
+    <div class="admin-detail-card card-enterprise">
+      <div class="admin-card-header">
+        <div class="admin-card-title">
+          <i data-lucide="briefcase"></i>
+          <span>Dados do Empreendimento</span>
+        </div>
+        <span class="admin-card-tag">Negócio Criado</span>
+      </div>
       <div class="modal-grid-2">
         <div class="detail-item">
           <span class="detail-label">Nome da Empresa</span>
-          <span class="detail-value"><strong>${escapeHtml(item.empresa_nome || item.empresaNome || "Não informado")}</strong></span>
+          <span class="detail-value" style="color: #9a3412; font-weight: 800; font-size: 1.05rem;">
+            ${escapeHtml(item.empresa_nome || item.empresaNome || "Não informado")}
+          </span>
         </div>
         <div class="detail-item">
           <span class="detail-label">Tipo de Negócio</span>
-          <span class="detail-value">${escapeHtml(item.empresa_tipo || item.empresaTipo || "Não informado")}</span>
+          <span class="detail-value" style="font-weight: 600;">
+            ${escapeHtml(item.empresa_tipo || item.empresaTipo || "Não informado")}
+          </span>
         </div>
+        ${(item.empresa_descricao || item.empresaDescricao) ? `
         <div class="detail-item" style="grid-column: span 2;">
-          <span class="detail-label">Descrição da Empresa</span>
-          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; font-size: 0.88rem; color: #475569; line-height: 1.5; margin-top: 4px;">
-            ${escapeHtml(item.empresa_descricao || item.empresaDescricao || "Não informada.")}
+          <span class="detail-label">Descrição da Atuação</span>
+          <div style="background: rgba(255, 255, 255, 0.7); border: 1px solid #fed7aa; border-radius: 8px; padding: 12px; font-size: 0.9rem; color: #7c2d12; line-height: 1.55; margin-top: 4px; white-space: pre-line;">
+            ${escapeHtml(item.empresa_descricao || item.empresaDescricao)}
           </div>
-        </div>
+        </div>` : ""}
       </div>
     </div>
     ` : ""}
 
-    <div>
-      <div class="modal-section-title">Técnico Responsável (Sebrae)</div>
+    <div class="admin-detail-card card-technician">
+      <div class="admin-card-header">
+        <div class="admin-card-title">
+          <i data-lucide="user-check"></i>
+          <span>Técnico Responsável (Sebrae)</span>
+        </div>
+        <span class="admin-card-tag">Equipe Sebrae</span>
+      </div>
       <div class="modal-grid-2">
         <div class="detail-item">
           <span class="detail-label">Nome do Técnico</span>
-          <span class="detail-value">${escapeHtml(item.tecnico_nome || item.tecnicoNome || "Não informado")}</span>
+          <span class="detail-value" style="font-weight: 700; color: #0369a1;">
+            ${escapeHtml(item.tecnico_nome || item.tecnicoNome || "Não informado")}
+          </span>
         </div>
         <div class="detail-item">
           <span class="detail-label">E-mail Corporativo</span>
-          <span class="detail-value">${escapeHtml(item.tecnico_email || item.tecnicoEmail || "Não informado")}</span>
+          <span class="detail-value">
+            ${item.tecnico_email || item.tecnicoEmail ? `
+              <a href="mailto:${escapeHtml(item.tecnico_email || item.tecnicoEmail)}" class="contact-link">
+                <i data-lucide="mail"></i>
+                <span>${escapeHtml(item.tecnico_email || item.tecnicoEmail)}</span>
+              </a>
+            ` : "Não informado"}
+          </span>
         </div>
         <div class="detail-item" style="grid-column: span 2;">
           <span class="detail-label">Telefone / WhatsApp</span>
-          <span class="detail-value">${escapeHtml(item.tecnico_telefone || item.tecnicoContato || "Não informado")}</span>
+          <span class="detail-value">
+            ${item.tecnico_telefone || item.tecnicoContato ? `
+              <a href="tel:${escapeHtml((item.tecnico_telefone || item.tecnicoContato).replace(/[^0-9+]/g, ''))}" class="contact-link">
+                <i data-lucide="phone"></i>
+                <span>${escapeHtml(item.tecnico_telefone || item.tecnicoContato)}</span>
+              </a>
+            ` : "Não informado"}
+          </span>
         </div>
       </div>
     </div>
 
-    <div>
-      <div class="modal-section-title">${isEstudante ? 'Dados do Estudante Empreendedor' : 'Dados do Professor'}</div>
+    <div class="admin-detail-card ${isEstudante ? 'card-student' : 'card-professor'}">
+      <div class="admin-card-header">
+        <div class="admin-card-title">
+          <i data-lucide="${isEstudante ? 'sparkles' : 'graduation-cap'}"></i>
+          <span>${isEstudante ? 'Dados do Estudante Empreendedor' : 'Dados do Professor'}</span>
+        </div>
+        <span class="admin-card-tag">${isEstudante ? 'Aluno Empreendedor' : 'Docente'}</span>
+      </div>
       <div class="modal-grid-2">
         <div class="detail-item">
-          <span class="detail-label">Nome</span>
-          <span class="detail-value"><strong>${escapeHtml(authorData.nome || "Não informado")}</strong></span>
+          <span class="detail-label">Nome Completo</span>
+          <span class="detail-value" style="font-weight: 800; font-size: 1.05rem; color: ${isEstudante ? '#15803d' : '#6b21a8'};">
+            ${escapeHtml(authorData.nome || "Não informado")}
+          </span>
         </div>
         <div class="detail-item">
           <span class="detail-label">E-mail</span>
-          <span class="detail-value">${escapeHtml(authorData.email || "Não informado")}</span>
+          <span class="detail-value">
+            ${authorData.email ? `
+              <a href="mailto:${escapeHtml(authorData.email)}" class="contact-link">
+                <i data-lucide="mail"></i>
+                <span>${escapeHtml(authorData.email)}</span>
+              </a>
+            ` : "Não informado"}
+          </span>
         </div>
         <div class="detail-item" style="grid-column: span 2;">
           <span class="detail-label">Telefone / Contato</span>
-          <span class="detail-value">${escapeHtml(authorData.telefone || "Não informado")}</span>
+          <span class="detail-value">
+            ${authorData.telefone ? `
+              <a href="tel:${escapeHtml(authorData.telefone.replace(/[^0-9+]/g, ''))}" class="contact-link">
+                <i data-lucide="phone"></i>
+                <span>${escapeHtml(authorData.telefone)}</span>
+              </a>
+            ` : "Não informado"}
+          </span>
         </div>
       </div>
     </div>

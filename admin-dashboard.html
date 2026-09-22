@@ -751,6 +751,137 @@
       padding-bottom: 4px;
     }
 
+    /* Enhanced Modal Section Cards */
+    .admin-detail-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .admin-detail-card:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Distinct thematic card accents */
+    .admin-detail-card.card-project {
+      background: #ffffff;
+      border-left: 4px solid #0054a6;
+    }
+
+    .admin-detail-card.card-description {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #3b82f6;
+    }
+
+    .admin-detail-card.card-enterprise {
+      background: #fffcf7;
+      border: 1px solid #fed7aa;
+      border-left: 4px solid #f97316;
+    }
+
+    .admin-detail-card.card-technician {
+      background: #f0f7ff;
+      border: 1px solid #bfdbfe;
+      border-left: 4px solid #0284c7;
+    }
+
+    .admin-detail-card.card-professor {
+      background: #faf5ff;
+      border: 1px solid #e9d5ff;
+      border-left: 4px solid #7c3aed;
+    }
+
+    .admin-detail-card.card-student {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-left: 4px solid #16a34a;
+    }
+
+    .admin-detail-card.card-indicators {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #0054a6;
+    }
+
+    /* Section Card Header */
+    .admin-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .admin-card-title {
+      font-size: 0.86rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .admin-card-title i,
+    .admin-card-title svg {
+      width: 17px;
+      height: 17px;
+      stroke-width: 2.2px;
+    }
+
+    .card-project .admin-card-title { color: #0054a6; }
+    .card-description .admin-card-title { color: #1e40af; }
+    .card-enterprise .admin-card-title { color: #c2410c; }
+    .card-technician .admin-card-title { color: #0369a1; }
+    .card-professor .admin-card-title { color: #6b21a8; }
+    .card-student .admin-card-title { color: #15803d; }
+    .card-indicators .admin-card-title { color: #0054a6; }
+
+    .admin-card-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .card-project .admin-card-tag { background: #e0f2fe; color: #0369a1; }
+    .card-enterprise .admin-card-tag { background: #ffedd5; color: #c2410c; }
+    .card-technician .admin-card-tag { background: #e0f2fe; color: #0284c7; }
+    .card-professor .admin-card-tag { background: #f3e8ff; color: #6b21a8; }
+    .card-student .admin-card-tag { background: #dcfce7; color: #15803d; }
+
+    .contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #0054a6;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.15s ease;
+    }
+
+    .contact-link:hover {
+      color: #00366b;
+      text-decoration: underline;
+    }
+
+    .contact-link i,
+    .contact-link svg {
+      width: 14px;
+      height: 14px;
+      stroke-width: 2.2px;
+      color: #64748b;
+    }
+
     .modal-grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -764,15 +895,18 @@
     }
 
     .detail-label {
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       font-weight: 600;
       color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
     }
 
     .detail-value {
-      font-size: 0.92rem;
+      font-size: 0.94rem;
       font-weight: 600;
-      color: #1e293b;
+      color: #0f172a;
+      line-height: 1.4;
     }
 
     .indicators-summary-list {
@@ -1601,6 +1735,6 @@
   <script src="config.js"></script>
 
   <!-- Admin Controller -->
-  <script src="admin.js?v=21"></script>
+  <script src="admin.js?v=22"></script>
 </body>
 </html>
