@@ -275,6 +275,10 @@ class TestLint(unittest.TestCase):
         self.assertIn("indicators-section-title", index_content)
         self.assertIn("details-convenio-status", index_content)
         self.assertIn("details-superintendencia-status", index_content)
+        self.assertIn("<label>Cooperativa de crédito</label>", index_content)
+        self.assertIn("<label>Convênio / Termo de Parceria</label>", index_content)
+        self.assertIn("<label>Educação Empreendedora em mais de 70% do municipio</label>", index_content)
+        self.assertIn("<label>Parceria com Superintendência de ensino</label>", index_content)
 
         with open(os.path.join(ROOT_DIR, "style.css"), "r", encoding="utf-8") as f:
             style_content = f.read()

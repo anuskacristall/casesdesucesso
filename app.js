@@ -1931,8 +1931,8 @@ function openDetailsModal(id) {
   const jeppBadge = document.getElementById("details-jepp");
   if (jeppBadge) {
     const jeppVal = String(item.jeppStatus || item.status_jepp || "").trim().toLowerCase();
-    if (jeppVal === "sim" || jeppVal === "sim (total)") {
-      jeppBadge.innerText = "Sim (Total)";
+    if (jeppVal === "sim" || jeppVal === "sim (total)" || jeppVal === "total") {
+      jeppBadge.innerText = "Total";
       jeppBadge.className = "badge bg-centro";
     } else if (jeppVal === "parcial") {
       jeppBadge.innerText = "Parcial";
