@@ -19,7 +19,7 @@
   </script>
 
   <!-- Base App Styles -->
-  <link rel="stylesheet" href="style.css?v=19">
+  <link rel="stylesheet" href="style.css?v=20">
 
   <!-- Admin Dedicated Styles -->
   <style>
@@ -680,8 +680,18 @@
     }
 
     #modal-case-details .admin-modal-card,
-    #modal-municipality-details .admin-modal-card {
+    #modal-municipality-details .admin-modal-card,
+    #modal-edit-municipality .admin-modal-card,
+    #modal-edit-case .admin-modal-card {
       max-width: 780px;
+    }
+
+    .admin-modal-card form {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
     }
 
     .admin-modal-header {
@@ -691,6 +701,7 @@
       align-items: center;
       justify-content: space-between;
       background: #f8fafc;
+      flex-shrink: 0;
     }
 
     .admin-modal-header h3 {
@@ -725,6 +736,8 @@
       display: flex;
       flex-direction: column;
       gap: 20px;
+      flex: 1;
+      min-height: 0;
     }
 
     .modal-section-title {
@@ -768,20 +781,45 @@
       gap: 10px;
     }
 
+    @media (max-width: 640px) {
+      .indicators-summary-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .indicator-check-row {
       background: #f8fafc;
       border: 1px solid #e2e8f0;
-      padding: 8px 12px;
+      padding: 10px 14px;
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 0.82rem;
+      gap: 12px;
+      font-size: 0.84rem;
     }
 
-    .indicator-check-row span:first-child {
+    .indicator-check-row span:first-child,
+    .indicator-check-row label {
       font-weight: 600;
       color: #334155;
+      line-height: 1.35;
+      flex: 1;
+    }
+
+    .indicator-check-row select.form-input {
+      width: 105px !important;
+      min-width: 105px !important;
+      max-width: 105px !important;
+      padding: 6px 10px !important;
+      font-size: 0.84rem !important;
+      font-weight: 600;
+      color: #0f172a;
+      background-color: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      cursor: pointer;
+      flex-shrink: 0;
     }
 
     .indicator-tag {
@@ -805,6 +843,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-shrink: 0;
     }
 
     .admin-modal-footer-actions {
@@ -1352,72 +1391,72 @@
           <div class="modal-section-title">Indicadores de Educação Empreendedora</div>
           <div class="indicators-summary-list">
             <div class="indicator-check-row">
-              <label for="edit-mun-jepp" style="margin:0; font-weight:600; color:#334155;">Programa JEPP</label>
-              <select id="edit-mun-jepp" class="form-input" style="width: auto; padding: 4px 8px;">
+              <label for="edit-mun-jepp">Programa JEPP</label>
+              <select id="edit-mun-jepp" class="form-input">
                 <option value="Sim">Sim</option>
                 <option value="Parcial">Parcial</option>
                 <option value="Não">Não</option>
               </select>
             </div>
             <div class="indicator-check-row">
-              <label for="edit-mun-ee70" style="margin:0; font-weight:600; color:#334155;">Possui Educação Empreendedora em mais de 70% do município?</label>
-              <select id="edit-mun-ee70" class="form-input" style="width: auto; padding: 4px 8px;">
+              <label for="edit-mun-ee70">Possui Educação Empreendedora em mais de 70% do município?</label>
+              <select id="edit-mun-ee70" class="form-input">
                 <option value="sim">Sim</option>
                 <option value="nao">Não</option>
               </select>
             </div>
             <div class="indicator-check-row">
-              <label for="edit-mun-convenio" style="margin:0; font-weight:600; color:#334155;">Convênio/contrato/termo de parceria com o Sebrae</label>
-              <select id="edit-mun-convenio" class="form-input" style="width: auto; padding: 4px 8px;">
+              <label for="edit-mun-convenio">Convênio/contrato/termo de parceria com o Sebrae</label>
+              <select id="edit-mun-convenio" class="form-input">
                 <option value="sim">Sim</option>
                 <option value="nao">Não</option>
               </select>
             </div>
             <div class="indicator-check-row">
-              <label for="edit-mun-superintendencia" style="margin:0; font-weight:600; color:#334155;">Parceria com superintendência de ensino</label>
-              <select id="edit-mun-superintendencia" class="form-input" style="width: auto; padding: 4px 8px;">
+              <label for="edit-mun-superintendencia">Parceria com superintendência de ensino</label>
+              <select id="edit-mun-superintendencia" class="form-input">
                 <option value="sim">Sim</option>
                 <option value="nao">Não</option>
               </select>
             </div>
             <div class="indicator-check-row">
-              <label for="edit-mun-cooperativa" style="margin:0; font-weight:600; color:#334155;">Cooperativa Escolar</label>
-              <select id="edit-mun-cooperativa" class="form-input" style="width: auto; padding: 4px 8px;">
+              <label for="edit-mun-cooperativa">Cooperativa Escolar</label>
+              <select id="edit-mun-cooperativa" class="form-input">
                 <option value="sim">Sim</option>
                 <option value="nao">Não</option>
               </select>
             </div>
             <div class="indicator-check-row">
-              <label for="edit-mun-lei" style="margin:0; font-weight:600; color:#334155;">Lei Municipal de Educação Empreendedora</label>
-              <select id="edit-mun-lei" class="form-input" style="width: auto; padding: 4px 8px;">
+              <label for="edit-mun-lei">Lei Municipal de Educação Empreendedora</label>
+              <select id="edit-mun-lei" class="form-input">
                 <option value="sim">Sim</option>
                 <option value="nao">Não</option>
               </select>
             </div>
             <div class="indicator-check-row">
-              <label for="edit-mun-comite" style="margin:0; font-weight:600; color:#334155;">Comitê Gestor</label>
-              <select id="edit-mun-comite" class="form-input" style="width: auto; padding: 4px 8px;">
+              <label for="edit-mun-comite">Comitê Gestor</label>
+              <select id="edit-mun-comite" class="form-input">
                 <option value="sim">Sim</option>
                 <option value="nao">Não</option>
               </select>
             </div>
             <div class="indicator-check-row">
-              <label for="edit-mun-ies" style="margin:0; font-weight:600; color:#334155;">Parceria com Instituição de Ensino Superior</label>
-              <select id="edit-mun-ies" class="form-input" style="width: auto; padding: 4px 8px;">
+              <label for="edit-mun-ies">Parceria com Instituição de Ensino Superior</label>
+              <select id="edit-mun-ies" class="form-input">
                 <option value="sim">Sim</option>
                 <option value="nao">Não</option>
               </select>
             </div>
             <div class="indicator-check-row">
-              <label for="edit-mun-emp-sim" style="margin:0; font-weight:600; color:#334155;">Empresa Simulada</label>
-              <select id="edit-mun-emp-sim" class="form-input" style="width: auto; padding: 4px 8px;">
+              <label for="edit-mun-emp-sim">Empresa Simulada</label>
+              <select id="edit-mun-emp-sim" class="form-input">
                 <option value="sim">Sim</option>
                 <option value="nao">Não</option>
               </select>
             </div>
             <div class="indicator-check-row">
-              <label for="edit-mun-esc-seb" style="margin:0; font-weight:600; color:#334155;">Sistema de Ensino Escola do Sebrae</label>
-              <select id="edit-mun-esc-seb" class="form-input" style="width: auto; padding: 4px 8px;">
+              <label for="edit-mun-esc-seb">Sistema de Ensino Escola do Sebrae</label>
+              <select id="edit-mun-esc-seb" class="form-input">
                 <option value="sim">Sim</option>
                 <option value="nao">Não</option>
               </select>
@@ -1562,6 +1601,6 @@
   <script src="config.js"></script>
 
   <!-- Admin Controller -->
-  <script src="admin.js?v=19"></script>
+  <script src="admin.js?v=20"></script>
 </body>
 </html>
