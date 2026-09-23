@@ -45,7 +45,7 @@
   <script src="lib/lucide.min.js"></script>
   
   <!-- Style Sheet -->
-  <link rel="stylesheet" href="style.css?v=23">
+  <link rel="stylesheet" href="style.css?v=25">
 </head>
 <body class="light-theme">
   <!-- Login View -->
@@ -222,7 +222,7 @@
             </div>
             <div class="referencia-btn-texts">
               <span class="referencia-btn-title">Municípios de Referência</span>
-              <span class="referencia-btn-sub">Cidades com alto índice de desenvolvimento</span>
+              <span class="referencia-btn-sub">Em Educação Empreendedora</span>
             </div>
           </div>
           <div class="referencia-btn-right">
@@ -963,14 +963,20 @@
           <legend><i data-lucide="check-square"></i> Indicadores da Educação Empreendedora no Município</legend>
 
           <!-- JEPP Implantado -->
-          <div class="form-group" style="padding-bottom: 16px; border-bottom: 1px solid var(--border-glass); margin-bottom: 0;">
-            <label for="municipality-jepp-status">JEPP Implantado no Município? *</label>
-            <select id="municipality-jepp-status" required>
-              <option value="" disabled selected>Selecione o status do JEPP...</option>
-              <option value="Sim">Sim (Totalmente Implantado)</option>
-              <option value="Parcial">Parcial (Em Implantação)</option>
-              <option value="Nao">Não Implantado</option>
-            </select>
+          <div class="indicator-row">
+            <div class="indicator-toggle">
+              <label>Programa JEPP Implantado no Município?</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="municipality-jepp-status" value="sim">
+                  <span>Sim</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="municipality-jepp-status" value="nao" checked>
+                  <span>Não</span>
+                </label>
+              </div>
+            </div>
           </div>
 
           <!-- EE em mais de 70% do município -->
@@ -1126,6 +1132,70 @@
             </div>
           </div>
 
+        </fieldset>
+
+        <!-- Seção 4: Instrumentos Aplicados no Município -->
+        <fieldset class="form-section instruments-section" style="margin-top: 20px;">
+          <legend style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <span style="display: inline-flex; align-items: center; gap: 8px;">
+              <i data-lucide="layers"></i> Instrumentos Aplicados no Município
+            </span>
+            <span id="instruments-score-badge" class="badge" style="background: #eff6ff; color: #0054a6; border: 1px solid #bfdbfe; font-size: 0.76rem; font-weight: 700;">
+              0 pontos
+            </span>
+          </legend>
+
+          <p style="font-size: 0.84rem; color: var(--text-muted); margin: 0 0 14px 0;">
+            Cada instrumento selecionado soma <strong>10 pontos</strong>. Selecione no mínimo <strong>3 instrumentos</strong> para obter destaque.
+          </p>
+
+          <div class="instruments-checkbox-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
+            <label class="instrument-checkbox-card">
+              <input type="checkbox" name="municipality-instruments" value="material_didatico" id="inst-mat-didatico">
+              <div class="instrument-card-info">
+                <span class="instrument-card-title">Aplicação de Material Didático</span>
+                <span class="instrument-card-pts">+10 pts</span>
+              </div>
+            </label>
+
+            <label class="instrument-checkbox-card">
+              <input type="checkbox" name="municipality-instruments" value="oficina" id="inst-oficina">
+              <div class="instrument-card-info">
+                <span class="instrument-card-title">Oficina</span>
+                <span class="instrument-card-pts">+10 pts</span>
+              </div>
+            </label>
+
+            <label class="instrument-checkbox-card">
+              <input type="checkbox" name="municipality-instruments" value="curso" id="inst-curso">
+              <div class="instrument-card-info">
+                <span class="instrument-card-title">Curso</span>
+                <span class="instrument-card-pts">+10 pts</span>
+              </div>
+            </label>
+
+            <label class="instrument-checkbox-card">
+              <input type="checkbox" name="municipality-instruments" value="encontro_mediado" id="inst-encontro-mediado">
+              <div class="instrument-card-info">
+                <span class="instrument-card-title">Encontro Mediado</span>
+                <span class="instrument-card-pts">+10 pts</span>
+              </div>
+            </label>
+
+            <label class="instrument-checkbox-card">
+              <input type="checkbox" name="municipality-instruments" value="palestra" id="inst-palestra">
+              <div class="instrument-card-info">
+                <span class="instrument-card-title">Palestra</span>
+                <span class="instrument-card-pts">+10 pts</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Destaque alert/badge container -->
+          <div id="instruments-destaque-banner" style="display: none; margin-top: 12px; padding: 10px 14px; background: #fefce8; border: 1.5px solid #fde047; border-radius: 8px; align-items: center; gap: 8px; color: #854d0e; font-size: 0.85rem; font-weight: 600;">
+            <i data-lucide="award" style="width: 18px; height: 18px; color: #ca8a04;"></i>
+            <span>⭐ Município com Destaque em Instrumentos (3 ou mais instrumentos aplicados)!</span>
+          </div>
         </fieldset>
 
         <!-- Ações do Formulário -->
@@ -1293,6 +1363,6 @@
   <script src="config.js"></script>
 
   <!-- Script Principal -->
-  <script src="app.js?v=42"></script>
+  <script src="app.js?v=44"></script>
 </body>
 </html>

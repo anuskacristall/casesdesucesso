@@ -190,6 +190,43 @@ class TestIndiceDesenvolvimento(unittest.TestCase):
         self.assertIn(".dev-index-modal-badge", style_css)
         self.assertIn(".indicator-toggle > label", style_css)
 
+    def test_instrumentos_score_and_destaque(self):
+        """Valida que cada instrumento vale 10 pontos e no mínimo 3 concedem Destaque."""
+        # 0 instrumentos
+        res0 = calculate_municipio_development_index({"instrumentos_aplicados": []})
+        self.assertEqual(res0["instrumentos_aplicados"], [])
+        self.assertEqual(res0["pontuacao_instrumentos"], 0)
+        self.assertFalse(res0["destaque_instrumentos"])
+
+        # 2 instrumentos (20 pts, sem destaque)
+        res2 = calculate_municipio_development_index({"instrumentos_aplicados": ["material_didatico", "oficina"]})
+        self.assertEqual(len(res2["instrumentos_aplicados"]), 2)
+        self.assertEqual(res2["pontuacao_instrumentos"], 20)
+        self.assertFalse(res2["destaque_instrumentos"])
+
+        # 3 instrumentos (30 pts, com destaque)
+        res3 = calculate_municipio_development_index({"instrumentos_aplicados": ["material_didatico", "oficina", "curso"]})
+        self.assertEqual(len(res3["instrumentos_aplicados"]), 3)
+        self.assertEqual(res3["pontuacao_instrumentos"], 30)
+        self.assertTrue(res3["destaque_instrumentos"])
+
+        # 5 instrumentos (50 pts, com destaque)
+        res5 = calculate_municipio_development_index({"instrumentos_aplicados": ["material_didatico", "oficina", "curso", "encontro_mediado", "palestra"]})
+        self.assertEqual(len(res5["instrumentos_aplicados"]), 5)
+        self.assertEqual(res5["pontuacao_instrumentos"], 50)
+        self.assertTrue(res5["destaque_instrumentos"])
+
+        # Auto-derivação a partir dos indicadores quando instrumentos_aplicados é None
+        res_derived = calculate_municipio_development_index({
+            "status_jepp": "Sim",
+            "empresa_simulada": True
+        })
+        self.assertIn("material_didatico", res_derived["instrumentos_aplicados"])
+        self.assertIn("oficina", res_derived["instrumentos_aplicados"])
+        self.assertIn("curso", res_derived["instrumentos_aplicados"])
+        self.assertEqual(res_derived["pontuacao_instrumentos"], 30)
+        self.assertTrue(res_derived["destaque_instrumentos"])
+
 
 if __name__ == "__main__":
     unittest.main()

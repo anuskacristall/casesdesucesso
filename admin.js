@@ -174,13 +174,51 @@ function calculateMunicipioDevelopmentIndex(item) {
     classificacaoKey = "desenvolvido";
   }
 
+  // Instrumentos Aplicados (10 pts cada, mínimo 3 para destaque)
+  let insts = item.instrumentos_aplicados;
+  if (!insts && insts !== []) {
+    const derived = new Set();
+    if (isJeppAttended(item.jepp_municipio) || isJeppAttended(item.status_jepp) || isJeppAttended(item.jeppStatus)) {
+      derived.add("material_didatico");
+      derived.add("oficina");
+    }
+    if (isAffirmative(item.empresa_simulada) || isAffirmative(item.empresa_simulada_possui) || isAffirmative(item.hasEmpresaSimulada)) {
+      derived.add("curso");
+    }
+    if (isAffirmative(item.escola_sebrae) || isAffirmative(item.escola_sebrae_possui) || isAffirmative(item.hasEscolaSebrae)) {
+      derived.add("curso");
+    }
+    if (isAffirmative(item.convenio_parceria) || isAffirmative(item.convenio_sebrae) || isAffirmative(item.hasConvenioSebrae)) {
+      derived.add("encontro_mediado");
+    }
+    if (isAffirmative(item.parceria_superintendencia) || isAffirmative(item.hasParceriaSuperintendencia)) {
+      derived.add("encontro_mediado");
+    }
+    if (isAffirmative(item.lei_educacao_empreendedora) || isAffirmative(item.lei_possui) || isAffirmative(item.hasLaw)) {
+      derived.add("encontro_mediado");
+    }
+    if (isAffirmative(item.parceria_ies) || isAffirmative(item.ies_possui) || isAffirmative(item.hasIes)) {
+      derived.add("encontro_mediado");
+    }
+    insts = Array.from(derived);
+  } else if (typeof insts === "string") {
+    try { insts = JSON.parse(insts); } catch (e) { insts = insts.split(",").map(s => s.trim()).filter(Boolean); }
+  }
+  if (!Array.isArray(insts)) insts = [];
+
+  const pontuacao_instrumentos = insts.length * 10;
+  const destaque_instrumentos = insts.length >= 3;
+
   return {
     pontuacao: pontuacaoBruta,
     pontuacao_maxima: 55,
     percentual,
     classificacao,
     classificacao_key: classificacaoKey,
-    criterios
+    criterios,
+    instrumentos_aplicados: insts,
+    pontuacao_instrumentos,
+    destaque_instrumentos
   };
 }
 
@@ -549,31 +587,34 @@ function renderMunicipalitiesTable() {
       ? `<strong>${escapeHtml(item.responsavel_nome || item.solicitante_nome || item.tecnico_nome)}</strong><br><small style="color:#64748b;">${escapeHtml(item.responsavel_email || item.solicitante_email || item.tecnico_email || "")} ${(item.responsavel_telefone || item.solicitante_telefone || item.tecnico_telefone) ? `• ${escapeHtml(item.responsavel_telefone || item.solicitante_telefone || item.tecnico_telefone)}` : ""}</small>`
       : `<span style="color:#94a3b8;">Não informado</span>`;
 
-    // Indicators: JEPP (Sim=azul, Parcial=amarelo, Não=só no detalhamento)
-    let jeppBadge = "";
-    const jeppVal = String(item.status_jepp || "").trim().toLowerCase();
-    if (jeppVal === "sim") {
-      jeppBadge = `<span class="mini-badge jepp-sim" title="Programa JEPP: Sim">JEPP: Sim</span>`;
-    } else if (jeppVal === "parcial") {
-      jeppBadge = `<span class="mini-badge jepp-parcial" title="Programa JEPP: Parcial">JEPP: Parcial</span>`;
-    }
+    // Indicators: exibição completa com verde para SIM e avermelhado para NÃO
+    const isValSim = (v) => v === true || v === 1 || String(v || "").trim().toLowerCase() === "sim" || String(v || "").trim().toLowerCase() === "true" || String(v || "").trim().toLowerCase() === "total";
 
-    // Todos os indicadores selecionados como SIM citados
-    const isValSim = (v) => v === true || String(v || "").trim().toLowerCase() === "sim";
-    const indBadges = [];
-    if (isValSim(item.municipio_ee_70)) indBadges.push(`<span class="mini-badge sim" title="Possui Educação Empreendedora em mais de 70% do município?">EE &gt; 70%</span>`);
-    if (isValSim(item.convenio_sebrae)) indBadges.push(`<span class="mini-badge sim" title="Convênio/termo de parceria com o Sebrae">Convênio Sebrae</span>`);
-    if (isValSim(item.parceria_superintendencia)) indBadges.push(`<span class="mini-badge sim" title="Parceria com superintendência de ensino">Parceria Superintendência</span>`);
-    if (isValSim(item.cooperativa_possui)) indBadges.push(`<span class="mini-badge sim" title="Cooperativa Escolar/Crédito">Cooperativa</span>`);
-    if (isValSim(item.lei_possui)) indBadges.push(`<span class="mini-badge sim" title="Lei Municipal de Educação Empreendedora">Lei Educação Empreendedora</span>`);
-    if (isValSim(item.comite_possui)) indBadges.push(`<span class="mini-badge sim" title="Comitê Gestor Municipal">Comitê Gestor</span>`);
-    if (isValSim(item.ies_possui)) indBadges.push(`<span class="mini-badge sim" title="Parceria com Instituição de Ensino Superior">Parceria Inst. Ensino Superior</span>`);
-    if (isValSim(item.empresa_simulada)) indBadges.push(`<span class="mini-badge sim" title="Empresa Simulada">Emp. Simulada</span>`);
-    if (isValSim(item.escola_sebrae)) indBadges.push(`<span class="mini-badge sim" title="Sistema de Ensino Escola do Sebrae">Escola do Sebrae</span>`);
+    const jeppSim = isValSim(item.status_jepp);
+    const jeppBadge = jeppSim
+      ? `<span class="mini-badge sim" title="Programa JEPP: Sim">JEPP: Sim</span>`
+      : `<span class="mini-badge nao" title="Programa JEPP: Não">JEPP: Não</span>`;
 
-    const indicatorsHtml = (jeppBadge || indBadges.length > 0)
-      ? `${jeppBadge}${indBadges.join("")}`
-      : `<span style="color:#94a3b8; font-size:0.75rem;">Nenhum ativo</span>`;
+    const indDefinitions = [
+      { key: item.municipio_ee_70, label: "EE &gt; 70%", title: "Educação Empreendedora em mais de 70% do município" },
+      { key: item.convenio_sebrae, label: "Convênio Sebrae", title: "Convênio/termo de parceria com o Sebrae" },
+      { key: item.parceria_superintendencia, label: "Parceria Superintendência", title: "Parceria com superintendência de ensino" },
+      { key: item.cooperativa_possui, label: "Cooperativa", title: "Cooperativa Escolar/Crédito" },
+      { key: item.lei_possui, label: "Lei EE", title: "Lei Municipal de Educação Empreendedora" },
+      { key: item.comite_possui, label: "Comitê Gestor", title: "Comitê Gestor Municipal" },
+      { key: item.ies_possui, label: "Parceria IES", title: "Parceria com Instituição de Ensino Superior" },
+      { key: item.empresa_simulada, label: "Emp. Simulada", title: "Empresa Simulada" },
+      { key: item.escola_sebrae, label: "Escola do Sebrae", title: "Sistema de Ensino Escola do Sebrae" }
+    ];
+
+    const indBadges = indDefinitions.map(def => {
+      const isSim = isValSim(def.key);
+      const cls = isSim ? "sim" : "nao";
+      const statusText = isSim ? "Sim" : "Não";
+      return `<span class="mini-badge ${cls}" title="${def.title}: ${statusText}">${def.label}</span>`;
+    });
+
+    const indicatorsHtml = `<div style="display: flex; flex-wrap: wrap; gap: 4px; max-width: 320px;">${jeppBadge}${indBadges.join("")}</div>`;
 
     const actions = `
       <div class="row-actions" style="justify-content: flex-end;">
@@ -1034,19 +1075,10 @@ async function updateCaseStatus(id, newStatus, successMsg) {
 }
 
 function getIndicatorBadge(val) {
-  if (typeof val === "boolean") {
-    return val
-      ? `<span class="indicator-tag sim">Sim</span>`
-      : `<span class="indicator-tag nao">Não</span>`;
-  }
-  const s = String(val || "").trim().toLowerCase();
-  if (s === "sim") {
-    return `<span class="indicator-tag sim">Sim</span>`;
-  }
-  if (s === "parcial") {
-    return `<span class="indicator-tag parcial">Parcial</span>`;
-  }
-  return `<span class="indicator-tag nao">Não</span>`;
+  const isAffirmative = val === true || val === 1 || String(val || "").trim().toLowerCase() === "sim" || String(val || "").trim().toLowerCase() === "true" || String(val || "").trim().toLowerCase() === "total";
+  return isAffirmative
+    ? `<span class="indicator-tag sim">Sim</span>`
+    : `<span class="indicator-tag nao">Não</span>`;
 }
 
 function renderDevIndexCalculationMemory(item) {
@@ -1131,6 +1163,62 @@ function renderDevIndexCalculationMemory(item) {
             </tfoot>
           </table>
         </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderAdminMunicipalityInstruments(item) {
+  let insts = item.instrumentos_aplicados;
+  if (!insts && insts !== []) {
+    const devIdx = calculateMunicipioDevelopmentIndex(item);
+    insts = devIdx && devIdx.instrumentos_aplicados ? devIdx.instrumentos_aplicados : [];
+  } else if (typeof insts === "string") {
+    try { insts = JSON.parse(insts); } catch (e) { insts = insts.split(",").map(s => s.trim()).filter(Boolean); }
+  }
+  if (!Array.isArray(insts)) insts = [];
+
+  const pontuacao = insts.length * 10;
+  const hasDestaque = insts.length >= 3;
+
+  const labels = {
+    material_didatico: "Aplicação de Material Didático",
+    oficina: "Oficina",
+    curso: "Curso",
+    encontro_mediado: "Encontro Mediado",
+    palestra: "Palestra"
+  };
+
+  const pillsHtml = insts.length > 0
+    ? insts.map(code => `
+        <span class="instrument-pill">
+          <i data-lucide="check" style="width: 14px; height: 14px;"></i>
+          <span>${escapeHtml(labels[code] || code)}</span>
+          <span class="instrument-pill-pts">+10 pts</span>
+        </span>
+      `).join("")
+    : `<span style="color: #94a3b8; font-size: 0.85rem; font-style: italic;">Nenhum instrumento informado</span>`;
+
+  return `
+    <div class="admin-detail-card instruments-detail-box" style="margin-top: 16px;">
+      <div class="instruments-detail-header">
+        <div class="admin-card-title" style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #0054a6;">
+          <i data-lucide="layers"></i>
+          <span>Instrumentos Aplicados no Município</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="badge" style="background: #eff6ff; color: #0054a6; border: 1px solid #bfdbfe; font-size: 0.8rem; font-weight: 700;">
+            ${pontuacao} pontos (${insts.length}/5)
+          </span>
+          ${hasDestaque ? `
+            <span class="badge" style="background: #fefce8; color: #854d0e; border: 1.5px solid #fde047; font-weight: 700;">
+              ⭐ Destaque
+            </span>
+          ` : ""}
+        </div>
+      </div>
+      <div class="instruments-pills-container">
+        ${pillsHtml}
       </div>
     </div>
   `;
@@ -1276,6 +1364,7 @@ function openMunicipalityDetails(id) {
         </div>
       </div>
     </div>
+    ${renderAdminMunicipalityInstruments(item)}
     ${renderDevIndexCalculationMemory(item)}
   `;
 
@@ -1778,9 +1867,55 @@ function openEditMunicipalityModal(id) {
   document.getElementById("edit-mun-emp-sim").value = (item.empresa_simulada === 'sim' || item.empresa_simulada === true) ? "sim" : "nao";
   document.getElementById("edit-mun-esc-seb").value = (item.escola_sebrae === 'sim' || item.escola_sebrae === true) ? "sim" : "nao";
 
+  // Instrumentos Aplicados
+  let insts = item.instrumentos_aplicados;
+  if (!insts && insts !== []) {
+    const devIdx = calculateMunicipioDevelopmentIndex(item);
+    insts = devIdx && devIdx.instrumentos_aplicados ? devIdx.instrumentos_aplicados : [];
+  } else if (typeof insts === "string") {
+    try { insts = JSON.parse(insts); } catch (e) { insts = insts.split(",").map(s => s.trim()).filter(Boolean); }
+  }
+  if (!Array.isArray(insts)) insts = [];
+
+  const setEditInst = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.checked = insts.includes(val);
+  };
+  setEditInst("edit-inst-mat-didatico", "material_didatico");
+  setEditInst("edit-inst-oficina", "oficina");
+  setEditInst("edit-inst-curso", "curso");
+  setEditInst("edit-inst-encontro-mediado", "encontro_mediado");
+  setEditInst("edit-inst-palestra", "palestra");
+
   const modal = document.getElementById("modal-edit-municipality");
   if (modal) modal.classList.add("active");
   if (typeof lucide !== "undefined") lucide.createIcons();
+}
+
+function syncEditMunicipalityInstruments() {
+  const jepp = document.getElementById("edit-mun-jepp")?.value;
+  const empSim = document.getElementById("edit-mun-emp-sim")?.value;
+  const escSeb = document.getElementById("edit-mun-esc-seb")?.value;
+  const convSeb = document.getElementById("edit-mun-convenio")?.value;
+  const parcSup = document.getElementById("edit-mun-superintendencia")?.value;
+  const lei = document.getElementById("edit-mun-lei")?.value;
+  const ies = document.getElementById("edit-mun-ies")?.value;
+
+  const setChecked = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.checked = true;
+  };
+
+  if (jepp === "Sim") {
+    setChecked("edit-inst-mat-didatico");
+    setChecked("edit-inst-oficina");
+  }
+  if (empSim === "sim" || escSeb === "sim") {
+    setChecked("edit-inst-curso");
+  }
+  if (convSeb === "sim" || parcSup === "sim" || lei === "sim" || ies === "sim") {
+    setChecked("edit-inst-encontro-mediado");
+  }
 }
 
 function closeEditMunicipalityModal() {
@@ -1804,6 +1939,17 @@ async function handleSaveMunicipalityEdit(e) {
     return;
   }
 
+  const selectedInsts = [];
+  const checkEditInst = (id, val) => {
+    const el = document.getElementById(id);
+    if (el && el.checked) selectedInsts.push(val);
+  };
+  checkEditInst("edit-inst-mat-didatico", "material_didatico");
+  checkEditInst("edit-inst-oficina", "oficina");
+  checkEditInst("edit-inst-curso", "curso");
+  checkEditInst("edit-inst-encontro-mediado", "encontro_mediado");
+  checkEditInst("edit-inst-palestra", "palestra");
+
   const updatedFields = {
     nome: nome,
     municipio: nome,
@@ -1822,7 +1968,10 @@ async function handleSaveMunicipalityEdit(e) {
     comite_possui: document.getElementById("edit-mun-comite").value === "sim",
     ies_possui: document.getElementById("edit-mun-ies").value === "sim",
     empresa_simulada: document.getElementById("edit-mun-emp-sim").value === "sim",
-    escola_sebrae: document.getElementById("edit-mun-esc-seb").value === "sim"
+    escola_sebrae: document.getElementById("edit-mun-esc-seb").value === "sim",
+    instrumentos_aplicados: selectedInsts,
+    pontuacao_instrumentos: selectedInsts.length * 10,
+    destaque_instrumentos: selectedInsts.length >= 3
   };
 
   Object.assign(item, updatedFields);
@@ -2048,6 +2197,21 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("click", (e) => {
     if (e.target.id === "modal-municipality-details") closeMunicipalityDetailsModal();
     if (e.target.id === "modal-case-details") closeCaseDetailsModal();
+  });
+
+  // Auto-sync de instrumentos no modal de edição de município
+  const editMunSelectIds = [
+    "edit-mun-jepp",
+    "edit-mun-emp-sim",
+    "edit-mun-esc-seb",
+    "edit-mun-convenio",
+    "edit-mun-superintendencia",
+    "edit-mun-lei",
+    "edit-mun-ies"
+  ];
+  editMunSelectIds.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("change", syncEditMunicipalityInstruments);
   });
 
   checkAdminAuth();

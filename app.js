@@ -1777,13 +1777,10 @@ function calculateMunicipioDevelopmentIndex(item) {
   });
 
   const percentual = Math.round((pontuacaoBruta / 55.0) * 1000) / 10;
-  let classificacao = "Início";
-  let classificacaoKey = "inicio";
+  let classificacao = "Em Desenvolvimento";
+  let classificacaoKey = "em_desenvolvimento";
 
-  if (pontuacaoBruta <= 21) {
-    classificacao = "Início";
-    classificacaoKey = "inicio";
-  } else if (pontuacaoBruta <= 38) {
+  if (pontuacaoBruta <= 38) {
     classificacao = "Em Desenvolvimento";
     classificacaoKey = "em_desenvolvimento";
   } else {
@@ -1791,13 +1788,51 @@ function calculateMunicipioDevelopmentIndex(item) {
     classificacaoKey = "desenvolvido";
   }
 
+  // Instrumentos Aplicados (10 pts cada, mínimo 3 para destaque)
+  let insts = item.instrumentos_aplicados;
+  if (!insts && insts !== []) {
+    const derived = new Set();
+    if (isJeppAttended(item.jepp_municipio) || isJeppAttended(item.status_jepp) || isJeppAttended(item.jeppStatus)) {
+      derived.add("material_didatico");
+      derived.add("oficina");
+    }
+    if (isAffirmative(item.empresa_simulada) || isAffirmative(item.empresa_simulada_possui) || isAffirmative(item.hasEmpresaSimulada)) {
+      derived.add("curso");
+    }
+    if (isAffirmative(item.escola_sebrae) || isAffirmative(item.escola_sebrae_possui) || isAffirmative(item.hasEscolaSebrae)) {
+      derived.add("curso");
+    }
+    if (isAffirmative(item.convenio_parceria) || isAffirmative(item.convenio_sebrae) || isAffirmative(item.hasConvenioSebrae)) {
+      derived.add("encontro_mediado");
+    }
+    if (isAffirmative(item.parceria_superintendencia) || isAffirmative(item.hasParceriaSuperintendencia)) {
+      derived.add("encontro_mediado");
+    }
+    if (isAffirmative(item.lei_educacao_empreendedora) || isAffirmative(item.lei_possui) || isAffirmative(item.hasLaw)) {
+      derived.add("encontro_mediado");
+    }
+    if (isAffirmative(item.parceria_ies) || isAffirmative(item.ies_possui) || isAffirmative(item.hasIes)) {
+      derived.add("encontro_mediado");
+    }
+    insts = Array.from(derived);
+  } else if (typeof insts === "string") {
+    try { insts = JSON.parse(insts); } catch (e) { insts = insts.split(",").map(s => s.trim()).filter(Boolean); }
+  }
+  if (!Array.isArray(insts)) insts = [];
+
+  const pontuacao_instrumentos = insts.length * 10;
+  const destaque_instrumentos = insts.length >= 3;
+
   return {
     pontuacao: pontuacaoBruta,
     pontuacao_maxima: 55,
     percentual,
     classificacao,
     classificacao_key: classificacaoKey,
-    criterios
+    criterios,
+    instrumentos_aplicados: insts,
+    pontuacao_instrumentos,
+    destaque_instrumentos
   };
 }
 
@@ -2326,11 +2361,76 @@ function closeRegisterPanel() {
   document.getElementById("register-panel").classList.remove("active");
 }
 
+function updateMunicipalityInstrumentsUI() {
+  const checkboxes = document.querySelectorAll('input[name="municipality-instruments"]:checked');
+  const count = checkboxes.length;
+  const scoreBadge = document.getElementById("instruments-score-badge");
+  const destaqueBanner = document.getElementById("instruments-destaque-banner");
+
+  if (scoreBadge) {
+    scoreBadge.textContent = `${count * 10} pontos`;
+  }
+  if (destaqueBanner) {
+    destaqueBanner.style.display = count >= 3 ? "flex" : "none";
+  }
+}
+
+function syncMunicipalityInstrumentsFromIndicators() {
+  // Regras de auto-seleção:
+  // JEPP = Sim -> material_didatico e oficina
+  // Empresa Simulada = Sim -> curso
+  // Convênio Sebrae = Sim -> encontro_mediado
+  // Escola Sebrae = Sim -> curso
+  // Parceria Superintendência = Sim -> encontro_mediado
+  // Lei EE = Sim -> encontro_mediado
+  // Parceria IES = Sim -> encontro_mediado
+
+  const jeppRadio = document.querySelector('input[name="municipality-jepp-status"]:checked');
+  const jeppSim = jeppRadio && jeppRadio.value === "sim";
+
+  const empSimEl = document.querySelector('input[name="municipality-empresa-simulada"]:checked');
+  const empSim = empSimEl && empSimEl.value === "sim";
+
+  const convSebEl = document.querySelector('input[name="municipality-convenio-sebrae"]:checked');
+  const convSeb = convSebEl && convSebEl.value === "sim";
+
+  const escSebEl = document.querySelector('input[name="municipality-escola-sebrae"]:checked');
+  const escSeb = escSebEl && escSebEl.value === "sim";
+
+  const parcSupEl = document.querySelector('input[name="municipality-parceria-superintendencia"]:checked');
+  const parcSup = parcSupEl && parcSupEl.value === "sim";
+
+  const leiEl = document.querySelector('input[name="municipality-law"]:checked');
+  const leiSim = leiEl && leiEl.value === "sim";
+
+  const iesEl = document.querySelector('input[name="municipality-ies"]:checked');
+  const iesSim = iesEl && iesEl.value === "sim";
+
+  const setChecked = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.checked = true;
+  };
+
+  if (jeppSim) {
+    setChecked("inst-mat-didatico");
+    setChecked("inst-oficina");
+  }
+  if (empSim || escSeb) {
+    setChecked("inst-curso");
+  }
+  if (convSeb || parcSup || leiSim || iesSim) {
+    setChecked("inst-encontro-mediado");
+  }
+
+  updateMunicipalityInstrumentsUI();
+}
+
 function openMunicipalityModal() {
   const modal = document.getElementById("municipality-modal");
   if (modal) {
     const form = document.getElementById("municipality-form");
     if (form) form.reset();
+    updateMunicipalityInstrumentsUI();
     modal.classList.add("active");
     modal.style.display = "flex";
     lucide.createIcons({ root: modal });
@@ -2413,7 +2513,8 @@ async function handleMunicipalitySubmit(e) {
   const contactName = document.getElementById("municipality-contact-name").value.trim();
   const contactEmail = document.getElementById("municipality-contact-email").value.trim();
   const contactPhone = document.getElementById("municipality-contact-phone").value.trim();
-  const jeppStatus = document.getElementById("municipality-jepp-status").value;
+  const jeppRadio = document.querySelector('input[name="municipality-jepp-status"]:checked');
+  const jeppStatus = jeppRadio && jeppRadio.value === "sim" ? "Sim" : "Não";
 
   const nivelEnsinoEl = document.getElementById("municipality-nivel-ensino");
   const nivelEnsino = nivelEnsinoEl ? nivelEnsinoEl.value : "";
@@ -2469,6 +2570,13 @@ async function handleMunicipalitySubmit(e) {
   const parcSupEl = document.querySelector('input[name="municipality-parceria-superintendencia"]:checked');
   const hasParceriaSuperintendencia = parcSupEl ? parcSupEl.value === "sim" : false;
 
+  // Instrumentos aplicados no município
+  const selectedInstruments = Array.from(
+    document.querySelectorAll('input[name="municipality-instruments"]:checked')
+  ).map(cb => cb.value);
+  const pontuacaoInstrumentos = selectedInstruments.length * 10;
+  const destaqueInstrumentos = selectedInstruments.length >= 3;
+
   // Validação de telefone com DDD entre parênteses
   if (!isValidPhone(contactPhone)) {
     showToast("Por favor, preencha o Telefone/WhatsApp válido com DDD: (XX) XXXXX-XXXX");
@@ -2516,6 +2624,9 @@ async function handleMunicipalitySubmit(e) {
       ies_possui: hasIes,
       empresa_simulada: hasEmpresaSimulada,
       escola_sebrae: hasEscolaSebrae,
+      instrumentos_aplicados: selectedInstruments,
+      pontuacao_instrumentos: pontuacaoInstrumentos,
+      destaque_instrumentos: destaqueInstrumentos,
       status: "pending",
       created_at: new Date().toISOString()
     };
@@ -3035,7 +3146,30 @@ function bindEvents() {
   });
 
   const formMun = document.getElementById("municipality-form");
-  if (formMun) formMun.addEventListener("submit", handleMunicipalitySubmit);
+  if (formMun) {
+    formMun.addEventListener("submit", handleMunicipalitySubmit);
+
+    // Sincronização automática dos instrumentos a partir dos indicadores
+    const indicatorNames = [
+      "municipality-jepp-status",
+      "municipality-empresa-simulada",
+      "municipality-convenio-sebrae",
+      "municipality-escola-sebrae",
+      "municipality-parceria-superintendencia",
+      "municipality-law",
+      "municipality-ies"
+    ];
+    indicatorNames.forEach((radName) => {
+      formMun.querySelectorAll(`input[name="${radName}"]`).forEach((r) => {
+        r.addEventListener("change", syncMunicipalityInstrumentsFromIndicators);
+      });
+    });
+
+    // Atualização de pontuação e destaque ao marcar/desmarcar instrumentos
+    formMun.querySelectorAll('input[name="municipality-instruments"]').forEach((cb) => {
+      cb.addEventListener("change", updateMunicipalityInstrumentsUI);
+    });
+  }
 
   const btnCloseCode = document.getElementById("btn-close-code-modal");
   if (btnCloseCode) btnCloseCode.addEventListener("click", closeConfirmCodeModal);
@@ -3847,133 +3981,7 @@ let allMunicipalities = [];
 let developedMunicipalities = [];
 let developingMunicipalities = [];
 
-function calculateMunicipioDevelopmentIndex(item) {
-  if (!item) return null;
-  if (item.indice_desenvolvimento && Array.isArray(item.indice_desenvolvimento.criterios)) {
-    return item.indice_desenvolvimento;
-  }
 
-  const isAffirmative = (v) => {
-    if (v === true || v === 1) return true;
-    const s = String(v || "").trim().toLowerCase();
-    return s === "sim" || s === "true" || s === "1" || s === "total" || s === "sim (total)" || s === "parcial";
-  };
-
-  const isJeppAttended = (v) => {
-    const s = String(v || "").trim().toLowerCase();
-    return s === "sim" || s === "true" || s === "1" || s === "total" || s === "sim (total)" || s === "parcial";
-  };
-
-  const criteriaDefs = [
-    {
-      ordem: 1,
-      ordem_str: "1º",
-      nome: "Possui Educação Empreendedora em mais de 70% do município",
-      identificador: "educacao_70_porcento",
-      peso: 10,
-      atendido: isAffirmative(item.educacao_70_porcento) || isAffirmative(item.municipio_ee_70) || isAffirmative(item.edu70)
-    },
-    {
-      ordem: 2,
-      ordem_str: "2º",
-      nome: "JEPP no município",
-      identificador: "jepp_municipio",
-      peso: 9,
-      atendido: isJeppAttended(item.jepp_municipio) || isJeppAttended(item.status_jepp) || isJeppAttended(item.jeppStatus)
-    },
-    {
-      ordem: 3,
-      ordem_str: "3º",
-      nome: "Convênio / termo de parceria",
-      identificador: "convenio_parceria",
-      peso: 8,
-      atendido: isAffirmative(item.convenio_parceria) || isAffirmative(item.convenio_sebrae) || isAffirmative(item.hasConvenioSebrae)
-    },
-    {
-      ordem: 4,
-      ordem_str: "4º",
-      nome: "Comitê e ações conjuntas",
-      identificador: "comite_acoes_conjuntas",
-      peso: 7,
-      atendido: isAffirmative(item.comite_acoes_conjuntas) || isAffirmative(item.comite_possui) || isAffirmative(item.hasCommittee)
-    },
-    {
-      ordem: 5,
-      ordem_str: "5º",
-      nome: "Parceria com instituição de ensino superior",
-      identificador: "parceria_ies",
-      peso: 6,
-      atendido: isAffirmative(item.parceria_ies) || isAffirmative(item.ies_possui) || isAffirmative(item.hasIes)
-    },
-    {
-      ordem: 6,
-      ordem_str: "6º",
-      nome: "Empresa simulada",
-      identificador: "empresa_simulada",
-      peso: 5,
-      atendido: isAffirmative(item.empresa_simulada) || isAffirmative(item.empresa_simulada_possui) || isAffirmative(item.hasEmpresaSimulada)
-    },
-    {
-      ordem: 7,
-      ordem_str: "7º",
-      nome: "Sistema de ensino Escola do Sebrae",
-      identificador: "escola_sebrae",
-      peso: 4,
-      atendido: isAffirmative(item.escola_sebrae) || isAffirmative(item.escola_sebrae_possui) || isAffirmative(item.hasEscolaSebrae)
-    },
-    {
-      ordem: 8,
-      ordem_str: "8º",
-      nome: "Cooperativa de crédito",
-      identificador: "cooperativa_credito",
-      peso: 3,
-      atendido: isAffirmative(item.cooperativa_credito) || isAffirmative(item.cooperativa_possui) || isAffirmative(item.hasCoop)
-    },
-    {
-      ordem: 9,
-      ordem_str: "9º",
-      nome: "Parceria com superintendência de ensino",
-      identificador: "parceria_superintendencia",
-      peso: 2,
-      atendido: isAffirmative(item.parceria_superintendencia) || isAffirmative(item.hasParceriaSuperintendencia)
-    },
-    {
-      ordem: 10,
-      ordem_str: "10º",
-      nome: "Lei da educação empreendedora",
-      identificador: "lei_educacao_empreendedora",
-      peso: 1,
-      atendido: isAffirmative(item.lei_educacao_empreendedora) || isAffirmative(item.lei_possui) || isAffirmative(item.hasLaw)
-    }
-  ];
-
-  let pontuacao = 0;
-  const criterios = criteriaDefs.map(c => {
-    const pontos = c.atendido ? c.peso : 0;
-    pontuacao += pontos;
-    return { ...c, pontos };
-  });
-
-  const pontuacao_maxima = 55;
-  const percentual = Math.round((pontuacao / pontuacao_maxima) * 1000) / 10;
-
-  // Apenas duas classificações: Desenvolvido (>= 39) e Em Desenvolvimento (<= 38)
-  let classificacao = "Em Desenvolvimento";
-  let classificacao_key = "em_desenvolvimento";
-  if (pontuacao >= 39) {
-    classificacao = "Desenvolvido";
-    classificacao_key = "desenvolvido";
-  }
-
-  return {
-    pontuacao,
-    pontuacao_maxima,
-    percentual,
-    classificacao,
-    classificacao_key,
-    criterios
-  };
-}
 
 function renderPublicMunicipalityIndicators(item) {
   const devIndex = calculateMunicipioDevelopmentIndex(item);
@@ -3994,13 +4002,8 @@ function renderPublicMunicipalityIndicators(item) {
 
       <div class="mun-indicators-grid">
         ${criterios.map(c => {
-          let statusClass = c.atendido ? "sim" : "nao";
-          let statusText = c.atendido ? "Sim" : "Não";
-          const rawVal = String(item[c.identificador] || item.status_jepp || "").toLowerCase().trim();
-          if (rawVal.includes("parcial")) {
-            statusClass = "parcial";
-            statusText = "Parcial";
-          }
+          const statusClass = c.atendido ? "sim" : "nao";
+          const statusText = c.atendido ? "Sim" : "Não";
           return `
             <div class="mun-indicator-card">
               <span class="mun-indicator-name">${escapeHtml(c.nome)}</span>
@@ -4008,6 +4011,59 @@ function renderPublicMunicipalityIndicators(item) {
             </div>
           `;
         }).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function renderPublicMunicipalityInstruments(item) {
+  let insts = item.instrumentos_aplicados || [];
+  if (typeof insts === "string") {
+    try { insts = JSON.parse(insts); } catch (e) { insts = insts.split(",").map(s => s.trim()).filter(Boolean); }
+  }
+  if (!Array.isArray(insts)) insts = [];
+
+  const pontuacao = insts.length * 10;
+  const hasDestaque = insts.length >= 3;
+
+  const labels = {
+    material_didatico: "Aplicação de Material Didático",
+    oficina: "Oficina",
+    curso: "Curso",
+    encontro_mediado: "Encontro Mediado",
+    palestra: "Palestra"
+  };
+
+  const pillsHtml = insts.length > 0
+    ? insts.map(code => `
+        <span class="instrument-pill">
+          <i data-lucide="check" style="width: 14px; height: 14px;"></i>
+          <span>${escapeHtml(labels[code] || code)}</span>
+          <span class="instrument-pill-pts">+10 pts</span>
+        </span>
+      `).join("")
+    : `<span style="color: #94a3b8; font-size: 0.85rem; font-style: italic;">Nenhum instrumento informado</span>`;
+
+  return `
+    <div class="instruments-detail-box" style="margin-top: 16px;">
+      <div class="instruments-detail-header">
+        <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #0054a6;">
+          <i data-lucide="layers" style="width: 18px; height: 18px;"></i>
+          <span>Instrumentos Aplicados no Município</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="badge" style="background: #eff6ff; color: #0054a6; border: 1px solid #bfdbfe; font-size: 0.8rem; font-weight: 700;">
+            ${pontuacao} pontos (${insts.length}/5)
+          </span>
+          ${hasDestaque ? `
+            <span class="badge" style="background: #fefce8; color: #854d0e; border: 1.5px solid #fde047; font-weight: 700;">
+              ⭐ Destaque
+            </span>
+          ` : ""}
+        </div>
+      </div>
+      <div class="instruments-pills-container">
+        ${pillsHtml}
       </div>
     </div>
   `;
@@ -4439,6 +4495,9 @@ function openReferenciaMunDetails(id) {
 
       <!-- Grade dos 10 Indicadores -->
       ${renderPublicMunicipalityIndicators(item)}
+
+      <!-- Instrumentos Aplicados no Município -->
+      ${renderPublicMunicipalityInstruments(item)}
     `;
   }
 

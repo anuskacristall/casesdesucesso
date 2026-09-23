@@ -388,13 +388,47 @@ def calculate_municipio_development_index(item: dict) -> dict:
         classificacao = "Desenvolvido"
         classificacao_key = "desenvolvido"
 
+    # Instrumentos aplicados (10 pts cada, mínimo 3 para destaque)
+    insts = item.get("instrumentos_aplicados")
+    if insts is None:
+        derived = set()
+        if is_jepp_attended(item.get("jepp_municipio")) or is_jepp_attended(item.get("status_jepp")) or is_jepp_attended(item.get("jeppStatus")):
+            derived.add("material_didatico")
+            derived.add("oficina")
+        if is_affirmative(item.get("empresa_simulada")) or is_affirmative(item.get("empresa_simulada_possui")) or is_affirmative(item.get("hasEmpresaSimulada")):
+            derived.add("curso")
+        if is_affirmative(item.get("escola_sebrae")) or is_affirmative(item.get("escola_sebrae_possui")) or is_affirmative(item.get("hasEscolaSebrae")):
+            derived.add("curso")
+        if is_affirmative(item.get("convenio_parceria")) or is_affirmative(item.get("convenio_sebrae")) or is_affirmative(item.get("hasConvenioSebrae")):
+            derived.add("encontro_mediado")
+        if is_affirmative(item.get("parceria_superintendencia")) or is_affirmative(item.get("hasParceriaSuperintendencia")):
+            derived.add("encontro_mediado")
+        if is_affirmative(item.get("lei_educacao_empreendedora")) or is_affirmative(item.get("lei_possui")) or is_affirmative(item.get("hasLaw")):
+            derived.add("encontro_mediado")
+        if is_affirmative(item.get("parceria_ies")) or is_affirmative(item.get("ies_possui")) or is_affirmative(item.get("hasIes")):
+            derived.add("encontro_mediado")
+        insts = sorted(list(derived))
+    elif isinstance(insts, str):
+        try:
+            insts = json.loads(insts)
+        except Exception:
+            insts = [s.strip() for s in insts.split(",") if s.strip()]
+    if not isinstance(insts, list):
+        insts = []
+
+    pontuacao_inst = len(insts) * 10
+    destaque_inst = len(insts) >= 3
+
     return {
         "pontuacao": pontuacao_bruta,
         "pontuacao_maxima": 55,
         "percentual": percentual,
         "classificacao": classificacao,
         "classificacao_key": classificacao_key,
-        "criterios": criterios
+        "criterios": criterios,
+        "instrumentos_aplicados": insts,
+        "pontuacao_instrumentos": pontuacao_inst,
+        "destaque_instrumentos": destaque_inst
     }
 
 class SecureBackendHandler(SimpleHTTPRequestHandler):
@@ -556,6 +590,9 @@ class SecureBackendHandler(SimpleHTTPRequestHandler):
             m["indice_percentual"] = dev_idx["percentual"]
             m["indice_classificacao"] = dev_idx["classificacao"]
             m["indice_classificacao_key"] = dev_idx["classificacao_key"]
+            m["instrumentos_aplicados"] = dev_idx.get("instrumentos_aplicados", [])
+            m["pontuacao_instrumentos"] = dev_idx.get("pontuacao_instrumentos", 0)
+            m["destaque_instrumentos"] = dev_idx.get("destaque_instrumentos", False)
         self.send_json_response(200, muns)
 
     def handle_post_case(self):
