@@ -3845,6 +3845,7 @@ function performFilteredCSVExport() {
 
 let allMunicipalities = [];
 let developedMunicipalities = [];
+let developingMunicipalities = [];
 
 function calculateMunicipioDevelopmentIndex(item) {
   if (!item) return null;
@@ -4097,10 +4098,6 @@ function renderDevIndexCalculationMemory(item) {
     </div>
   `;
 }
-
-let allMunicipalities = [];
-let developedMunicipalities = [];
-let developingMunicipalities = [];
 
 async function loadMunicipalitiesData() {
   try {
