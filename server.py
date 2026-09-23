@@ -381,10 +381,7 @@ def calculate_municipio_development_index(item: dict) -> dict:
 
     percentual = round((pontuacao_bruta / 55.0) * 100, 1)
 
-    if pontuacao_bruta <= 21:
-        classificacao = "Início"
-        classificacao_key = "inicio"
-    elif pontuacao_bruta <= 38:
+    if pontuacao_bruta <= 38:
         classificacao = "Em Desenvolvimento"
         classificacao_key = "em_desenvolvimento"
     else:

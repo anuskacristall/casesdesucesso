@@ -163,13 +163,10 @@ function calculateMunicipioDevelopmentIndex(item) {
   });
 
   const percentual = Math.round((pontuacaoBruta / 55.0) * 1000) / 10;
-  let classificacao = "Início";
-  let classificacaoKey = "inicio";
+  let classificacao = "Em Desenvolvimento";
+  let classificacaoKey = "em_desenvolvimento";
 
-  if (pontuacaoBruta <= 21) {
-    classificacao = "Início";
-    classificacaoKey = "inicio";
-  } else if (pontuacaoBruta <= 38) {
+  if (pontuacaoBruta <= 38) {
     classificacao = "Em Desenvolvimento";
     classificacaoKey = "em_desenvolvimento";
   } else {
@@ -1058,7 +1055,6 @@ function renderDevIndexCalculationMemory(item) {
 
   const { pontuacao, pontuacao_maxima, percentual, classificacao, classificacao_key, criterios } = devIndex;
 
-  const isInicio = classificacao_key === "inicio";
   const isEmDesenv = classificacao_key === "em_desenvolvimento";
   const isDesenvolvido = classificacao_key === "desenvolvido";
 
@@ -1084,15 +1080,11 @@ function renderDevIndexCalculationMemory(item) {
           </div>
 
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <div style="padding: 6px 10px; border-radius: 6px; font-size: 0.73rem; font-weight: 700; display: flex; flex-direction: column; gap: 1px; ${isInicio ? 'background: #fef3c7; color: #92400e; border: 2px solid #f59e0b; box-shadow: 0 1px 4px rgba(245, 158, 11, 0.2);' : 'background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; opacity: 0.75;'}">
-              <span>Início</span>
-              <small style="font-weight: 600; font-size: 0.68rem;">0 a 21 pts (0% - 39%)</small>
-            </div>
-            <div style="padding: 6px 10px; border-radius: 6px; font-size: 0.73rem; font-weight: 700; display: flex; flex-direction: column; gap: 1px; ${isEmDesenv ? 'background: #e0f2fe; color: #0369a1; border: 2px solid #0284c7; box-shadow: 0 1px 4px rgba(2, 132, 199, 0.2);' : 'background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; opacity: 0.75;'}">
+            <div style="padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; display: flex; flex-direction: column; gap: 1px; ${isEmDesenv ? 'background: #e0f2fe; color: #0369a1; border: 2px solid #0284c7; box-shadow: 0 1px 4px rgba(2, 132, 199, 0.2);' : 'background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; opacity: 0.75;'}">
               <span>Em Desenvolvimento</span>
-              <small style="font-weight: 600; font-size: 0.68rem;">22 a 38 pts (40% - 69%)</small>
+              <small style="font-weight: 600; font-size: 0.68rem;">0 a 38 pts (0% - 69%)</small>
             </div>
-            <div style="padding: 6px 10px; border-radius: 6px; font-size: 0.73rem; font-weight: 700; display: flex; flex-direction: column; gap: 1px; ${isDesenvolvido ? 'background: #dcfce7; color: #15803d; border: 2px solid #22c55e; box-shadow: 0 1px 4px rgba(34, 197, 94, 0.2);' : 'background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; opacity: 0.75;'}">
+            <div style="padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; display: flex; flex-direction: column; gap: 1px; ${isDesenvolvido ? 'background: #dcfce7; color: #15803d; border: 2px solid #22c55e; box-shadow: 0 1px 4px rgba(34, 197, 94, 0.2);' : 'background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; opacity: 0.75;'}">
               <span>Desenvolvido</span>
               <small style="font-weight: 600; font-size: 0.68rem;">39 a 55 pts (70% - 100%)</small>
             </div>

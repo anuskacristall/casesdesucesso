@@ -45,7 +45,7 @@
   <script src="lib/lucide.min.js"></script>
   
   <!-- Style Sheet -->
-  <link rel="stylesheet" href="style.css?v=22">
+  <link rel="stylesheet" href="style.css?v=23">
 </head>
 <body class="light-theme">
   <!-- Login View -->
@@ -227,6 +227,23 @@
           </div>
           <div class="referencia-btn-right">
             <span id="badge-referencia-muns-count" class="referencia-count-badge">0</span>
+            <i data-lucide="chevron-right" class="referencia-arrow"></i>
+          </div>
+        </button>
+
+        <!-- Button: Municípios em Desenvolvimento -->
+        <button id="btn-open-em-desenvolvimento-muns" class="btn btn-em-desenvolvimento-muns" type="button" title="Ver municípios em desenvolvimento em Educação Empreendedora" style="margin-top: 6px;">
+          <div class="referencia-btn-left">
+            <div class="referencia-btn-icon">
+              <i data-lucide="trending-up"></i>
+            </div>
+            <div class="referencia-btn-texts">
+              <span class="referencia-btn-title">Municípios em Desenvolvimento</span>
+              <span class="referencia-btn-sub">Cidades em evolução nos indicadores</span>
+            </div>
+          </div>
+          <div class="referencia-btn-right">
+            <span id="badge-em-desenvolvimento-muns-count" class="referencia-count-badge">0</span>
             <i data-lucide="chevron-right" class="referencia-arrow"></i>
           </div>
         </button>
@@ -1142,16 +1159,16 @@
       <div class="modal-header" style="border-bottom: 1px solid var(--border-glass); padding-bottom: 14px;">
         <div class="modal-title-area">
           <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px;">
-            <span class="badge" style="background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+            <span class="badge" style="background: #e0f2fe; color: #0054a6; border: 1px solid #bfdbfe; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
               <i data-lucide="award" style="width: 13px; height: 13px;"></i> Municípios Desenvolvidos
             </span>
-            <span id="referencia-muns-total-badge" class="badge" style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; font-weight: 700;">
+            <span id="referencia-muns-total-badge" class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-weight: 700;">
               0 municípios
             </span>
           </div>
-          <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--accent-color); margin: 0;">Municípios de Referência e Sucesso</h2>
+          <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--accent-color); margin: 0;">Municípios de Referência</h2>
           <p style="margin: 4px 0 0 0; color: var(--text-muted); font-size: 0.92rem;">
-            Relação de municípios aprovados classificados como <strong>Desenvolvidos</strong> no Índice de Desenvolvimento Municipal (39 a 55 pontos).
+            Classificação baseada nos indicadores preenchidos no cadastro de cada município
           </p>
         </div>
         <button id="btn-close-referencia-modal" class="btn-close" type="button">&times;</button>
@@ -1161,7 +1178,7 @@
       <div style="padding: 14px 24px 8px 24px;">
         <div style="position: relative; width: 100%;">
           <i data-lucide="search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #94a3b8;"></i>
-          <input type="text" id="input-search-referencia-muns" placeholder="Buscar por município, regional, MR ou responsável..." style="width: 100%; padding: 10px 14px 10px 40px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-size: 0.92rem; background: #ffffff; outline: none; transition: border-color 0.2s ease;">
+          <input type="text" id="input-search-referencia-muns" placeholder="Buscar por município, regional, microrregião ou responsável..." style="width: 100%; padding: 10px 14px 10px 40px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-size: 0.92rem; background: #ffffff; outline: none; transition: border-color 0.2s ease;">
         </div>
       </div>
 
@@ -1172,10 +1189,10 @@
             <thead>
               <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #475569; font-weight: 700; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.5px;">
                 <th style="padding: 12px 14px; width: 180px;">Regional</th>
-                <th style="padding: 12px 14px; width: 180px;">MR</th>
+                <th style="padding: 12px 14px; width: 180px;">Microrregião</th>
                 <th style="padding: 12px 14px;">Município</th>
                 <th style="padding: 12px 14px;">Responsável</th>
-                <th style="padding: 12px 14px; text-align: right; width: 220px;">Indicadores</th>
+                <th style="padding: 12px 14px; text-align: right; width: 160px;">Indicadores</th>
               </tr>
             </thead>
             <tbody id="referencia-muns-tbody">
@@ -1187,22 +1204,84 @@
     </div>
   </div>
 
-  <!-- MODAL: DETALHES DE INDICADORES DO MUNICÍPIO (MEMÓRIA DE CÁLCULO) -->
+  <!-- MODAL: LISTAGEM DE MUNICÍPIOS EM DESENVOLVIMENTO -->
+  <div id="modal-municipios-em-desenvolvimento" class="modal-wrapper">
+    <div class="modal-content glass-panel animate-zoom modal-large" style="max-width: 1080px; width: 95%;">
+      <!-- Header -->
+      <div class="modal-header" style="border-bottom: 1px solid var(--border-glass); padding-bottom: 14px;">
+        <div class="modal-title-area">
+          <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px;">
+            <span class="badge" style="background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+              <i data-lucide="trending-up" style="width: 13px; height: 13px;"></i> Municípios em Desenvolvimento
+            </span>
+            <span id="em-desenvolvimento-muns-total-badge" class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-weight: 700;">
+              0 municípios
+            </span>
+          </div>
+          <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--accent-color); margin: 0;">Municípios em Desenvolvimento</h2>
+          <p style="margin: 4px 0 0 0; color: var(--text-muted); font-size: 0.92rem;">
+            Classificação baseada nos indicadores preenchidos no cadastro de cada município
+          </p>
+        </div>
+        <button id="btn-close-em-desenvolvimento-modal" class="btn-close" type="button">&times;</button>
+      </div>
+
+      <!-- Barra de Busca Rápida -->
+      <div style="padding: 14px 24px 8px 24px;">
+        <div style="position: relative; width: 100%;">
+          <i data-lucide="search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #94a3b8;"></i>
+          <input type="text" id="input-search-em-desenvolvimento-muns" placeholder="Buscar por município, regional, microrregião ou responsável..." style="width: 100%; padding: 10px 14px 10px 40px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-size: 0.92rem; background: #ffffff; outline: none; transition: border-color 0.2s ease;">
+        </div>
+      </div>
+
+      <!-- Tabela Estilo Admin -->
+      <div class="modal-body" style="padding: 8px 24px 24px 24px; max-height: calc(85vh - 200px); overflow-y: auto;">
+        <div style="overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 10px; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+          <table class="admin-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem;">
+            <thead>
+              <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #475569; font-weight: 700; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                <th style="padding: 12px 14px; width: 180px;">Regional</th>
+                <th style="padding: 12px 14px; width: 180px;">Microrregião</th>
+                <th style="padding: 12px 14px;">Município</th>
+                <th style="padding: 12px 14px;">Responsável</th>
+                <th style="padding: 12px 14px; text-align: right; width: 160px;">Indicadores</th>
+              </tr>
+            </thead>
+            <tbody id="em-desenvolvimento-muns-tbody">
+              <!-- Renderizado dinamicamente -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DETALHES DE INDICADORES DO MUNICÍPIO -->
   <div id="modal-referencia-mun-details" class="modal-wrapper">
     <div class="modal-content glass-panel animate-zoom modal-large" style="max-width: 900px; width: 95%;">
-      <div class="modal-header" style="border-bottom: 1px solid var(--border-glass); padding-bottom: 14px;">
+      <div class="modal-header" style="border-bottom: 1px solid var(--border-glass); padding-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
         <div class="modal-title-area">
           <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px;">
             <span id="ref-mun-detail-regional-badge" class="badge">Regional</span>
-            <span class="badge" style="background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; font-weight: 700;">Município Desenvolvido</span>
+            <span id="ref-mun-detail-tier-badge" class="badge" style="background: #e0f2fe; color: #0054a6; border: 1px solid #bfdbfe; font-weight: 700;">Município Desenvolvido</span>
           </div>
           <h2 id="ref-mun-detail-title" style="font-size: 1.6rem; font-weight: 800; color: var(--accent-color); margin: 0;">Nome do Município</h2>
-          <p id="ref-mun-detail-subtitle" style="margin: 4px 0 0 0; color: var(--text-muted); font-size: 0.92rem;"><i data-lucide="map-pin"></i> MR ...</p>
+          <p id="ref-mun-detail-subtitle" style="margin: 4px 0 0 0; color: var(--text-muted); font-size: 0.92rem; display: flex; align-items: center; gap: 6px;">
+            <i data-lucide="map-pin" style="width: 15px; height: 15px; flex-shrink: 0;"></i>
+            <span id="ref-mun-detail-mr-text">Microrregião ...</span>
+          </p>
         </div>
-        <button id="btn-close-ref-mun-details" class="btn-close" type="button">&times;</button>
+        
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div class="mun-cases-counter-card">
+            <span class="mun-cases-counter-label">Cases do município</span>
+            <span id="ref-mun-cases-count" class="mun-cases-counter-val">0</span>
+          </div>
+          <button id="btn-close-ref-mun-details" class="btn-close" type="button" style="position: static; margin: 0;">&times;</button>
+        </div>
       </div>
       <div id="ref-mun-detail-body" class="modal-body" style="padding: 20px 24px; max-height: calc(85vh - 160px); overflow-y: auto;">
-        <!-- Preenchido dinamicamente com dados gerais, responsável e tabela de 10 indicadores -->
+        <!-- Preenchido dinamicamente com dados gerais, responsável e grid de 10 indicadores -->
       </div>
     </div>
   </div>
@@ -1214,6 +1293,6 @@
   <script src="config.js"></script>
 
   <!-- Script Principal -->
-  <script src="app.js?v=40"></script>
+  <script src="app.js?v=41"></script>
 </body>
 </html>

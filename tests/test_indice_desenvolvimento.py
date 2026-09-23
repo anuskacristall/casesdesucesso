@@ -68,14 +68,14 @@ class TestIndiceDesenvolvimento(unittest.TestCase):
         - Em Desenvolvimento: 22 a 38 pts (40% a 69%)
         - Desenvolvido: 39 a 55 pts (70% a 100%)
         """
-        # 0 pontos -> Início
+        # 0 pontos -> Em Desenvolvimento (faixa unificada de 0 a 38 pontos)
         res0 = calculate_municipio_development_index({})
         self.assertEqual(res0["pontuacao"], 0)
         self.assertEqual(res0["percentual"], 0.0)
-        self.assertEqual(res0["classificacao"], "Início")
-        self.assertEqual(res0["classificacao_key"], "inicio")
+        self.assertEqual(res0["classificacao"], "Em Desenvolvimento")
+        self.assertEqual(res0["classificacao_key"], "em_desenvolvimento")
 
-        # 21 pontos (peso 10 + 8 + 3 = 21) -> Início
+        # 21 pontos (peso 10 + 8 + 3 = 21) -> Em Desenvolvimento
         res21 = calculate_municipio_development_index({
             "educacao_70_porcento": True,  # 10
             "convenio_parceria": True,    # 8
@@ -83,8 +83,8 @@ class TestIndiceDesenvolvimento(unittest.TestCase):
         })
         self.assertEqual(res21["pontuacao"], 21)
         self.assertEqual(res21["percentual"], 38.2)
-        self.assertEqual(res21["classificacao"], "Início")
-        self.assertEqual(res21["classificacao_key"], "inicio")
+        self.assertEqual(res21["classificacao"], "Em Desenvolvimento")
+        self.assertEqual(res21["classificacao_key"], "em_desenvolvimento")
 
         # 22 pontos (peso 10 + 9 + 3 = 22) -> Em Desenvolvimento
         res22 = calculate_municipio_development_index({
