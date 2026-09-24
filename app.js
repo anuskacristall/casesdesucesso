@@ -4280,6 +4280,10 @@ async function loadMunicipalitiesData() {
     const res = await fetch(getApiUrl("/api/municipalities"));
     if (res.ok) {
       allMunicipalities = await res.json();
+      try {
+        const approvedList = (Array.isArray(allMunicipalities) ? allMunicipalities : []).filter(m => m.status === "approved");
+        localStorage.setItem("sebrae_approved_municipalities", JSON.stringify(approvedList));
+      } catch (err) {}
     }
   } catch (e) {
     try {

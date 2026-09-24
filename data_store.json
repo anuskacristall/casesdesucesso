@@ -94,7 +94,159 @@
       "ies_possui": true,
       "empresa_simulada": false,
       "escola_sebrae": true,
-      "created_at": "2026-09-01T10:00:00.000Z"
+      "created_at": "2026-09-01T10:00:00.000Z",
+      "parceria_secretaria_educacao": true,
+      "secretaria_educacao_possui": true,
+      "produto_despertar": true,
+      "despertar_possui": true,
+      "rede_aqui_tem_sebrae": true,
+      "aqui_tem_sebrae_possui": true,
+      "indice_desenvolvimento": {
+        "pontuacao": 87,
+        "pontuacao_maxima": 91,
+        "percentual": 95.6,
+        "classificacao": "Desenvolvido",
+        "classificacao_key": "desenvolvido",
+        "criterios": [
+          {
+            "ordem": 1,
+            "ordem_str": "1º",
+            "nome": "Possui Educação Empreendedora em mais de 70% do município",
+            "identificador": "educacao_70_porcento",
+            "peso": 13,
+            "atendido": true,
+            "pontos": 13
+          },
+          {
+            "ordem": 2,
+            "ordem_str": "2º",
+            "nome": "Parceria com Secretária Municipal de Educação",
+            "identificador": "parceria_secretaria_educacao",
+            "peso": 12,
+            "atendido": true,
+            "pontos": 12
+          },
+          {
+            "ordem": 3,
+            "ordem_str": "3º",
+            "nome": "JEPP no município",
+            "identificador": "jepp_municipio",
+            "peso": 11,
+            "atendido": true,
+            "pontos": 11
+          },
+          {
+            "ordem": 4,
+            "ordem_str": "4º",
+            "nome": "Produto Despertar implantado",
+            "identificador": "produto_despertar",
+            "peso": 10,
+            "atendido": true,
+            "pontos": 10
+          },
+          {
+            "ordem": 5,
+            "ordem_str": "5º",
+            "nome": "Parceria com superintendência de ensino",
+            "identificador": "parceria_superintendencia",
+            "peso": 9,
+            "atendido": true,
+            "pontos": 9
+          },
+          {
+            "ordem": 6,
+            "ordem_str": "6º",
+            "nome": "Parceria com instituição de ensino superior",
+            "identificador": "parceria_ies",
+            "peso": 8,
+            "atendido": true,
+            "pontos": 8
+          },
+          {
+            "ordem": 7,
+            "ordem_str": "7º",
+            "nome": "Rede Aqui Tem Sebrae",
+            "identificador": "rede_aqui_tem_sebrae",
+            "peso": 7,
+            "atendido": true,
+            "pontos": 7
+          },
+          {
+            "ordem": 8,
+            "ordem_str": "8º",
+            "nome": "Convênio / termo de parceria",
+            "identificador": "convenio_parceria",
+            "peso": 6,
+            "atendido": true,
+            "pontos": 6
+          },
+          {
+            "ordem": 9,
+            "ordem_str": "9º",
+            "nome": "Comitê e ações conjuntas",
+            "identificador": "comite_acoes_conjuntas",
+            "peso": 5,
+            "atendido": true,
+            "pontos": 5
+          },
+          {
+            "ordem": 10,
+            "ordem_str": "10º",
+            "nome": "Empresa simulada",
+            "identificador": "empresa_simulada",
+            "peso": 4,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 11,
+            "ordem_str": "11º",
+            "nome": "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+            "identificador": "escola_sebrae",
+            "peso": 3,
+            "atendido": true,
+            "pontos": 3
+          },
+          {
+            "ordem": 12,
+            "ordem_str": "12º",
+            "nome": "Parceria com Cooperativa de Crédito",
+            "identificador": "cooperativa_credito",
+            "peso": 2,
+            "atendido": true,
+            "pontos": 2
+          },
+          {
+            "ordem": 13,
+            "ordem_str": "13º",
+            "nome": "Lei da educação empreendedora",
+            "identificador": "lei_educacao_empreendedora",
+            "peso": 1,
+            "atendido": true,
+            "pontos": 1
+          }
+        ],
+        "instrumentos_aplicados": [
+          "curso",
+          "encontro_mediado",
+          "material_didatico",
+          "oficina"
+        ],
+        "pontuacao_instrumentos": 40,
+        "destaque_instrumentos": true
+      },
+      "indice_pontuacao": 87,
+      "indice_percentual": 95.6,
+      "indice_classificacao": "Desenvolvido",
+      "indice_classificacao_key": "desenvolvido",
+      "instrumentos_aplicados": [
+        "curso",
+        "encontro_mediado",
+        "material_didatico",
+        "oficina"
+      ],
+      "pontuacao_instrumentos": 40,
+      "destaque_instrumentos": true
     },
     {
       "id": "mun-betim",
@@ -116,7 +268,157 @@
       "ies_possui": true,
       "empresa_simulada": false,
       "escola_sebrae": false,
-      "created_at": "2026-09-01T10:00:00.000Z"
+      "created_at": "2026-09-01T10:00:00.000Z",
+      "parceria_secretaria_educacao": true,
+      "secretaria_educacao_possui": true,
+      "produto_despertar": true,
+      "despertar_possui": true,
+      "rede_aqui_tem_sebrae": true,
+      "aqui_tem_sebrae_possui": true,
+      "indice_desenvolvimento": {
+        "pontuacao": 84,
+        "pontuacao_maxima": 91,
+        "percentual": 92.3,
+        "classificacao": "Desenvolvido",
+        "classificacao_key": "desenvolvido",
+        "criterios": [
+          {
+            "ordem": 1,
+            "ordem_str": "1º",
+            "nome": "Possui Educação Empreendedora em mais de 70% do município",
+            "identificador": "educacao_70_porcento",
+            "peso": 13,
+            "atendido": true,
+            "pontos": 13
+          },
+          {
+            "ordem": 2,
+            "ordem_str": "2º",
+            "nome": "Parceria com Secretária Municipal de Educação",
+            "identificador": "parceria_secretaria_educacao",
+            "peso": 12,
+            "atendido": true,
+            "pontos": 12
+          },
+          {
+            "ordem": 3,
+            "ordem_str": "3º",
+            "nome": "JEPP no município",
+            "identificador": "jepp_municipio",
+            "peso": 11,
+            "atendido": true,
+            "pontos": 11
+          },
+          {
+            "ordem": 4,
+            "ordem_str": "4º",
+            "nome": "Produto Despertar implantado",
+            "identificador": "produto_despertar",
+            "peso": 10,
+            "atendido": true,
+            "pontos": 10
+          },
+          {
+            "ordem": 5,
+            "ordem_str": "5º",
+            "nome": "Parceria com superintendência de ensino",
+            "identificador": "parceria_superintendencia",
+            "peso": 9,
+            "atendido": true,
+            "pontos": 9
+          },
+          {
+            "ordem": 6,
+            "ordem_str": "6º",
+            "nome": "Parceria com instituição de ensino superior",
+            "identificador": "parceria_ies",
+            "peso": 8,
+            "atendido": true,
+            "pontos": 8
+          },
+          {
+            "ordem": 7,
+            "ordem_str": "7º",
+            "nome": "Rede Aqui Tem Sebrae",
+            "identificador": "rede_aqui_tem_sebrae",
+            "peso": 7,
+            "atendido": true,
+            "pontos": 7
+          },
+          {
+            "ordem": 8,
+            "ordem_str": "8º",
+            "nome": "Convênio / termo de parceria",
+            "identificador": "convenio_parceria",
+            "peso": 6,
+            "atendido": true,
+            "pontos": 6
+          },
+          {
+            "ordem": 9,
+            "ordem_str": "9º",
+            "nome": "Comitê e ações conjuntas",
+            "identificador": "comite_acoes_conjuntas",
+            "peso": 5,
+            "atendido": true,
+            "pontos": 5
+          },
+          {
+            "ordem": 10,
+            "ordem_str": "10º",
+            "nome": "Empresa simulada",
+            "identificador": "empresa_simulada",
+            "peso": 4,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 11,
+            "ordem_str": "11º",
+            "nome": "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+            "identificador": "escola_sebrae",
+            "peso": 3,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 12,
+            "ordem_str": "12º",
+            "nome": "Parceria com Cooperativa de Crédito",
+            "identificador": "cooperativa_credito",
+            "peso": 2,
+            "atendido": true,
+            "pontos": 2
+          },
+          {
+            "ordem": 13,
+            "ordem_str": "13º",
+            "nome": "Lei da educação empreendedora",
+            "identificador": "lei_educacao_empreendedora",
+            "peso": 1,
+            "atendido": true,
+            "pontos": 1
+          }
+        ],
+        "instrumentos_aplicados": [
+          "encontro_mediado",
+          "material_didatico",
+          "oficina"
+        ],
+        "pontuacao_instrumentos": 30,
+        "destaque_instrumentos": true
+      },
+      "indice_pontuacao": 84,
+      "indice_percentual": 92.3,
+      "indice_classificacao": "Desenvolvido",
+      "indice_classificacao_key": "desenvolvido",
+      "instrumentos_aplicados": [
+        "encontro_mediado",
+        "material_didatico",
+        "oficina"
+      ],
+      "pontuacao_instrumentos": 30,
+      "destaque_instrumentos": true
     },
     {
       "id": "mun-campo-belo",
@@ -138,7 +440,157 @@
       "ies_possui": true,
       "empresa_simulada": false,
       "escola_sebrae": false,
-      "created_at": "2026-09-01T10:00:00.000Z"
+      "created_at": "2026-09-01T10:00:00.000Z",
+      "parceria_secretaria_educacao": true,
+      "secretaria_educacao_possui": true,
+      "produto_despertar": false,
+      "despertar_possui": false,
+      "rede_aqui_tem_sebrae": false,
+      "aqui_tem_sebrae_possui": false,
+      "indice_desenvolvimento": {
+        "pontuacao": 51,
+        "pontuacao_maxima": 91,
+        "percentual": 56.0,
+        "classificacao": "Em Desenvolvimento",
+        "classificacao_key": "em_desenvolvimento",
+        "criterios": [
+          {
+            "ordem": 1,
+            "ordem_str": "1º",
+            "nome": "Possui Educação Empreendedora em mais de 70% do município",
+            "identificador": "educacao_70_porcento",
+            "peso": 13,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 2,
+            "ordem_str": "2º",
+            "nome": "Parceria com Secretária Municipal de Educação",
+            "identificador": "parceria_secretaria_educacao",
+            "peso": 12,
+            "atendido": true,
+            "pontos": 12
+          },
+          {
+            "ordem": 3,
+            "ordem_str": "3º",
+            "nome": "JEPP no município",
+            "identificador": "jepp_municipio",
+            "peso": 11,
+            "atendido": true,
+            "pontos": 11
+          },
+          {
+            "ordem": 4,
+            "ordem_str": "4º",
+            "nome": "Produto Despertar implantado",
+            "identificador": "produto_despertar",
+            "peso": 10,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 5,
+            "ordem_str": "5º",
+            "nome": "Parceria com superintendência de ensino",
+            "identificador": "parceria_superintendencia",
+            "peso": 9,
+            "atendido": true,
+            "pontos": 9
+          },
+          {
+            "ordem": 6,
+            "ordem_str": "6º",
+            "nome": "Parceria com instituição de ensino superior",
+            "identificador": "parceria_ies",
+            "peso": 8,
+            "atendido": true,
+            "pontos": 8
+          },
+          {
+            "ordem": 7,
+            "ordem_str": "7º",
+            "nome": "Rede Aqui Tem Sebrae",
+            "identificador": "rede_aqui_tem_sebrae",
+            "peso": 7,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 8,
+            "ordem_str": "8º",
+            "nome": "Convênio / termo de parceria",
+            "identificador": "convenio_parceria",
+            "peso": 6,
+            "atendido": true,
+            "pontos": 6
+          },
+          {
+            "ordem": 9,
+            "ordem_str": "9º",
+            "nome": "Comitê e ações conjuntas",
+            "identificador": "comite_acoes_conjuntas",
+            "peso": 5,
+            "atendido": true,
+            "pontos": 5
+          },
+          {
+            "ordem": 10,
+            "ordem_str": "10º",
+            "nome": "Empresa simulada",
+            "identificador": "empresa_simulada",
+            "peso": 4,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 11,
+            "ordem_str": "11º",
+            "nome": "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+            "identificador": "escola_sebrae",
+            "peso": 3,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 12,
+            "ordem_str": "12º",
+            "nome": "Parceria com Cooperativa de Crédito",
+            "identificador": "cooperativa_credito",
+            "peso": 2,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 13,
+            "ordem_str": "13º",
+            "nome": "Lei da educação empreendedora",
+            "identificador": "lei_educacao_empreendedora",
+            "peso": 1,
+            "atendido": false,
+            "pontos": 0
+          }
+        ],
+        "instrumentos_aplicados": [
+          "encontro_mediado",
+          "material_didatico",
+          "oficina"
+        ],
+        "pontuacao_instrumentos": 30,
+        "destaque_instrumentos": true
+      },
+      "indice_pontuacao": 51,
+      "indice_percentual": 56.0,
+      "indice_classificacao": "Em Desenvolvimento",
+      "indice_classificacao_key": "em_desenvolvimento",
+      "instrumentos_aplicados": [
+        "encontro_mediado",
+        "material_didatico",
+        "oficina"
+      ],
+      "pontuacao_instrumentos": 30,
+      "destaque_instrumentos": true
     },
     {
       "id": "mun-diamantina",
@@ -160,7 +612,157 @@
       "ies_possui": true,
       "empresa_simulada": false,
       "escola_sebrae": false,
-      "created_at": "2026-09-01T10:00:00.000Z"
+      "created_at": "2026-09-01T10:00:00.000Z",
+      "parceria_secretaria_educacao": true,
+      "secretaria_educacao_possui": true,
+      "produto_despertar": false,
+      "despertar_possui": false,
+      "rede_aqui_tem_sebrae": false,
+      "aqui_tem_sebrae_possui": false,
+      "indice_desenvolvimento": {
+        "pontuacao": 51,
+        "pontuacao_maxima": 91,
+        "percentual": 56.0,
+        "classificacao": "Em Desenvolvimento",
+        "classificacao_key": "em_desenvolvimento",
+        "criterios": [
+          {
+            "ordem": 1,
+            "ordem_str": "1º",
+            "nome": "Possui Educação Empreendedora em mais de 70% do município",
+            "identificador": "educacao_70_porcento",
+            "peso": 13,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 2,
+            "ordem_str": "2º",
+            "nome": "Parceria com Secretária Municipal de Educação",
+            "identificador": "parceria_secretaria_educacao",
+            "peso": 12,
+            "atendido": true,
+            "pontos": 12
+          },
+          {
+            "ordem": 3,
+            "ordem_str": "3º",
+            "nome": "JEPP no município",
+            "identificador": "jepp_municipio",
+            "peso": 11,
+            "atendido": true,
+            "pontos": 11
+          },
+          {
+            "ordem": 4,
+            "ordem_str": "4º",
+            "nome": "Produto Despertar implantado",
+            "identificador": "produto_despertar",
+            "peso": 10,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 5,
+            "ordem_str": "5º",
+            "nome": "Parceria com superintendência de ensino",
+            "identificador": "parceria_superintendencia",
+            "peso": 9,
+            "atendido": true,
+            "pontos": 9
+          },
+          {
+            "ordem": 6,
+            "ordem_str": "6º",
+            "nome": "Parceria com instituição de ensino superior",
+            "identificador": "parceria_ies",
+            "peso": 8,
+            "atendido": true,
+            "pontos": 8
+          },
+          {
+            "ordem": 7,
+            "ordem_str": "7º",
+            "nome": "Rede Aqui Tem Sebrae",
+            "identificador": "rede_aqui_tem_sebrae",
+            "peso": 7,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 8,
+            "ordem_str": "8º",
+            "nome": "Convênio / termo de parceria",
+            "identificador": "convenio_parceria",
+            "peso": 6,
+            "atendido": true,
+            "pontos": 6
+          },
+          {
+            "ordem": 9,
+            "ordem_str": "9º",
+            "nome": "Comitê e ações conjuntas",
+            "identificador": "comite_acoes_conjuntas",
+            "peso": 5,
+            "atendido": true,
+            "pontos": 5
+          },
+          {
+            "ordem": 10,
+            "ordem_str": "10º",
+            "nome": "Empresa simulada",
+            "identificador": "empresa_simulada",
+            "peso": 4,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 11,
+            "ordem_str": "11º",
+            "nome": "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+            "identificador": "escola_sebrae",
+            "peso": 3,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 12,
+            "ordem_str": "12º",
+            "nome": "Parceria com Cooperativa de Crédito",
+            "identificador": "cooperativa_credito",
+            "peso": 2,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 13,
+            "ordem_str": "13º",
+            "nome": "Lei da educação empreendedora",
+            "identificador": "lei_educacao_empreendedora",
+            "peso": 1,
+            "atendido": false,
+            "pontos": 0
+          }
+        ],
+        "instrumentos_aplicados": [
+          "encontro_mediado",
+          "material_didatico",
+          "oficina"
+        ],
+        "pontuacao_instrumentos": 30,
+        "destaque_instrumentos": true
+      },
+      "indice_pontuacao": 51,
+      "indice_percentual": 56.0,
+      "indice_classificacao": "Em Desenvolvimento",
+      "indice_classificacao_key": "em_desenvolvimento",
+      "instrumentos_aplicados": [
+        "encontro_mediado",
+        "material_didatico",
+        "oficina"
+      ],
+      "pontuacao_instrumentos": 30,
+      "destaque_instrumentos": true
     },
     {
       "id": "mun-divinopolis",
@@ -182,7 +784,157 @@
       "ies_possui": true,
       "empresa_simulada": false,
       "escola_sebrae": false,
-      "created_at": "2026-09-01T10:00:00.000Z"
+      "created_at": "2026-09-01T10:00:00.000Z",
+      "parceria_secretaria_educacao": true,
+      "secretaria_educacao_possui": true,
+      "produto_despertar": false,
+      "despertar_possui": false,
+      "rede_aqui_tem_sebrae": false,
+      "aqui_tem_sebrae_possui": false,
+      "indice_desenvolvimento": {
+        "pontuacao": 49,
+        "pontuacao_maxima": 91,
+        "percentual": 53.8,
+        "classificacao": "Em Desenvolvimento",
+        "classificacao_key": "em_desenvolvimento",
+        "criterios": [
+          {
+            "ordem": 1,
+            "ordem_str": "1º",
+            "nome": "Possui Educação Empreendedora em mais de 70% do município",
+            "identificador": "educacao_70_porcento",
+            "peso": 13,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 2,
+            "ordem_str": "2º",
+            "nome": "Parceria com Secretária Municipal de Educação",
+            "identificador": "parceria_secretaria_educacao",
+            "peso": 12,
+            "atendido": true,
+            "pontos": 12
+          },
+          {
+            "ordem": 3,
+            "ordem_str": "3º",
+            "nome": "JEPP no município",
+            "identificador": "jepp_municipio",
+            "peso": 11,
+            "atendido": true,
+            "pontos": 11
+          },
+          {
+            "ordem": 4,
+            "ordem_str": "4º",
+            "nome": "Produto Despertar implantado",
+            "identificador": "produto_despertar",
+            "peso": 10,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 5,
+            "ordem_str": "5º",
+            "nome": "Parceria com superintendência de ensino",
+            "identificador": "parceria_superintendencia",
+            "peso": 9,
+            "atendido": true,
+            "pontos": 9
+          },
+          {
+            "ordem": 6,
+            "ordem_str": "6º",
+            "nome": "Parceria com instituição de ensino superior",
+            "identificador": "parceria_ies",
+            "peso": 8,
+            "atendido": true,
+            "pontos": 8
+          },
+          {
+            "ordem": 7,
+            "ordem_str": "7º",
+            "nome": "Rede Aqui Tem Sebrae",
+            "identificador": "rede_aqui_tem_sebrae",
+            "peso": 7,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 8,
+            "ordem_str": "8º",
+            "nome": "Convênio / termo de parceria",
+            "identificador": "convenio_parceria",
+            "peso": 6,
+            "atendido": true,
+            "pontos": 6
+          },
+          {
+            "ordem": 9,
+            "ordem_str": "9º",
+            "nome": "Comitê e ações conjuntas",
+            "identificador": "comite_acoes_conjuntas",
+            "peso": 5,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 10,
+            "ordem_str": "10º",
+            "nome": "Empresa simulada",
+            "identificador": "empresa_simulada",
+            "peso": 4,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 11,
+            "ordem_str": "11º",
+            "nome": "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+            "identificador": "escola_sebrae",
+            "peso": 3,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 12,
+            "ordem_str": "12º",
+            "nome": "Parceria com Cooperativa de Crédito",
+            "identificador": "cooperativa_credito",
+            "peso": 2,
+            "atendido": true,
+            "pontos": 2
+          },
+          {
+            "ordem": 13,
+            "ordem_str": "13º",
+            "nome": "Lei da educação empreendedora",
+            "identificador": "lei_educacao_empreendedora",
+            "peso": 1,
+            "atendido": true,
+            "pontos": 1
+          }
+        ],
+        "instrumentos_aplicados": [
+          "encontro_mediado",
+          "material_didatico",
+          "oficina"
+        ],
+        "pontuacao_instrumentos": 30,
+        "destaque_instrumentos": true
+      },
+      "indice_pontuacao": 49,
+      "indice_percentual": 53.8,
+      "indice_classificacao": "Em Desenvolvimento",
+      "indice_classificacao_key": "em_desenvolvimento",
+      "instrumentos_aplicados": [
+        "encontro_mediado",
+        "material_didatico",
+        "oficina"
+      ],
+      "pontuacao_instrumentos": 30,
+      "destaque_instrumentos": true
     },
     {
       "id": "mun-governador-valadares",
@@ -204,7 +956,157 @@
       "ies_possui": true,
       "empresa_simulada": false,
       "escola_sebrae": false,
-      "created_at": "2026-09-01T10:00:00.000Z"
+      "created_at": "2026-09-01T10:00:00.000Z",
+      "parceria_secretaria_educacao": true,
+      "secretaria_educacao_possui": true,
+      "produto_despertar": true,
+      "despertar_possui": true,
+      "rede_aqui_tem_sebrae": true,
+      "aqui_tem_sebrae_possui": true,
+      "indice_desenvolvimento": {
+        "pontuacao": 82,
+        "pontuacao_maxima": 91,
+        "percentual": 90.1,
+        "classificacao": "Desenvolvido",
+        "classificacao_key": "desenvolvido",
+        "criterios": [
+          {
+            "ordem": 1,
+            "ordem_str": "1º",
+            "nome": "Possui Educação Empreendedora em mais de 70% do município",
+            "identificador": "educacao_70_porcento",
+            "peso": 13,
+            "atendido": true,
+            "pontos": 13
+          },
+          {
+            "ordem": 2,
+            "ordem_str": "2º",
+            "nome": "Parceria com Secretária Municipal de Educação",
+            "identificador": "parceria_secretaria_educacao",
+            "peso": 12,
+            "atendido": true,
+            "pontos": 12
+          },
+          {
+            "ordem": 3,
+            "ordem_str": "3º",
+            "nome": "JEPP no município",
+            "identificador": "jepp_municipio",
+            "peso": 11,
+            "atendido": true,
+            "pontos": 11
+          },
+          {
+            "ordem": 4,
+            "ordem_str": "4º",
+            "nome": "Produto Despertar implantado",
+            "identificador": "produto_despertar",
+            "peso": 10,
+            "atendido": true,
+            "pontos": 10
+          },
+          {
+            "ordem": 5,
+            "ordem_str": "5º",
+            "nome": "Parceria com superintendência de ensino",
+            "identificador": "parceria_superintendencia",
+            "peso": 9,
+            "atendido": true,
+            "pontos": 9
+          },
+          {
+            "ordem": 6,
+            "ordem_str": "6º",
+            "nome": "Parceria com instituição de ensino superior",
+            "identificador": "parceria_ies",
+            "peso": 8,
+            "atendido": true,
+            "pontos": 8
+          },
+          {
+            "ordem": 7,
+            "ordem_str": "7º",
+            "nome": "Rede Aqui Tem Sebrae",
+            "identificador": "rede_aqui_tem_sebrae",
+            "peso": 7,
+            "atendido": true,
+            "pontos": 7
+          },
+          {
+            "ordem": 8,
+            "ordem_str": "8º",
+            "nome": "Convênio / termo de parceria",
+            "identificador": "convenio_parceria",
+            "peso": 6,
+            "atendido": true,
+            "pontos": 6
+          },
+          {
+            "ordem": 9,
+            "ordem_str": "9º",
+            "nome": "Comitê e ações conjuntas",
+            "identificador": "comite_acoes_conjuntas",
+            "peso": 5,
+            "atendido": true,
+            "pontos": 5
+          },
+          {
+            "ordem": 10,
+            "ordem_str": "10º",
+            "nome": "Empresa simulada",
+            "identificador": "empresa_simulada",
+            "peso": 4,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 11,
+            "ordem_str": "11º",
+            "nome": "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+            "identificador": "escola_sebrae",
+            "peso": 3,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 12,
+            "ordem_str": "12º",
+            "nome": "Parceria com Cooperativa de Crédito",
+            "identificador": "cooperativa_credito",
+            "peso": 2,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 13,
+            "ordem_str": "13º",
+            "nome": "Lei da educação empreendedora",
+            "identificador": "lei_educacao_empreendedora",
+            "peso": 1,
+            "atendido": true,
+            "pontos": 1
+          }
+        ],
+        "instrumentos_aplicados": [
+          "encontro_mediado",
+          "material_didatico",
+          "oficina"
+        ],
+        "pontuacao_instrumentos": 30,
+        "destaque_instrumentos": true
+      },
+      "indice_pontuacao": 82,
+      "indice_percentual": 90.1,
+      "indice_classificacao": "Desenvolvido",
+      "indice_classificacao_key": "desenvolvido",
+      "instrumentos_aplicados": [
+        "encontro_mediado",
+        "material_didatico",
+        "oficina"
+      ],
+      "pontuacao_instrumentos": 30,
+      "destaque_instrumentos": true
     },
     {
       "id": "mun-ipatinga",
@@ -226,7 +1128,159 @@
       "ies_possui": true,
       "empresa_simulada": true,
       "escola_sebrae": false,
-      "created_at": "2026-09-01T10:00:00.000Z"
+      "created_at": "2026-09-01T10:00:00.000Z",
+      "parceria_secretaria_educacao": true,
+      "secretaria_educacao_possui": true,
+      "produto_despertar": true,
+      "despertar_possui": true,
+      "rede_aqui_tem_sebrae": true,
+      "aqui_tem_sebrae_possui": true,
+      "indice_desenvolvimento": {
+        "pontuacao": 88,
+        "pontuacao_maxima": 91,
+        "percentual": 96.7,
+        "classificacao": "Desenvolvido",
+        "classificacao_key": "desenvolvido",
+        "criterios": [
+          {
+            "ordem": 1,
+            "ordem_str": "1º",
+            "nome": "Possui Educação Empreendedora em mais de 70% do município",
+            "identificador": "educacao_70_porcento",
+            "peso": 13,
+            "atendido": true,
+            "pontos": 13
+          },
+          {
+            "ordem": 2,
+            "ordem_str": "2º",
+            "nome": "Parceria com Secretária Municipal de Educação",
+            "identificador": "parceria_secretaria_educacao",
+            "peso": 12,
+            "atendido": true,
+            "pontos": 12
+          },
+          {
+            "ordem": 3,
+            "ordem_str": "3º",
+            "nome": "JEPP no município",
+            "identificador": "jepp_municipio",
+            "peso": 11,
+            "atendido": true,
+            "pontos": 11
+          },
+          {
+            "ordem": 4,
+            "ordem_str": "4º",
+            "nome": "Produto Despertar implantado",
+            "identificador": "produto_despertar",
+            "peso": 10,
+            "atendido": true,
+            "pontos": 10
+          },
+          {
+            "ordem": 5,
+            "ordem_str": "5º",
+            "nome": "Parceria com superintendência de ensino",
+            "identificador": "parceria_superintendencia",
+            "peso": 9,
+            "atendido": true,
+            "pontos": 9
+          },
+          {
+            "ordem": 6,
+            "ordem_str": "6º",
+            "nome": "Parceria com instituição de ensino superior",
+            "identificador": "parceria_ies",
+            "peso": 8,
+            "atendido": true,
+            "pontos": 8
+          },
+          {
+            "ordem": 7,
+            "ordem_str": "7º",
+            "nome": "Rede Aqui Tem Sebrae",
+            "identificador": "rede_aqui_tem_sebrae",
+            "peso": 7,
+            "atendido": true,
+            "pontos": 7
+          },
+          {
+            "ordem": 8,
+            "ordem_str": "8º",
+            "nome": "Convênio / termo de parceria",
+            "identificador": "convenio_parceria",
+            "peso": 6,
+            "atendido": true,
+            "pontos": 6
+          },
+          {
+            "ordem": 9,
+            "ordem_str": "9º",
+            "nome": "Comitê e ações conjuntas",
+            "identificador": "comite_acoes_conjuntas",
+            "peso": 5,
+            "atendido": true,
+            "pontos": 5
+          },
+          {
+            "ordem": 10,
+            "ordem_str": "10º",
+            "nome": "Empresa simulada",
+            "identificador": "empresa_simulada",
+            "peso": 4,
+            "atendido": true,
+            "pontos": 4
+          },
+          {
+            "ordem": 11,
+            "ordem_str": "11º",
+            "nome": "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+            "identificador": "escola_sebrae",
+            "peso": 3,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 12,
+            "ordem_str": "12º",
+            "nome": "Parceria com Cooperativa de Crédito",
+            "identificador": "cooperativa_credito",
+            "peso": 2,
+            "atendido": true,
+            "pontos": 2
+          },
+          {
+            "ordem": 13,
+            "ordem_str": "13º",
+            "nome": "Lei da educação empreendedora",
+            "identificador": "lei_educacao_empreendedora",
+            "peso": 1,
+            "atendido": true,
+            "pontos": 1
+          }
+        ],
+        "instrumentos_aplicados": [
+          "curso",
+          "encontro_mediado",
+          "material_didatico",
+          "oficina"
+        ],
+        "pontuacao_instrumentos": 40,
+        "destaque_instrumentos": true
+      },
+      "indice_pontuacao": 88,
+      "indice_percentual": 96.7,
+      "indice_classificacao": "Desenvolvido",
+      "indice_classificacao_key": "desenvolvido",
+      "instrumentos_aplicados": [
+        "curso",
+        "encontro_mediado",
+        "material_didatico",
+        "oficina"
+      ],
+      "pontuacao_instrumentos": 40,
+      "destaque_instrumentos": true
     },
     {
       "id": "mun-juiz-de-fora",
@@ -248,7 +1302,159 @@
       "ies_possui": true,
       "empresa_simulada": true,
       "escola_sebrae": false,
-      "created_at": "2026-09-01T10:00:00.000Z"
+      "created_at": "2026-09-01T10:00:00.000Z",
+      "parceria_secretaria_educacao": true,
+      "secretaria_educacao_possui": true,
+      "produto_despertar": true,
+      "despertar_possui": true,
+      "rede_aqui_tem_sebrae": true,
+      "aqui_tem_sebrae_possui": true,
+      "indice_desenvolvimento": {
+        "pontuacao": 86,
+        "pontuacao_maxima": 91,
+        "percentual": 94.5,
+        "classificacao": "Desenvolvido",
+        "classificacao_key": "desenvolvido",
+        "criterios": [
+          {
+            "ordem": 1,
+            "ordem_str": "1º",
+            "nome": "Possui Educação Empreendedora em mais de 70% do município",
+            "identificador": "educacao_70_porcento",
+            "peso": 13,
+            "atendido": true,
+            "pontos": 13
+          },
+          {
+            "ordem": 2,
+            "ordem_str": "2º",
+            "nome": "Parceria com Secretária Municipal de Educação",
+            "identificador": "parceria_secretaria_educacao",
+            "peso": 12,
+            "atendido": true,
+            "pontos": 12
+          },
+          {
+            "ordem": 3,
+            "ordem_str": "3º",
+            "nome": "JEPP no município",
+            "identificador": "jepp_municipio",
+            "peso": 11,
+            "atendido": true,
+            "pontos": 11
+          },
+          {
+            "ordem": 4,
+            "ordem_str": "4º",
+            "nome": "Produto Despertar implantado",
+            "identificador": "produto_despertar",
+            "peso": 10,
+            "atendido": true,
+            "pontos": 10
+          },
+          {
+            "ordem": 5,
+            "ordem_str": "5º",
+            "nome": "Parceria com superintendência de ensino",
+            "identificador": "parceria_superintendencia",
+            "peso": 9,
+            "atendido": true,
+            "pontos": 9
+          },
+          {
+            "ordem": 6,
+            "ordem_str": "6º",
+            "nome": "Parceria com instituição de ensino superior",
+            "identificador": "parceria_ies",
+            "peso": 8,
+            "atendido": true,
+            "pontos": 8
+          },
+          {
+            "ordem": 7,
+            "ordem_str": "7º",
+            "nome": "Rede Aqui Tem Sebrae",
+            "identificador": "rede_aqui_tem_sebrae",
+            "peso": 7,
+            "atendido": true,
+            "pontos": 7
+          },
+          {
+            "ordem": 8,
+            "ordem_str": "8º",
+            "nome": "Convênio / termo de parceria",
+            "identificador": "convenio_parceria",
+            "peso": 6,
+            "atendido": true,
+            "pontos": 6
+          },
+          {
+            "ordem": 9,
+            "ordem_str": "9º",
+            "nome": "Comitê e ações conjuntas",
+            "identificador": "comite_acoes_conjuntas",
+            "peso": 5,
+            "atendido": true,
+            "pontos": 5
+          },
+          {
+            "ordem": 10,
+            "ordem_str": "10º",
+            "nome": "Empresa simulada",
+            "identificador": "empresa_simulada",
+            "peso": 4,
+            "atendido": true,
+            "pontos": 4
+          },
+          {
+            "ordem": 11,
+            "ordem_str": "11º",
+            "nome": "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+            "identificador": "escola_sebrae",
+            "peso": 3,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 12,
+            "ordem_str": "12º",
+            "nome": "Parceria com Cooperativa de Crédito",
+            "identificador": "cooperativa_credito",
+            "peso": 2,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 13,
+            "ordem_str": "13º",
+            "nome": "Lei da educação empreendedora",
+            "identificador": "lei_educacao_empreendedora",
+            "peso": 1,
+            "atendido": true,
+            "pontos": 1
+          }
+        ],
+        "instrumentos_aplicados": [
+          "curso",
+          "encontro_mediado",
+          "material_didatico",
+          "oficina"
+        ],
+        "pontuacao_instrumentos": 40,
+        "destaque_instrumentos": true
+      },
+      "indice_pontuacao": 86,
+      "indice_percentual": 94.5,
+      "indice_classificacao": "Desenvolvido",
+      "indice_classificacao_key": "desenvolvido",
+      "instrumentos_aplicados": [
+        "curso",
+        "encontro_mediado",
+        "material_didatico",
+        "oficina"
+      ],
+      "pontuacao_instrumentos": 40,
+      "destaque_instrumentos": true
     },
     {
       "id": "mun-montes-claros",
@@ -270,7 +1476,157 @@
       "ies_possui": true,
       "empresa_simulada": false,
       "escola_sebrae": false,
-      "created_at": "2026-09-01T10:00:00.000Z"
+      "created_at": "2026-09-01T10:00:00.000Z",
+      "parceria_secretaria_educacao": true,
+      "secretaria_educacao_possui": true,
+      "produto_despertar": false,
+      "despertar_possui": false,
+      "rede_aqui_tem_sebrae": false,
+      "aqui_tem_sebrae_possui": false,
+      "indice_desenvolvimento": {
+        "pontuacao": 53,
+        "pontuacao_maxima": 91,
+        "percentual": 58.2,
+        "classificacao": "Em Desenvolvimento",
+        "classificacao_key": "em_desenvolvimento",
+        "criterios": [
+          {
+            "ordem": 1,
+            "ordem_str": "1º",
+            "nome": "Possui Educação Empreendedora em mais de 70% do município",
+            "identificador": "educacao_70_porcento",
+            "peso": 13,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 2,
+            "ordem_str": "2º",
+            "nome": "Parceria com Secretária Municipal de Educação",
+            "identificador": "parceria_secretaria_educacao",
+            "peso": 12,
+            "atendido": true,
+            "pontos": 12
+          },
+          {
+            "ordem": 3,
+            "ordem_str": "3º",
+            "nome": "JEPP no município",
+            "identificador": "jepp_municipio",
+            "peso": 11,
+            "atendido": true,
+            "pontos": 11
+          },
+          {
+            "ordem": 4,
+            "ordem_str": "4º",
+            "nome": "Produto Despertar implantado",
+            "identificador": "produto_despertar",
+            "peso": 10,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 5,
+            "ordem_str": "5º",
+            "nome": "Parceria com superintendência de ensino",
+            "identificador": "parceria_superintendencia",
+            "peso": 9,
+            "atendido": true,
+            "pontos": 9
+          },
+          {
+            "ordem": 6,
+            "ordem_str": "6º",
+            "nome": "Parceria com instituição de ensino superior",
+            "identificador": "parceria_ies",
+            "peso": 8,
+            "atendido": true,
+            "pontos": 8
+          },
+          {
+            "ordem": 7,
+            "ordem_str": "7º",
+            "nome": "Rede Aqui Tem Sebrae",
+            "identificador": "rede_aqui_tem_sebrae",
+            "peso": 7,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 8,
+            "ordem_str": "8º",
+            "nome": "Convênio / termo de parceria",
+            "identificador": "convenio_parceria",
+            "peso": 6,
+            "atendido": true,
+            "pontos": 6
+          },
+          {
+            "ordem": 9,
+            "ordem_str": "9º",
+            "nome": "Comitê e ações conjuntas",
+            "identificador": "comite_acoes_conjuntas",
+            "peso": 5,
+            "atendido": true,
+            "pontos": 5
+          },
+          {
+            "ordem": 10,
+            "ordem_str": "10º",
+            "nome": "Empresa simulada",
+            "identificador": "empresa_simulada",
+            "peso": 4,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 11,
+            "ordem_str": "11º",
+            "nome": "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+            "identificador": "escola_sebrae",
+            "peso": 3,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 12,
+            "ordem_str": "12º",
+            "nome": "Parceria com Cooperativa de Crédito",
+            "identificador": "cooperativa_credito",
+            "peso": 2,
+            "atendido": true,
+            "pontos": 2
+          },
+          {
+            "ordem": 13,
+            "ordem_str": "13º",
+            "nome": "Lei da educação empreendedora",
+            "identificador": "lei_educacao_empreendedora",
+            "peso": 1,
+            "atendido": false,
+            "pontos": 0
+          }
+        ],
+        "instrumentos_aplicados": [
+          "encontro_mediado",
+          "material_didatico",
+          "oficina"
+        ],
+        "pontuacao_instrumentos": 30,
+        "destaque_instrumentos": true
+      },
+      "indice_pontuacao": 53,
+      "indice_percentual": 58.2,
+      "indice_classificacao": "Em Desenvolvimento",
+      "indice_classificacao_key": "em_desenvolvimento",
+      "instrumentos_aplicados": [
+        "encontro_mediado",
+        "material_didatico",
+        "oficina"
+      ],
+      "pontuacao_instrumentos": 30,
+      "destaque_instrumentos": true
     },
     {
       "id": "mun-paracatu",
@@ -292,7 +1648,157 @@
       "ies_possui": true,
       "empresa_simulada": false,
       "escola_sebrae": false,
-      "created_at": "2026-09-01T10:00:00.000Z"
+      "created_at": "2026-09-01T10:00:00.000Z",
+      "parceria_secretaria_educacao": true,
+      "secretaria_educacao_possui": true,
+      "produto_despertar": false,
+      "despertar_possui": false,
+      "rede_aqui_tem_sebrae": false,
+      "aqui_tem_sebrae_possui": false,
+      "indice_desenvolvimento": {
+        "pontuacao": 49,
+        "pontuacao_maxima": 91,
+        "percentual": 53.8,
+        "classificacao": "Em Desenvolvimento",
+        "classificacao_key": "em_desenvolvimento",
+        "criterios": [
+          {
+            "ordem": 1,
+            "ordem_str": "1º",
+            "nome": "Possui Educação Empreendedora em mais de 70% do município",
+            "identificador": "educacao_70_porcento",
+            "peso": 13,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 2,
+            "ordem_str": "2º",
+            "nome": "Parceria com Secretária Municipal de Educação",
+            "identificador": "parceria_secretaria_educacao",
+            "peso": 12,
+            "atendido": true,
+            "pontos": 12
+          },
+          {
+            "ordem": 3,
+            "ordem_str": "3º",
+            "nome": "JEPP no município",
+            "identificador": "jepp_municipio",
+            "peso": 11,
+            "atendido": true,
+            "pontos": 11
+          },
+          {
+            "ordem": 4,
+            "ordem_str": "4º",
+            "nome": "Produto Despertar implantado",
+            "identificador": "produto_despertar",
+            "peso": 10,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 5,
+            "ordem_str": "5º",
+            "nome": "Parceria com superintendência de ensino",
+            "identificador": "parceria_superintendencia",
+            "peso": 9,
+            "atendido": true,
+            "pontos": 9
+          },
+          {
+            "ordem": 6,
+            "ordem_str": "6º",
+            "nome": "Parceria com instituição de ensino superior",
+            "identificador": "parceria_ies",
+            "peso": 8,
+            "atendido": true,
+            "pontos": 8
+          },
+          {
+            "ordem": 7,
+            "ordem_str": "7º",
+            "nome": "Rede Aqui Tem Sebrae",
+            "identificador": "rede_aqui_tem_sebrae",
+            "peso": 7,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 8,
+            "ordem_str": "8º",
+            "nome": "Convênio / termo de parceria",
+            "identificador": "convenio_parceria",
+            "peso": 6,
+            "atendido": true,
+            "pontos": 6
+          },
+          {
+            "ordem": 9,
+            "ordem_str": "9º",
+            "nome": "Comitê e ações conjuntas",
+            "identificador": "comite_acoes_conjuntas",
+            "peso": 5,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 10,
+            "ordem_str": "10º",
+            "nome": "Empresa simulada",
+            "identificador": "empresa_simulada",
+            "peso": 4,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 11,
+            "ordem_str": "11º",
+            "nome": "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+            "identificador": "escola_sebrae",
+            "peso": 3,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 12,
+            "ordem_str": "12º",
+            "nome": "Parceria com Cooperativa de Crédito",
+            "identificador": "cooperativa_credito",
+            "peso": 2,
+            "atendido": true,
+            "pontos": 2
+          },
+          {
+            "ordem": 13,
+            "ordem_str": "13º",
+            "nome": "Lei da educação empreendedora",
+            "identificador": "lei_educacao_empreendedora",
+            "peso": 1,
+            "atendido": true,
+            "pontos": 1
+          }
+        ],
+        "instrumentos_aplicados": [
+          "encontro_mediado",
+          "material_didatico",
+          "oficina"
+        ],
+        "pontuacao_instrumentos": 30,
+        "destaque_instrumentos": true
+      },
+      "indice_pontuacao": 49,
+      "indice_percentual": 53.8,
+      "indice_classificacao": "Em Desenvolvimento",
+      "indice_classificacao_key": "em_desenvolvimento",
+      "instrumentos_aplicados": [
+        "encontro_mediado",
+        "material_didatico",
+        "oficina"
+      ],
+      "pontuacao_instrumentos": 30,
+      "destaque_instrumentos": true
     },
     {
       "id": "mun-patos-de-minas",
@@ -314,7 +1820,159 @@
       "ies_possui": true,
       "empresa_simulada": true,
       "escola_sebrae": false,
-      "created_at": "2026-09-01T10:00:00.000Z"
+      "created_at": "2026-09-01T10:00:00.000Z",
+      "parceria_secretaria_educacao": true,
+      "secretaria_educacao_possui": true,
+      "produto_despertar": true,
+      "despertar_possui": true,
+      "rede_aqui_tem_sebrae": true,
+      "aqui_tem_sebrae_possui": true,
+      "indice_desenvolvimento": {
+        "pontuacao": 88,
+        "pontuacao_maxima": 91,
+        "percentual": 96.7,
+        "classificacao": "Desenvolvido",
+        "classificacao_key": "desenvolvido",
+        "criterios": [
+          {
+            "ordem": 1,
+            "ordem_str": "1º",
+            "nome": "Possui Educação Empreendedora em mais de 70% do município",
+            "identificador": "educacao_70_porcento",
+            "peso": 13,
+            "atendido": true,
+            "pontos": 13
+          },
+          {
+            "ordem": 2,
+            "ordem_str": "2º",
+            "nome": "Parceria com Secretária Municipal de Educação",
+            "identificador": "parceria_secretaria_educacao",
+            "peso": 12,
+            "atendido": true,
+            "pontos": 12
+          },
+          {
+            "ordem": 3,
+            "ordem_str": "3º",
+            "nome": "JEPP no município",
+            "identificador": "jepp_municipio",
+            "peso": 11,
+            "atendido": true,
+            "pontos": 11
+          },
+          {
+            "ordem": 4,
+            "ordem_str": "4º",
+            "nome": "Produto Despertar implantado",
+            "identificador": "produto_despertar",
+            "peso": 10,
+            "atendido": true,
+            "pontos": 10
+          },
+          {
+            "ordem": 5,
+            "ordem_str": "5º",
+            "nome": "Parceria com superintendência de ensino",
+            "identificador": "parceria_superintendencia",
+            "peso": 9,
+            "atendido": true,
+            "pontos": 9
+          },
+          {
+            "ordem": 6,
+            "ordem_str": "6º",
+            "nome": "Parceria com instituição de ensino superior",
+            "identificador": "parceria_ies",
+            "peso": 8,
+            "atendido": true,
+            "pontos": 8
+          },
+          {
+            "ordem": 7,
+            "ordem_str": "7º",
+            "nome": "Rede Aqui Tem Sebrae",
+            "identificador": "rede_aqui_tem_sebrae",
+            "peso": 7,
+            "atendido": true,
+            "pontos": 7
+          },
+          {
+            "ordem": 8,
+            "ordem_str": "8º",
+            "nome": "Convênio / termo de parceria",
+            "identificador": "convenio_parceria",
+            "peso": 6,
+            "atendido": true,
+            "pontos": 6
+          },
+          {
+            "ordem": 9,
+            "ordem_str": "9º",
+            "nome": "Comitê e ações conjuntas",
+            "identificador": "comite_acoes_conjuntas",
+            "peso": 5,
+            "atendido": true,
+            "pontos": 5
+          },
+          {
+            "ordem": 10,
+            "ordem_str": "10º",
+            "nome": "Empresa simulada",
+            "identificador": "empresa_simulada",
+            "peso": 4,
+            "atendido": true,
+            "pontos": 4
+          },
+          {
+            "ordem": 11,
+            "ordem_str": "11º",
+            "nome": "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+            "identificador": "escola_sebrae",
+            "peso": 3,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 12,
+            "ordem_str": "12º",
+            "nome": "Parceria com Cooperativa de Crédito",
+            "identificador": "cooperativa_credito",
+            "peso": 2,
+            "atendido": true,
+            "pontos": 2
+          },
+          {
+            "ordem": 13,
+            "ordem_str": "13º",
+            "nome": "Lei da educação empreendedora",
+            "identificador": "lei_educacao_empreendedora",
+            "peso": 1,
+            "atendido": true,
+            "pontos": 1
+          }
+        ],
+        "instrumentos_aplicados": [
+          "curso",
+          "encontro_mediado",
+          "material_didatico",
+          "oficina"
+        ],
+        "pontuacao_instrumentos": 40,
+        "destaque_instrumentos": true
+      },
+      "indice_pontuacao": 88,
+      "indice_percentual": 96.7,
+      "indice_classificacao": "Desenvolvido",
+      "indice_classificacao_key": "desenvolvido",
+      "instrumentos_aplicados": [
+        "curso",
+        "encontro_mediado",
+        "material_didatico",
+        "oficina"
+      ],
+      "pontuacao_instrumentos": 40,
+      "destaque_instrumentos": true
     },
     {
       "id": "mun-pouso-alegre",
@@ -336,7 +1994,157 @@
       "ies_possui": true,
       "empresa_simulada": false,
       "escola_sebrae": false,
-      "created_at": "2026-09-01T10:00:00.000Z"
+      "created_at": "2026-09-01T10:00:00.000Z",
+      "parceria_secretaria_educacao": true,
+      "secretaria_educacao_possui": true,
+      "produto_despertar": false,
+      "despertar_possui": false,
+      "rede_aqui_tem_sebrae": false,
+      "aqui_tem_sebrae_possui": false,
+      "indice_desenvolvimento": {
+        "pontuacao": 49,
+        "pontuacao_maxima": 91,
+        "percentual": 53.8,
+        "classificacao": "Em Desenvolvimento",
+        "classificacao_key": "em_desenvolvimento",
+        "criterios": [
+          {
+            "ordem": 1,
+            "ordem_str": "1º",
+            "nome": "Possui Educação Empreendedora em mais de 70% do município",
+            "identificador": "educacao_70_porcento",
+            "peso": 13,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 2,
+            "ordem_str": "2º",
+            "nome": "Parceria com Secretária Municipal de Educação",
+            "identificador": "parceria_secretaria_educacao",
+            "peso": 12,
+            "atendido": true,
+            "pontos": 12
+          },
+          {
+            "ordem": 3,
+            "ordem_str": "3º",
+            "nome": "JEPP no município",
+            "identificador": "jepp_municipio",
+            "peso": 11,
+            "atendido": true,
+            "pontos": 11
+          },
+          {
+            "ordem": 4,
+            "ordem_str": "4º",
+            "nome": "Produto Despertar implantado",
+            "identificador": "produto_despertar",
+            "peso": 10,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 5,
+            "ordem_str": "5º",
+            "nome": "Parceria com superintendência de ensino",
+            "identificador": "parceria_superintendencia",
+            "peso": 9,
+            "atendido": true,
+            "pontos": 9
+          },
+          {
+            "ordem": 6,
+            "ordem_str": "6º",
+            "nome": "Parceria com instituição de ensino superior",
+            "identificador": "parceria_ies",
+            "peso": 8,
+            "atendido": true,
+            "pontos": 8
+          },
+          {
+            "ordem": 7,
+            "ordem_str": "7º",
+            "nome": "Rede Aqui Tem Sebrae",
+            "identificador": "rede_aqui_tem_sebrae",
+            "peso": 7,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 8,
+            "ordem_str": "8º",
+            "nome": "Convênio / termo de parceria",
+            "identificador": "convenio_parceria",
+            "peso": 6,
+            "atendido": true,
+            "pontos": 6
+          },
+          {
+            "ordem": 9,
+            "ordem_str": "9º",
+            "nome": "Comitê e ações conjuntas",
+            "identificador": "comite_acoes_conjuntas",
+            "peso": 5,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 10,
+            "ordem_str": "10º",
+            "nome": "Empresa simulada",
+            "identificador": "empresa_simulada",
+            "peso": 4,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 11,
+            "ordem_str": "11º",
+            "nome": "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+            "identificador": "escola_sebrae",
+            "peso": 3,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 12,
+            "ordem_str": "12º",
+            "nome": "Parceria com Cooperativa de Crédito",
+            "identificador": "cooperativa_credito",
+            "peso": 2,
+            "atendido": true,
+            "pontos": 2
+          },
+          {
+            "ordem": 13,
+            "ordem_str": "13º",
+            "nome": "Lei da educação empreendedora",
+            "identificador": "lei_educacao_empreendedora",
+            "peso": 1,
+            "atendido": true,
+            "pontos": 1
+          }
+        ],
+        "instrumentos_aplicados": [
+          "encontro_mediado",
+          "material_didatico",
+          "oficina"
+        ],
+        "pontuacao_instrumentos": 30,
+        "destaque_instrumentos": true
+      },
+      "indice_pontuacao": 49,
+      "indice_percentual": 53.8,
+      "indice_classificacao": "Em Desenvolvimento",
+      "indice_classificacao_key": "em_desenvolvimento",
+      "instrumentos_aplicados": [
+        "encontro_mediado",
+        "material_didatico",
+        "oficina"
+      ],
+      "pontuacao_instrumentos": 30,
+      "destaque_instrumentos": true
     },
     {
       "id": "mun-sao-joao-del-rei",
@@ -358,7 +2166,157 @@
       "ies_possui": true,
       "empresa_simulada": false,
       "escola_sebrae": false,
-      "created_at": "2026-09-01T10:00:00.000Z"
+      "created_at": "2026-09-01T10:00:00.000Z",
+      "parceria_secretaria_educacao": true,
+      "secretaria_educacao_possui": true,
+      "produto_despertar": false,
+      "despertar_possui": false,
+      "rede_aqui_tem_sebrae": false,
+      "aqui_tem_sebrae_possui": false,
+      "indice_desenvolvimento": {
+        "pontuacao": 53,
+        "pontuacao_maxima": 91,
+        "percentual": 58.2,
+        "classificacao": "Em Desenvolvimento",
+        "classificacao_key": "em_desenvolvimento",
+        "criterios": [
+          {
+            "ordem": 1,
+            "ordem_str": "1º",
+            "nome": "Possui Educação Empreendedora em mais de 70% do município",
+            "identificador": "educacao_70_porcento",
+            "peso": 13,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 2,
+            "ordem_str": "2º",
+            "nome": "Parceria com Secretária Municipal de Educação",
+            "identificador": "parceria_secretaria_educacao",
+            "peso": 12,
+            "atendido": true,
+            "pontos": 12
+          },
+          {
+            "ordem": 3,
+            "ordem_str": "3º",
+            "nome": "JEPP no município",
+            "identificador": "jepp_municipio",
+            "peso": 11,
+            "atendido": true,
+            "pontos": 11
+          },
+          {
+            "ordem": 4,
+            "ordem_str": "4º",
+            "nome": "Produto Despertar implantado",
+            "identificador": "produto_despertar",
+            "peso": 10,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 5,
+            "ordem_str": "5º",
+            "nome": "Parceria com superintendência de ensino",
+            "identificador": "parceria_superintendencia",
+            "peso": 9,
+            "atendido": true,
+            "pontos": 9
+          },
+          {
+            "ordem": 6,
+            "ordem_str": "6º",
+            "nome": "Parceria com instituição de ensino superior",
+            "identificador": "parceria_ies",
+            "peso": 8,
+            "atendido": true,
+            "pontos": 8
+          },
+          {
+            "ordem": 7,
+            "ordem_str": "7º",
+            "nome": "Rede Aqui Tem Sebrae",
+            "identificador": "rede_aqui_tem_sebrae",
+            "peso": 7,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 8,
+            "ordem_str": "8º",
+            "nome": "Convênio / termo de parceria",
+            "identificador": "convenio_parceria",
+            "peso": 6,
+            "atendido": true,
+            "pontos": 6
+          },
+          {
+            "ordem": 9,
+            "ordem_str": "9º",
+            "nome": "Comitê e ações conjuntas",
+            "identificador": "comite_acoes_conjuntas",
+            "peso": 5,
+            "atendido": true,
+            "pontos": 5
+          },
+          {
+            "ordem": 10,
+            "ordem_str": "10º",
+            "nome": "Empresa simulada",
+            "identificador": "empresa_simulada",
+            "peso": 4,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 11,
+            "ordem_str": "11º",
+            "nome": "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+            "identificador": "escola_sebrae",
+            "peso": 3,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 12,
+            "ordem_str": "12º",
+            "nome": "Parceria com Cooperativa de Crédito",
+            "identificador": "cooperativa_credito",
+            "peso": 2,
+            "atendido": true,
+            "pontos": 2
+          },
+          {
+            "ordem": 13,
+            "ordem_str": "13º",
+            "nome": "Lei da educação empreendedora",
+            "identificador": "lei_educacao_empreendedora",
+            "peso": 1,
+            "atendido": false,
+            "pontos": 0
+          }
+        ],
+        "instrumentos_aplicados": [
+          "encontro_mediado",
+          "material_didatico",
+          "oficina"
+        ],
+        "pontuacao_instrumentos": 30,
+        "destaque_instrumentos": true
+      },
+      "indice_pontuacao": 53,
+      "indice_percentual": 58.2,
+      "indice_classificacao": "Em Desenvolvimento",
+      "indice_classificacao_key": "em_desenvolvimento",
+      "instrumentos_aplicados": [
+        "encontro_mediado",
+        "material_didatico",
+        "oficina"
+      ],
+      "pontuacao_instrumentos": 30,
+      "destaque_instrumentos": true
     },
     {
       "id": "mun-teofilo-otoni",
@@ -380,7 +2338,157 @@
       "ies_possui": true,
       "empresa_simulada": false,
       "escola_sebrae": false,
-      "created_at": "2026-09-01T10:00:00.000Z"
+      "created_at": "2026-09-01T10:00:00.000Z",
+      "parceria_secretaria_educacao": true,
+      "secretaria_educacao_possui": true,
+      "produto_despertar": false,
+      "despertar_possui": false,
+      "rede_aqui_tem_sebrae": false,
+      "aqui_tem_sebrae_possui": false,
+      "indice_desenvolvimento": {
+        "pontuacao": 53,
+        "pontuacao_maxima": 91,
+        "percentual": 58.2,
+        "classificacao": "Em Desenvolvimento",
+        "classificacao_key": "em_desenvolvimento",
+        "criterios": [
+          {
+            "ordem": 1,
+            "ordem_str": "1º",
+            "nome": "Possui Educação Empreendedora em mais de 70% do município",
+            "identificador": "educacao_70_porcento",
+            "peso": 13,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 2,
+            "ordem_str": "2º",
+            "nome": "Parceria com Secretária Municipal de Educação",
+            "identificador": "parceria_secretaria_educacao",
+            "peso": 12,
+            "atendido": true,
+            "pontos": 12
+          },
+          {
+            "ordem": 3,
+            "ordem_str": "3º",
+            "nome": "JEPP no município",
+            "identificador": "jepp_municipio",
+            "peso": 11,
+            "atendido": true,
+            "pontos": 11
+          },
+          {
+            "ordem": 4,
+            "ordem_str": "4º",
+            "nome": "Produto Despertar implantado",
+            "identificador": "produto_despertar",
+            "peso": 10,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 5,
+            "ordem_str": "5º",
+            "nome": "Parceria com superintendência de ensino",
+            "identificador": "parceria_superintendencia",
+            "peso": 9,
+            "atendido": true,
+            "pontos": 9
+          },
+          {
+            "ordem": 6,
+            "ordem_str": "6º",
+            "nome": "Parceria com instituição de ensino superior",
+            "identificador": "parceria_ies",
+            "peso": 8,
+            "atendido": true,
+            "pontos": 8
+          },
+          {
+            "ordem": 7,
+            "ordem_str": "7º",
+            "nome": "Rede Aqui Tem Sebrae",
+            "identificador": "rede_aqui_tem_sebrae",
+            "peso": 7,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 8,
+            "ordem_str": "8º",
+            "nome": "Convênio / termo de parceria",
+            "identificador": "convenio_parceria",
+            "peso": 6,
+            "atendido": true,
+            "pontos": 6
+          },
+          {
+            "ordem": 9,
+            "ordem_str": "9º",
+            "nome": "Comitê e ações conjuntas",
+            "identificador": "comite_acoes_conjuntas",
+            "peso": 5,
+            "atendido": true,
+            "pontos": 5
+          },
+          {
+            "ordem": 10,
+            "ordem_str": "10º",
+            "nome": "Empresa simulada",
+            "identificador": "empresa_simulada",
+            "peso": 4,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 11,
+            "ordem_str": "11º",
+            "nome": "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+            "identificador": "escola_sebrae",
+            "peso": 3,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 12,
+            "ordem_str": "12º",
+            "nome": "Parceria com Cooperativa de Crédito",
+            "identificador": "cooperativa_credito",
+            "peso": 2,
+            "atendido": true,
+            "pontos": 2
+          },
+          {
+            "ordem": 13,
+            "ordem_str": "13º",
+            "nome": "Lei da educação empreendedora",
+            "identificador": "lei_educacao_empreendedora",
+            "peso": 1,
+            "atendido": false,
+            "pontos": 0
+          }
+        ],
+        "instrumentos_aplicados": [
+          "encontro_mediado",
+          "material_didatico",
+          "oficina"
+        ],
+        "pontuacao_instrumentos": 30,
+        "destaque_instrumentos": true
+      },
+      "indice_pontuacao": 53,
+      "indice_percentual": 58.2,
+      "indice_classificacao": "Em Desenvolvimento",
+      "indice_classificacao_key": "em_desenvolvimento",
+      "instrumentos_aplicados": [
+        "encontro_mediado",
+        "material_didatico",
+        "oficina"
+      ],
+      "pontuacao_instrumentos": 30,
+      "destaque_instrumentos": true
     },
     {
       "id": "mun-uberaba",
@@ -402,7 +2510,157 @@
       "ies_possui": true,
       "empresa_simulada": false,
       "escola_sebrae": false,
-      "created_at": "2026-09-01T10:00:00.000Z"
+      "created_at": "2026-09-01T10:00:00.000Z",
+      "parceria_secretaria_educacao": true,
+      "secretaria_educacao_possui": true,
+      "produto_despertar": true,
+      "despertar_possui": true,
+      "rede_aqui_tem_sebrae": true,
+      "aqui_tem_sebrae_possui": true,
+      "indice_desenvolvimento": {
+        "pontuacao": 84,
+        "pontuacao_maxima": 91,
+        "percentual": 92.3,
+        "classificacao": "Desenvolvido",
+        "classificacao_key": "desenvolvido",
+        "criterios": [
+          {
+            "ordem": 1,
+            "ordem_str": "1º",
+            "nome": "Possui Educação Empreendedora em mais de 70% do município",
+            "identificador": "educacao_70_porcento",
+            "peso": 13,
+            "atendido": true,
+            "pontos": 13
+          },
+          {
+            "ordem": 2,
+            "ordem_str": "2º",
+            "nome": "Parceria com Secretária Municipal de Educação",
+            "identificador": "parceria_secretaria_educacao",
+            "peso": 12,
+            "atendido": true,
+            "pontos": 12
+          },
+          {
+            "ordem": 3,
+            "ordem_str": "3º",
+            "nome": "JEPP no município",
+            "identificador": "jepp_municipio",
+            "peso": 11,
+            "atendido": true,
+            "pontos": 11
+          },
+          {
+            "ordem": 4,
+            "ordem_str": "4º",
+            "nome": "Produto Despertar implantado",
+            "identificador": "produto_despertar",
+            "peso": 10,
+            "atendido": true,
+            "pontos": 10
+          },
+          {
+            "ordem": 5,
+            "ordem_str": "5º",
+            "nome": "Parceria com superintendência de ensino",
+            "identificador": "parceria_superintendencia",
+            "peso": 9,
+            "atendido": true,
+            "pontos": 9
+          },
+          {
+            "ordem": 6,
+            "ordem_str": "6º",
+            "nome": "Parceria com instituição de ensino superior",
+            "identificador": "parceria_ies",
+            "peso": 8,
+            "atendido": true,
+            "pontos": 8
+          },
+          {
+            "ordem": 7,
+            "ordem_str": "7º",
+            "nome": "Rede Aqui Tem Sebrae",
+            "identificador": "rede_aqui_tem_sebrae",
+            "peso": 7,
+            "atendido": true,
+            "pontos": 7
+          },
+          {
+            "ordem": 8,
+            "ordem_str": "8º",
+            "nome": "Convênio / termo de parceria",
+            "identificador": "convenio_parceria",
+            "peso": 6,
+            "atendido": true,
+            "pontos": 6
+          },
+          {
+            "ordem": 9,
+            "ordem_str": "9º",
+            "nome": "Comitê e ações conjuntas",
+            "identificador": "comite_acoes_conjuntas",
+            "peso": 5,
+            "atendido": true,
+            "pontos": 5
+          },
+          {
+            "ordem": 10,
+            "ordem_str": "10º",
+            "nome": "Empresa simulada",
+            "identificador": "empresa_simulada",
+            "peso": 4,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 11,
+            "ordem_str": "11º",
+            "nome": "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+            "identificador": "escola_sebrae",
+            "peso": 3,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 12,
+            "ordem_str": "12º",
+            "nome": "Parceria com Cooperativa de Crédito",
+            "identificador": "cooperativa_credito",
+            "peso": 2,
+            "atendido": true,
+            "pontos": 2
+          },
+          {
+            "ordem": 13,
+            "ordem_str": "13º",
+            "nome": "Lei da educação empreendedora",
+            "identificador": "lei_educacao_empreendedora",
+            "peso": 1,
+            "atendido": true,
+            "pontos": 1
+          }
+        ],
+        "instrumentos_aplicados": [
+          "encontro_mediado",
+          "material_didatico",
+          "oficina"
+        ],
+        "pontuacao_instrumentos": 30,
+        "destaque_instrumentos": true
+      },
+      "indice_pontuacao": 84,
+      "indice_percentual": 92.3,
+      "indice_classificacao": "Desenvolvido",
+      "indice_classificacao_key": "desenvolvido",
+      "instrumentos_aplicados": [
+        "encontro_mediado",
+        "material_didatico",
+        "oficina"
+      ],
+      "pontuacao_instrumentos": 30,
+      "destaque_instrumentos": true
     },
     {
       "id": "mun-uberlandia",
@@ -424,7 +2682,159 @@
       "ies_possui": true,
       "empresa_simulada": true,
       "escola_sebrae": false,
-      "created_at": "2026-09-01T10:00:00.000Z"
+      "created_at": "2026-09-01T10:00:00.000Z",
+      "parceria_secretaria_educacao": true,
+      "secretaria_educacao_possui": true,
+      "produto_despertar": true,
+      "despertar_possui": true,
+      "rede_aqui_tem_sebrae": true,
+      "aqui_tem_sebrae_possui": true,
+      "indice_desenvolvimento": {
+        "pontuacao": 86,
+        "pontuacao_maxima": 91,
+        "percentual": 94.5,
+        "classificacao": "Desenvolvido",
+        "classificacao_key": "desenvolvido",
+        "criterios": [
+          {
+            "ordem": 1,
+            "ordem_str": "1º",
+            "nome": "Possui Educação Empreendedora em mais de 70% do município",
+            "identificador": "educacao_70_porcento",
+            "peso": 13,
+            "atendido": true,
+            "pontos": 13
+          },
+          {
+            "ordem": 2,
+            "ordem_str": "2º",
+            "nome": "Parceria com Secretária Municipal de Educação",
+            "identificador": "parceria_secretaria_educacao",
+            "peso": 12,
+            "atendido": true,
+            "pontos": 12
+          },
+          {
+            "ordem": 3,
+            "ordem_str": "3º",
+            "nome": "JEPP no município",
+            "identificador": "jepp_municipio",
+            "peso": 11,
+            "atendido": true,
+            "pontos": 11
+          },
+          {
+            "ordem": 4,
+            "ordem_str": "4º",
+            "nome": "Produto Despertar implantado",
+            "identificador": "produto_despertar",
+            "peso": 10,
+            "atendido": true,
+            "pontos": 10
+          },
+          {
+            "ordem": 5,
+            "ordem_str": "5º",
+            "nome": "Parceria com superintendência de ensino",
+            "identificador": "parceria_superintendencia",
+            "peso": 9,
+            "atendido": true,
+            "pontos": 9
+          },
+          {
+            "ordem": 6,
+            "ordem_str": "6º",
+            "nome": "Parceria com instituição de ensino superior",
+            "identificador": "parceria_ies",
+            "peso": 8,
+            "atendido": true,
+            "pontos": 8
+          },
+          {
+            "ordem": 7,
+            "ordem_str": "7º",
+            "nome": "Rede Aqui Tem Sebrae",
+            "identificador": "rede_aqui_tem_sebrae",
+            "peso": 7,
+            "atendido": true,
+            "pontos": 7
+          },
+          {
+            "ordem": 8,
+            "ordem_str": "8º",
+            "nome": "Convênio / termo de parceria",
+            "identificador": "convenio_parceria",
+            "peso": 6,
+            "atendido": true,
+            "pontos": 6
+          },
+          {
+            "ordem": 9,
+            "ordem_str": "9º",
+            "nome": "Comitê e ações conjuntas",
+            "identificador": "comite_acoes_conjuntas",
+            "peso": 5,
+            "atendido": true,
+            "pontos": 5
+          },
+          {
+            "ordem": 10,
+            "ordem_str": "10º",
+            "nome": "Empresa simulada",
+            "identificador": "empresa_simulada",
+            "peso": 4,
+            "atendido": true,
+            "pontos": 4
+          },
+          {
+            "ordem": 11,
+            "ordem_str": "11º",
+            "nome": "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+            "identificador": "escola_sebrae",
+            "peso": 3,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 12,
+            "ordem_str": "12º",
+            "nome": "Parceria com Cooperativa de Crédito",
+            "identificador": "cooperativa_credito",
+            "peso": 2,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 13,
+            "ordem_str": "13º",
+            "nome": "Lei da educação empreendedora",
+            "identificador": "lei_educacao_empreendedora",
+            "peso": 1,
+            "atendido": true,
+            "pontos": 1
+          }
+        ],
+        "instrumentos_aplicados": [
+          "curso",
+          "encontro_mediado",
+          "material_didatico",
+          "oficina"
+        ],
+        "pontuacao_instrumentos": 40,
+        "destaque_instrumentos": true
+      },
+      "indice_pontuacao": 86,
+      "indice_percentual": 94.5,
+      "indice_classificacao": "Desenvolvido",
+      "indice_classificacao_key": "desenvolvido",
+      "instrumentos_aplicados": [
+        "curso",
+        "encontro_mediado",
+        "material_didatico",
+        "oficina"
+      ],
+      "pontuacao_instrumentos": 40,
+      "destaque_instrumentos": true
     },
     {
       "id": "mun-varginha",
@@ -446,7 +2856,157 @@
       "ies_possui": true,
       "empresa_simulada": false,
       "escola_sebrae": false,
-      "created_at": "2026-09-01T10:00:00.000Z"
+      "created_at": "2026-09-01T10:00:00.000Z",
+      "parceria_secretaria_educacao": true,
+      "secretaria_educacao_possui": true,
+      "produto_despertar": true,
+      "despertar_possui": true,
+      "rede_aqui_tem_sebrae": true,
+      "aqui_tem_sebrae_possui": true,
+      "indice_desenvolvimento": {
+        "pontuacao": 79,
+        "pontuacao_maxima": 91,
+        "percentual": 86.8,
+        "classificacao": "Desenvolvido",
+        "classificacao_key": "desenvolvido",
+        "criterios": [
+          {
+            "ordem": 1,
+            "ordem_str": "1º",
+            "nome": "Possui Educação Empreendedora em mais de 70% do município",
+            "identificador": "educacao_70_porcento",
+            "peso": 13,
+            "atendido": true,
+            "pontos": 13
+          },
+          {
+            "ordem": 2,
+            "ordem_str": "2º",
+            "nome": "Parceria com Secretária Municipal de Educação",
+            "identificador": "parceria_secretaria_educacao",
+            "peso": 12,
+            "atendido": true,
+            "pontos": 12
+          },
+          {
+            "ordem": 3,
+            "ordem_str": "3º",
+            "nome": "JEPP no município",
+            "identificador": "jepp_municipio",
+            "peso": 11,
+            "atendido": true,
+            "pontos": 11
+          },
+          {
+            "ordem": 4,
+            "ordem_str": "4º",
+            "nome": "Produto Despertar implantado",
+            "identificador": "produto_despertar",
+            "peso": 10,
+            "atendido": true,
+            "pontos": 10
+          },
+          {
+            "ordem": 5,
+            "ordem_str": "5º",
+            "nome": "Parceria com superintendência de ensino",
+            "identificador": "parceria_superintendencia",
+            "peso": 9,
+            "atendido": true,
+            "pontos": 9
+          },
+          {
+            "ordem": 6,
+            "ordem_str": "6º",
+            "nome": "Parceria com instituição de ensino superior",
+            "identificador": "parceria_ies",
+            "peso": 8,
+            "atendido": true,
+            "pontos": 8
+          },
+          {
+            "ordem": 7,
+            "ordem_str": "7º",
+            "nome": "Rede Aqui Tem Sebrae",
+            "identificador": "rede_aqui_tem_sebrae",
+            "peso": 7,
+            "atendido": true,
+            "pontos": 7
+          },
+          {
+            "ordem": 8,
+            "ordem_str": "8º",
+            "nome": "Convênio / termo de parceria",
+            "identificador": "convenio_parceria",
+            "peso": 6,
+            "atendido": true,
+            "pontos": 6
+          },
+          {
+            "ordem": 9,
+            "ordem_str": "9º",
+            "nome": "Comitê e ações conjuntas",
+            "identificador": "comite_acoes_conjuntas",
+            "peso": 5,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 10,
+            "ordem_str": "10º",
+            "nome": "Empresa simulada",
+            "identificador": "empresa_simulada",
+            "peso": 4,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 11,
+            "ordem_str": "11º",
+            "nome": "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+            "identificador": "escola_sebrae",
+            "peso": 3,
+            "atendido": false,
+            "pontos": 0
+          },
+          {
+            "ordem": 12,
+            "ordem_str": "12º",
+            "nome": "Parceria com Cooperativa de Crédito",
+            "identificador": "cooperativa_credito",
+            "peso": 2,
+            "atendido": true,
+            "pontos": 2
+          },
+          {
+            "ordem": 13,
+            "ordem_str": "13º",
+            "nome": "Lei da educação empreendedora",
+            "identificador": "lei_educacao_empreendedora",
+            "peso": 1,
+            "atendido": true,
+            "pontos": 1
+          }
+        ],
+        "instrumentos_aplicados": [
+          "encontro_mediado",
+          "material_didatico",
+          "oficina"
+        ],
+        "pontuacao_instrumentos": 30,
+        "destaque_instrumentos": true
+      },
+      "indice_pontuacao": 79,
+      "indice_percentual": 86.8,
+      "indice_classificacao": "Desenvolvido",
+      "indice_classificacao_key": "desenvolvido",
+      "instrumentos_aplicados": [
+        "encontro_mediado",
+        "material_didatico",
+        "oficina"
+      ],
+      "pontuacao_instrumentos": 30,
+      "destaque_instrumentos": true
     }
   ],
   "cases_overrides": {
