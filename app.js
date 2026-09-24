@@ -2365,7 +2365,11 @@ function openRegisterPanel() {
   // Toggle student and professor fieldset visibility based on register type
   const studentFieldset = document.getElementById("student-details-fieldset");
   const professorFieldset = document.getElementById("professor-details-fieldset");
+  const tituloLabel = document.getElementById("form-titulo-label") || document.querySelector('label[for="form-titulo"]');
+  const tituloInput = document.getElementById("form-titulo");
   const caseEmpresaGerais = document.getElementById("case-empresa-fields-gerais");
+  const empTipoInp = document.getElementById("form-empresa-tipo");
+  const empNomeHidden = document.getElementById("form-empresa-nome");
   const descLabel = document.getElementById("form-descricao-label") || document.querySelector('label[for="form-descricao"]');
   const descInput = document.getElementById("form-descricao");
 
@@ -2379,7 +2383,10 @@ function openRegisterPanel() {
   if (currentRegisterType === 'estudante') {
     if (studentFieldset) studentFieldset.style.display = "flex";
     if (professorFieldset) professorFieldset.style.display = "none";
+    if (tituloLabel) tituloLabel.textContent = "Nome da Empresa *";
+    if (tituloInput) tituloInput.placeholder = "Ex: EcoHorta Sustentável, ReciclaTech, Doces Caseiros...";
     if (caseEmpresaGerais) caseEmpresaGerais.style.display = "block";
+    if (empTipoInp) empTipoInp.required = true;
     if (descLabel) descLabel.textContent = "Descrição da Empresa *";
     if (descInput) descInput.placeholder = "Descreva a atuação da empresa, produtos/serviços e modelo de negócio do estudante...";
     if (studNome) { studNome.required = true; studNome.value = ""; }
@@ -2392,9 +2399,11 @@ function openRegisterPanel() {
     // Professor
     if (studentFieldset) studentFieldset.style.display = "none";
     if (professorFieldset) professorFieldset.style.display = "flex";
+    if (tituloLabel) tituloLabel.textContent = "Título / Nome do Case *";
+    if (tituloInput) tituloInput.placeholder = "Ex: Horta Orgânica Comunitária ou Reciclagem IoT";
     if (caseEmpresaGerais) caseEmpresaGerais.style.display = "none";
-    const empNomeInp = document.getElementById("form-empresa-nome"); if (empNomeInp) empNomeInp.value = "";
-    const empTipoInp = document.getElementById("form-empresa-tipo"); if (empTipoInp) empTipoInp.value = "";
+    if (empTipoInp) { empTipoInp.required = false; empTipoInp.value = ""; }
+    if (empNomeHidden) empNomeHidden.value = "";
     if (descLabel) descLabel.textContent = "Resumo do Projeto *";
     if (descInput) descInput.placeholder = "Descreva o projeto pedagógico desenvolvido com os alunos, objetivos e metodologia...";
     if (profNome) { profNome.required = true; profNome.value = ""; }
@@ -3409,9 +3418,12 @@ async function handleFormSubmit(e) {
   const estudanteEmail = currentRegisterType === 'estudante' ? document.getElementById("form-estudante-email").value.trim() : "";
   const estudanteTelefone = currentRegisterType === 'estudante' ? document.getElementById("form-estudante-contato").value.trim() : "";
 
-  const empresaNome = (document.getElementById("form-empresa-nome") ? document.getElementById("form-empresa-nome").value : "").trim();
-  const empresaTipo = (document.getElementById("form-empresa-tipo") ? document.getElementById("form-empresa-tipo").value : "").trim();
-  const empresaDescricao = (document.getElementById("form-empresa-descricao") ? document.getElementById("form-empresa-descricao").value : "").trim();
+  const empresaNome = currentRegisterType === 'estudante' ? titulo : ((document.getElementById("form-empresa-nome") ? document.getElementById("form-empresa-nome").value : "").trim());
+  const empresaTipo = currentRegisterType === 'estudante' ? ((document.getElementById("form-empresa-tipo") ? document.getElementById("form-empresa-tipo").value : "").trim()) : "";
+  const empresaDescricao = currentRegisterType === 'estudante' ? descricao : ((document.getElementById("form-empresa-descricao") ? document.getElementById("form-empresa-descricao").value : "").trim());
+
+  const empNomeHidden = document.getElementById("form-empresa-nome");
+  if (empNomeHidden) empNomeHidden.value = empresaNome;
 
   // Space String validation on required fields
   const requiredFields = [
@@ -3421,8 +3433,8 @@ async function handleFormSubmit(e) {
     { name: "Escola / Instituição", val: escola, id: "form-escola" },
     { name: "Nível de Ensino", val: nivelEnsino, id: "form-nivel-ensino" },
     { name: "Dependência Administrativa", val: dependenciaAdm, id: "form-dependencia-adm" },
-    { name: "Título", val: titulo, id: "form-titulo" },
-    { name: "Descrição", val: descricao, id: "form-descricao" },
+    { name: currentRegisterType === 'estudante' ? "Nome da Empresa" : "Título", val: titulo, id: "form-titulo" },
+    { name: currentRegisterType === 'estudante' ? "Descrição da Empresa" : "Descrição", val: descricao, id: "form-descricao" },
     { name: "Nome do Técnico", val: tecnicoNome, id: "form-tecnico-nome" },
     { name: "E-mail do Técnico", val: tecnicoEmail, id: "form-tecnico-email" }
   ];
@@ -3431,6 +3443,7 @@ async function handleFormSubmit(e) {
     requiredFields.push({ name: "Nome do Professor", val: professorNome, id: "form-professor-nome" });
     requiredFields.push({ name: "E-mail do Professor", val: professorEmail, id: "form-professor-email" });
   } else if (currentRegisterType === 'estudante') {
+    requiredFields.push({ name: "Tipo de Negócio", val: empresaTipo, id: "form-empresa-tipo" });
     requiredFields.push({ name: "Nome do Estudante", val: estudanteNome, id: "form-estudante-nome" });
   }
 

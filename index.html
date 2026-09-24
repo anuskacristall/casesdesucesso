@@ -315,26 +315,19 @@
         <fieldset>
           <legend><i data-lucide="book-open"></i> Informações Gerais do Case</legend>
           <div class="form-group">
-            <label for="form-titulo">Título / Nome do Case *</label>
+            <label for="form-titulo" id="form-titulo-label">Título / Nome do Case *</label>
             <input type="text" id="form-titulo" placeholder="Ex: Horta Orgânica Comunitária ou Reciclagem IoT" required>
+            <input type="hidden" id="form-empresa-nome">
           </div>
           
-          <!-- Campos de Empreendimento para Estudante Empreendedor -->
-          <div id="case-empresa-fields-gerais" style="display: none; margin-bottom: 4px;">
-            <div class="form-row">
-              <div class="form-group flex-2">
-                <label for="form-empresa-nome">Nome da Empresa</label>
-                <input type="text" id="form-empresa-nome" placeholder="Ex: EcoHorta Sustentável ou ReciclaTech">
-              </div>
-              <div class="form-group flex-1">
-                <label for="form-empresa-tipo">Tipo de Negócio</label>
-                <input type="text" id="form-empresa-tipo" placeholder="Ex: Cooperativa, Tecnologia, Alimentação...">
-              </div>
-            </div>
+          <!-- Campo Tipo de Negócio para Estudante Empreendedor -->
+          <div id="case-empresa-fields-gerais" class="form-group" style="display: none;">
+            <label for="form-empresa-tipo" id="form-empresa-tipo-label">Tipo de Negócio *</label>
+            <input type="text" id="form-empresa-tipo" placeholder="Ex: Cooperativa, Tecnologia, Alimentação, Artesanato...">
           </div>
 
           <div class="form-group">
-            <label for="form-descricao" id="form-descricao-label">Descrição / Resumo Geral do Case *</label>
+            <label for="form-descricao" id="form-descricao-label">Resumo do Projeto *</label>
             <textarea id="form-descricao" placeholder="Descreva o escopo geral do projeto de educação empreendedora no município..." required style="min-height: 85px; resize: vertical;"></textarea>
           </div>
         </fieldset>
@@ -1336,6 +1329,6 @@
   <script src="config.js"></script>
 
   <!-- Script Principal -->
-  <script src="app.js?v=46"></script>
+  <script src="app.js?v=47"></script>
 </body>
 </html>

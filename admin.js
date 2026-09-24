@@ -725,9 +725,9 @@ function renderCasesTable() {
 
     const devIndex = calculateMunicipioDevelopmentIndex(item);
     const indexBadge = devIndex ? `
-      <div class="dev-index-badge ${devIndex.classificacao_key}" style="align-items: flex-start; text-align: left;">
-        <span class="dev-index-val ${devIndex.classificacao_key}" style="font-size: 0.75rem;">${escapeHtml(devIndex.classificacao)}</span>
-        <span class="dev-index-sub" style="color: #64748b; font-size: 0.68rem;">${devIndex.pontuacao}/55 pts (${devIndex.percentual}%)</span>
+      <div class="dev-index-badge ${devIndex.classificacao_key}" style="display: inline-flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 4px 8px; border-radius: 4px; box-sizing: border-box; width: 100%; max-width: 140px; margin: 0 auto;">
+        <span class="dev-index-val ${devIndex.classificacao_key}" style="font-size: 0.75rem; font-weight: 800; text-align: center; width: 100%; display: block; padding: 0; background: transparent !important; border: none !important;">${escapeHtml(devIndex.classificacao)}</span>
+        <span class="dev-index-sub" style="font-size: 0.68rem; font-weight: 700; text-align: center; width: 100%; display: block; margin-top: 2px; opacity: 0.85;">${devIndex.pontuacao}/55 PTS (${devIndex.percentual}%)</span>
       </div>
     ` : `<span style="color: #94a3b8;">-</span>`;
 
@@ -776,9 +776,9 @@ function renderCasesTable() {
       <tr>
         <td><span class="protocol-code">${escapeHtml(protocol)}</span></td>
         <td><strong style="color: #1e293b;">${escapeHtml(title)}</strong></td>
-        <td><span style="font-weight:700; color: ${typeColor}; background: ${isEstudante ? '#ecfdf5' : '#e0f2fe'}; padding: 3px 8px; border-radius: 4px; font-size: 0.76rem;">${typeLabel}</span></td>
+        <td><span style="display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; font-weight: 700; color: ${isEstudante ? '#047857' : '#0054a6'}; background: ${isEstudante ? '#ecfdf5' : '#e0f2fe'}; border: 1px solid ${isEstudante ? '#a7f3d0' : '#bae6fd'}; padding: 4px 8px; border-radius: 4px; font-size: 0.76rem; line-height: 1.2;">${typeLabel}</span></td>
         <td>${place}</td>
-        <td>${indexBadge}</td>
+        <td style="text-align: center;">${indexBadge}</td>
         <td><strong>${escapeHtml(authorName)}</strong></td>
         <td>
           <span class="badge-status ${statusCfg.class}">${statusCfg.label}</span>
