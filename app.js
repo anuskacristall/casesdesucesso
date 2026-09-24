@@ -2365,7 +2365,7 @@ function openRegisterPanel() {
   // Toggle student and professor fieldset visibility based on register type
   const studentFieldset = document.getElementById("student-details-fieldset");
   const professorFieldset = document.getElementById("professor-details-fieldset");
-  const empreendimentoFieldset = document.getElementById("empreendimento-fieldset");
+  const caseEmpresaGerais = document.getElementById("case-empresa-fields-gerais");
   const descLabel = document.getElementById("form-descricao-label") || document.querySelector('label[for="form-descricao"]');
   const descInput = document.getElementById("form-descricao");
 
@@ -2379,7 +2379,7 @@ function openRegisterPanel() {
   if (currentRegisterType === 'estudante') {
     if (studentFieldset) studentFieldset.style.display = "flex";
     if (professorFieldset) professorFieldset.style.display = "none";
-    if (empreendimentoFieldset) empreendimentoFieldset.style.display = "block";
+    if (caseEmpresaGerais) caseEmpresaGerais.style.display = "block";
     if (descLabel) descLabel.textContent = "Descrição da Empresa *";
     if (descInput) descInput.placeholder = "Descreva a atuação da empresa, produtos/serviços e modelo de negócio do estudante...";
     if (studNome) { studNome.required = true; studNome.value = ""; }
@@ -2392,7 +2392,9 @@ function openRegisterPanel() {
     // Professor
     if (studentFieldset) studentFieldset.style.display = "none";
     if (professorFieldset) professorFieldset.style.display = "flex";
-    if (empreendimentoFieldset) empreendimentoFieldset.style.display = "none";
+    if (caseEmpresaGerais) caseEmpresaGerais.style.display = "none";
+    const empNomeInp = document.getElementById("form-empresa-nome"); if (empNomeInp) empNomeInp.value = "";
+    const empTipoInp = document.getElementById("form-empresa-tipo"); if (empTipoInp) empTipoInp.value = "";
     if (descLabel) descLabel.textContent = "Resumo do Projeto *";
     if (descInput) descInput.placeholder = "Descreva o projeto pedagógico desenvolvido com os alunos, objetivos e metodologia...";
     if (profNome) { profNome.required = true; profNome.value = ""; }
@@ -4525,28 +4527,29 @@ function openReferenciaMunDetails(id) {
 
       <!-- Responsável pelo Cadastro -->
       <div class="admin-detail-card card-technician" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
-        <div class="admin-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
-          <div class="admin-card-title" style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #0369a1;">
+        <div class="admin-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
+          <div class="admin-card-title" style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #0369a1; font-size: 0.95rem;">
             <i data-lucide="user-check" style="width: 18px; height: 18px;"></i>
             <span>Responsável pelo Cadastro</span>
           </div>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
-          <div class="detail-item">
-            <span class="detail-label" style="display: block; font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 600; margin-bottom: 3px;">Nome</span>
-            <span class="detail-value" style="font-weight: 700; color: #1e293b;">${escapeHtml(respNome)}</span>
+        <div style="display: flex; flex-direction: column; gap: 6px; padding: 2px 4px;">
+          <div style="font-size: 1.15rem; font-weight: 800; color: #1e293b; letter-spacing: -0.2px;">
+            ${escapeHtml(respNome)}
           </div>
-          <div class="detail-item">
-            <span class="detail-label" style="display: block; font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 600; margin-bottom: 3px;">E-mail</span>
-            <span class="detail-value">
-              ${respEmail ? `<a href="mailto:${escapeHtml(respEmail)}" style="color: #0054a6; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; word-break: break-all;"><i data-lucide="mail" style="width: 14px; height: 14px; flex-shrink: 0;"></i> <span>${escapeHtml(respEmail)}</span></a>` : "Não informado"}
-            </span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label" style="display: block; font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 600; margin-bottom: 3px;">Telefone / WhatsApp</span>
-            <span class="detail-value">
-              ${respTel ? `<a href="tel:${escapeHtml(respTel.replace(/[^0-9+]/g, ''))}" style="color: #1e293b; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;"><i data-lucide="phone" style="width: 14px; height: 14px; flex-shrink: 0;"></i> <span>${escapeHtml(respTel)}</span></a>` : "Não informado"}
-            </span>
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 20px; font-size: 0.95rem; margin-top: 2px;">
+            ${respEmail ? `
+              <a href="mailto:${escapeHtml(respEmail)}" style="color: #0054a6; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 500;">
+                <i data-lucide="mail" style="width: 16px; height: 16px; color: #0054a6;"></i>
+                <span>${escapeHtml(respEmail)}</span>
+              </a>
+            ` : `<span style="color: #94a3b8; font-size: 0.88rem;">E-mail não informado</span>`}
+            ${respTel ? `
+              <a href="tel:${escapeHtml(respTel.replace(/[^0-9+]/g, ''))}" style="color: #475569; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 500;">
+                <i data-lucide="phone" style="width: 15px; height: 15px; color: #64748b;"></i>
+                <span>${escapeHtml(respTel)}</span>
+              </a>
+            ` : ""}
           </div>
         </div>
       </div>

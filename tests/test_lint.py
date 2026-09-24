@@ -246,7 +246,7 @@ class TestLint(unittest.TestCase):
         self.assertIn("municipality-parceria-superintendencia", index_content)
         self.assertIn("form-empresa-nome", index_content)
         self.assertIn("form-empresa-tipo", index_content)
-        self.assertIn("form-empresa-descricao", index_content)
+        self.assertIn("case-empresa-fields-gerais", index_content)
         self.assertIn("Sistema de Ensino Escola do Sebrae", index_content)
         self.assertIn("Possui Educação Empreendedora em mais de 70% do município?", index_content)
         self.assertIn("Indicadores da Educação Empreendedora no município", index_content)
