@@ -250,22 +250,24 @@ ADMIN_DEFAULT_PASSWORD = os.getenv('ADMIN_DEFAULT_PASSWORD', 'admin123')
 
 def calculate_municipio_development_index(item: dict) -> dict:
     """
-    Calcula o Índice de Desenvolvimento do Município baseado em 10 critérios:
-    1º educacao_70_porcento: peso 10
-    2º jepp_municipio: peso 9
-    3º convenio_parceria: peso 8
-    4º comite_acoes_conjuntas: peso 7
-    5º parceria_ies: peso 6
-    6º empresa_simulada: peso 5
-    7º escola_sebrae: peso 4
-    8º cooperativa_credito: peso 3
-    9º parceria_superintendencia: peso 2
-    10º lei_educacao_empreendedora: peso 1
-    Total de pesos = 55
+    Calcula o Índice de Desenvolvimento do Município baseado em 13 critérios:
+    1º educacao_70_porcento: peso 13
+    2º parceria_secretaria_educacao: peso 12
+    3º jepp_municipio: peso 11
+    4º produto_despertar: peso 10
+    5º parceria_superintendencia: peso 9
+    6º parceria_ies: peso 8
+    7º rede_aqui_tem_sebrae: peso 7
+    8º convenio_parceria: peso 6
+    9º comite_acoes_conjuntas: peso 5
+    10º empresa_simulada: peso 4
+    11º escola_sebrae: peso 3
+    12º cooperativa_credito: peso 2
+    13º lei_educacao_empreendedora: peso 1
+    Total de pesos = 91
     Faixas:
-    0 a 21: Início
-    22 a 38: Em Desenvolvimento
-    39 a 55: Desenvolvido
+    0 a 63: Em Desenvolvimento (<= 70%)
+    64 a 91: Desenvolvido (> 70%)
     """
     def is_affirmative(v):
         if v is True:
@@ -285,76 +287,100 @@ def calculate_municipio_development_index(item: dict) -> dict:
             "ordem_str": "1º",
             "nome": "Possui Educação Empreendedora em mais de 70% do município",
             "identificador": "educacao_70_porcento",
-            "peso": 10,
+            "peso": 13,
             "atendido": is_affirmative(item.get("educacao_70_porcento")) or is_affirmative(item.get("municipio_ee_70")) or is_affirmative(item.get("edu70"))
         },
         {
             "ordem": 2,
             "ordem_str": "2º",
-            "nome": "JEPP no município",
-            "identificador": "jepp_municipio",
-            "peso": 9,
-            "atendido": is_jepp_attended(item.get("jepp_municipio")) or is_jepp_attended(item.get("status_jepp")) or is_jepp_attended(item.get("jeppStatus"))
+            "nome": "Parceria com Secretária Municipal de Educação",
+            "identificador": "parceria_secretaria_educacao",
+            "peso": 12,
+            "atendido": is_affirmative(item.get("parceria_secretaria_educacao")) or is_affirmative(item.get("secretaria_educacao_possui")) or is_affirmative(item.get("hasParceriaSecretariaEducacao")) or is_affirmative(item.get("secretaria_educacao"))
         },
         {
             "ordem": 3,
             "ordem_str": "3º",
-            "nome": "Convênio / termo de parceria",
-            "identificador": "convenio_parceria",
-            "peso": 8,
-            "atendido": is_affirmative(item.get("convenio_parceria")) or is_affirmative(item.get("convenio_sebrae")) or is_affirmative(item.get("hasConvenioSebrae"))
+            "nome": "JEPP no município",
+            "identificador": "jepp_municipio",
+            "peso": 11,
+            "atendido": is_jepp_attended(item.get("jepp_municipio")) or is_jepp_attended(item.get("status_jepp")) or is_jepp_attended(item.get("jeppStatus"))
         },
         {
             "ordem": 4,
             "ordem_str": "4º",
-            "nome": "Comitê e ações conjuntas",
-            "identificador": "comite_acoes_conjuntas",
-            "peso": 7,
-            "atendido": is_affirmative(item.get("comite_acoes_conjuntas")) or is_affirmative(item.get("comite_possui")) or is_affirmative(item.get("hasCommittee"))
+            "nome": "Produto Despertar implantado",
+            "identificador": "produto_despertar",
+            "peso": 10,
+            "atendido": is_affirmative(item.get("produto_despertar")) or is_affirmative(item.get("despertar_possui")) or is_affirmative(item.get("hasDespertar")) or is_affirmative(item.get("produto_despertar_possui"))
         },
         {
             "ordem": 5,
             "ordem_str": "5º",
-            "nome": "Parceria com instituição de ensino superior",
-            "identificador": "parceria_ies",
-            "peso": 6,
-            "atendido": is_affirmative(item.get("parceria_ies")) or is_affirmative(item.get("ies_possui")) or is_affirmative(item.get("hasIes"))
+            "nome": "Parceria com superintendência de ensino",
+            "identificador": "parceria_superintendencia",
+            "peso": 9,
+            "atendido": is_affirmative(item.get("parceria_superintendencia")) or is_affirmative(item.get("hasParceriaSuperintendencia")) or is_affirmative(item.get("superintendencia_possui"))
         },
         {
             "ordem": 6,
             "ordem_str": "6º",
-            "nome": "Empresa simulada",
-            "identificador": "empresa_simulada",
-            "peso": 5,
-            "atendido": is_affirmative(item.get("empresa_simulada")) or is_affirmative(item.get("empresa_simulada_possui")) or is_affirmative(item.get("hasEmpresaSimulada"))
+            "nome": "Parceria com instituição de ensino superior",
+            "identificador": "parceria_ies",
+            "peso": 8,
+            "atendido": is_affirmative(item.get("parceria_ies")) or is_affirmative(item.get("ies_possui")) or is_affirmative(item.get("hasIes"))
         },
         {
             "ordem": 7,
             "ordem_str": "7º",
-            "nome": "Sistema de ensino Escola do Sebrae",
-            "identificador": "escola_sebrae",
-            "peso": 4,
-            "atendido": is_affirmative(item.get("escola_sebrae")) or is_affirmative(item.get("escola_sebrae_possui")) or is_affirmative(item.get("hasEscolaSebrae"))
+            "nome": "Rede Aqui Tem Sebrae",
+            "identificador": "rede_aqui_tem_sebrae",
+            "peso": 7,
+            "atendido": is_affirmative(item.get("rede_aqui_tem_sebrae")) or is_affirmative(item.get("aqui_tem_sebrae_possui")) or is_affirmative(item.get("hasRedeAquiTemSebrae")) or is_affirmative(item.get("aqui_tem_sebrae"))
         },
         {
             "ordem": 8,
             "ordem_str": "8º",
-            "nome": "Cooperativa de crédito",
-            "identificador": "cooperativa_credito",
-            "peso": 3,
-            "atendido": is_affirmative(item.get("cooperativa_credito")) or is_affirmative(item.get("cooperativa_possui")) or is_affirmative(item.get("hasCoop"))
+            "nome": "Convênio / termo de parceria",
+            "identificador": "convenio_parceria",
+            "peso": 6,
+            "atendido": is_affirmative(item.get("convenio_parceria")) or is_affirmative(item.get("convenio_sebrae")) or is_affirmative(item.get("hasConvenioSebrae"))
         },
         {
             "ordem": 9,
             "ordem_str": "9º",
-            "nome": "Parceria com superintendência de ensino",
-            "identificador": "parceria_superintendencia",
-            "peso": 2,
-            "atendido": is_affirmative(item.get("parceria_superintendencia")) or is_affirmative(item.get("hasParceriaSuperintendencia"))
+            "nome": "Comitê e ações conjuntas",
+            "identificador": "comite_acoes_conjuntas",
+            "peso": 5,
+            "atendido": is_affirmative(item.get("comite_acoes_conjuntas")) or is_affirmative(item.get("comite_possui")) or is_affirmative(item.get("hasCommittee"))
         },
         {
             "ordem": 10,
             "ordem_str": "10º",
+            "nome": "Empresa simulada",
+            "identificador": "empresa_simulada",
+            "peso": 4,
+            "atendido": is_affirmative(item.get("empresa_simulada")) or is_affirmative(item.get("empresa_simulada_possui")) or is_affirmative(item.get("hasEmpresaSimulada"))
+        },
+        {
+            "ordem": 11,
+            "ordem_str": "11º",
+            "nome": "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+            "identificador": "escola_sebrae",
+            "peso": 3,
+            "atendido": is_affirmative(item.get("escola_sebrae")) or is_affirmative(item.get("escola_sebrae_possui")) or is_affirmative(item.get("hasEscolaSebrae"))
+        },
+        {
+            "ordem": 12,
+            "ordem_str": "12º",
+            "nome": "Parceria com Cooperativa de Crédito",
+            "identificador": "cooperativa_credito",
+            "peso": 2,
+            "atendido": is_affirmative(item.get("cooperativa_credito")) or is_affirmative(item.get("cooperativa_possui")) or is_affirmative(item.get("hasCoop"))
+        },
+        {
+            "ordem": 13,
+            "ordem_str": "13º",
             "nome": "Lei da educação empreendedora",
             "identificador": "lei_educacao_empreendedora",
             "peso": 1,
@@ -379,9 +405,9 @@ def calculate_municipio_development_index(item: dict) -> dict:
             "pontos": pontos
         })
 
-    percentual = round((pontuacao_bruta / 55.0) * 100, 1)
+    percentual = round((pontuacao_bruta / 91.0) * 100, 1)
 
-    if pontuacao_bruta <= 38:
+    if pontuacao_bruta <= 63:
         classificacao = "Em Desenvolvimento"
         classificacao_key = "em_desenvolvimento"
     else:
@@ -403,6 +429,8 @@ def calculate_municipio_development_index(item: dict) -> dict:
             derived.add("encontro_mediado")
         if is_affirmative(item.get("parceria_superintendencia")) or is_affirmative(item.get("hasParceriaSuperintendencia")):
             derived.add("encontro_mediado")
+        if is_affirmative(item.get("parceria_secretaria_educacao")) or is_affirmative(item.get("secretaria_educacao_possui")) or is_affirmative(item.get("hasParceriaSecretariaEducacao")):
+            derived.add("encontro_mediado")
         if is_affirmative(item.get("lei_educacao_empreendedora")) or is_affirmative(item.get("lei_possui")) or is_affirmative(item.get("hasLaw")):
             derived.add("encontro_mediado")
         if is_affirmative(item.get("parceria_ies")) or is_affirmative(item.get("ies_possui")) or is_affirmative(item.get("hasIes")):
@@ -421,7 +449,7 @@ def calculate_municipio_development_index(item: dict) -> dict:
 
     return {
         "pontuacao": pontuacao_bruta,
-        "pontuacao_maxima": 55,
+        "pontuacao_maxima": 91,
         "percentual": percentual,
         "classificacao": classificacao,
         "classificacao_key": classificacao_key,

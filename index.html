@@ -940,27 +940,10 @@
         <fieldset class="form-section indicators-section">
           <legend><i data-lucide="check-square"></i> Indicadores da Educação Empreendedora no Município</legend>
 
-          <!-- JEPP Implantado -->
+          <!-- 1º: Possui Educação Empreendedora em mais de 70% do município -->
           <div class="indicator-row">
             <div class="indicator-toggle">
-              <label>Programa JEPP Implantado no Município?</label>
-              <div class="radio-group">
-                <label class="radio-label">
-                  <input type="radio" name="municipality-jepp-status" value="sim">
-                  <span>Sim</span>
-                </label>
-                <label class="radio-label">
-                  <input type="radio" name="municipality-jepp-status" value="nao" checked>
-                  <span>Não</span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- EE em mais de 70% do município -->
-          <div class="indicator-row">
-            <div class="indicator-toggle">
-              <label>Possui Educação Empreendedora em mais de 70% do município?</label>
+              <label>1º - Possui Educação Empreendedora em mais de 70% do município?</label>
               <div class="radio-group">
                 <label class="radio-label">
                   <input type="radio" name="municipality-edu-70" value="sim">
@@ -974,27 +957,61 @@
             </div>
           </div>
 
-          <!-- Convênio/contrato/termo de aceite de parceria com o Sebrae -->
+          <!-- 2º: Parceria com Secretária Municipal de Educação -->
           <div class="indicator-row">
             <div class="indicator-toggle">
-              <label>Convênio/contrato/termo de aceite de parceria com o Sebrae?</label>
+              <label>2º - Parceria com Secretária Municipal de Educação?</label>
               <div class="radio-group">
                 <label class="radio-label">
-                  <input type="radio" name="municipality-convenio-sebrae" value="sim">
+                  <input type="radio" name="municipality-secretaria-educacao" value="sim">
                   <span>Sim</span>
                 </label>
                 <label class="radio-label">
-                  <input type="radio" name="municipality-convenio-sebrae" value="nao" checked>
+                  <input type="radio" name="municipality-secretaria-educacao" value="nao" checked>
                   <span>Não</span>
                 </label>
               </div>
             </div>
           </div>
 
-          <!-- Parceria com superintendência de ensino -->
+          <!-- 3º: JEPP no município -->
           <div class="indicator-row">
             <div class="indicator-toggle">
-              <label>Parceria com superintendência de ensino?</label>
+              <label>3º - JEPP no município?</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="municipality-jepp-status" value="sim">
+                  <span>Sim</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="municipality-jepp-status" value="nao" checked>
+                  <span>Não</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4º: Produto Despertar implantado -->
+          <div class="indicator-row">
+            <div class="indicator-toggle">
+              <label>4º - Produto Despertar implantado?</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="municipality-produto-despertar" value="sim">
+                  <span>Sim</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="municipality-produto-despertar" value="nao" checked>
+                  <span>Não</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5º: Parceria com superintendência de ensino -->
+          <div class="indicator-row">
+            <div class="indicator-toggle">
+              <label>5º - Parceria com superintendência de ensino?</label>
               <div class="radio-group">
                 <label class="radio-label">
                   <input type="radio" name="municipality-parceria-superintendencia" value="sim">
@@ -1008,61 +1025,10 @@
             </div>
           </div>
 
-          <!-- Cooperativa de Crédito -->
+          <!-- 6º: Parceria com instituição de ensino superior -->
           <div class="indicator-row">
             <div class="indicator-toggle">
-              <label>Ações com Cooperativa de Crédito?</label>
-              <div class="radio-group">
-                <label class="radio-label">
-                  <input type="radio" name="municipality-coop" value="sim">
-                  <span>Sim</span>
-                </label>
-                <label class="radio-label">
-                  <input type="radio" name="municipality-coop" value="nao" checked>
-                  <span>Não</span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- Lei de Educação Empreendedora -->
-          <div class="indicator-row">
-            <div class="indicator-toggle">
-              <label>Possui Lei de Educação Empreendedora no Município?</label>
-              <div class="radio-group">
-                <label class="radio-label">
-                  <input type="radio" name="municipality-law" value="sim">
-                  <span>Sim</span>
-                </label>
-                <label class="radio-label">
-                  <input type="radio" name="municipality-law" value="nao" checked>
-                  <span>Não</span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- Comitê Conjunto -->
-          <div class="indicator-row">
-            <div class="indicator-toggle">
-              <label>Tem Comitê ou Ações em conjunto (Secretaria, Superintendência e SEBRAE)?</label>
-              <div class="radio-group">
-                <label class="radio-label">
-                  <input type="radio" name="municipality-committee" value="sim">
-                  <span>Sim</span>
-                </label>
-                <label class="radio-label">
-                  <input type="radio" name="municipality-committee" value="nao" checked>
-                  <span>Não</span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- Parceria com Instituição de Ensino Superior -->
-          <div class="indicator-row">
-            <div class="indicator-toggle">
-              <label>Tem Parceria com Instituições de Ensino Superior em conjunto com o SEBRAE?</label>
+              <label>6º - Parceria com instituição de ensino superior?</label>
               <div class="radio-group">
                 <label class="radio-label">
                   <input type="radio" name="municipality-ies" value="sim">
@@ -1076,10 +1042,61 @@
             </div>
           </div>
 
-          <!-- Empresa Simulada -->
+          <!-- 7º: Rede Aqui Tem Sebrae -->
           <div class="indicator-row">
             <div class="indicator-toggle">
-              <label>Possui Empresa Simulada no Município?</label>
+              <label>7º - Rede Aqui Tem Sebrae?</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="municipality-rede-aqui-tem-sebrae" value="sim">
+                  <span>Sim</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="municipality-rede-aqui-tem-sebrae" value="nao" checked>
+                  <span>Não</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 8º: Convênio / termo de parceria -->
+          <div class="indicator-row">
+            <div class="indicator-toggle">
+              <label>8º - Convênio / termo de parceria?</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="municipality-convenio-sebrae" value="sim">
+                  <span>Sim</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="municipality-convenio-sebrae" value="nao" checked>
+                  <span>Não</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 9º: Comitê e ações conjuntas -->
+          <div class="indicator-row">
+            <div class="indicator-toggle">
+              <label>9º - Comitê e ações conjuntas?</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="municipality-committee" value="sim">
+                  <span>Sim</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="municipality-committee" value="nao" checked>
+                  <span>Não</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 10º: Empresa simulada -->
+          <div class="indicator-row">
+            <div class="indicator-toggle">
+              <label>10º - Empresa simulada?</label>
               <div class="radio-group">
                 <label class="radio-label">
                   <input type="radio" name="municipality-empresa-simulada" value="sim">
@@ -1093,10 +1110,10 @@
             </div>
           </div>
 
-          <!-- Sistema de Ensino Escola do Sebrae -->
+          <!-- 11º: Sistema de Ensino Escola do Sebrae (Cursos Técnicos) -->
           <div class="indicator-row">
             <div class="indicator-toggle">
-              <label>Possui Sistema de Ensino Escola do Sebrae no Município?</label>
+              <label>11º - Sistema de Ensino Escola do Sebrae (Cursos Técnicos)?</label>
               <div class="radio-group">
                 <label class="radio-label">
                   <input type="radio" name="municipality-escola-sebrae" value="sim">
@@ -1104,6 +1121,40 @@
                 </label>
                 <label class="radio-label">
                   <input type="radio" name="municipality-escola-sebrae" value="nao" checked>
+                  <span>Não</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 12º: Parceria com Cooperativa de Crédito -->
+          <div class="indicator-row">
+            <div class="indicator-toggle">
+              <label>12º - Parceria com Cooperativa de Crédito?</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="municipality-coop" value="sim">
+                  <span>Sim</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="municipality-coop" value="nao" checked>
+                  <span>Não</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 13º: Lei da educação empreendedora -->
+          <div class="indicator-row">
+            <div class="indicator-toggle">
+              <label>13º - Lei da educação empreendedora?</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="municipality-law" value="sim">
+                  <span>Sim</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="municipality-law" value="nao" checked>
                   <span>Não</span>
                 </label>
               </div>
@@ -1329,6 +1380,6 @@
   <script src="config.js"></script>
 
   <!-- Script Principal -->
-  <script src="app.js?v=47"></script>
+  <script src="app.js?v=48"></script>
 </body>
 </html>

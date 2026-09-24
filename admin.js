@@ -75,76 +75,100 @@ function calculateMunicipioDevelopmentIndex(item) {
       ordem_str: "1º",
       nome: "Possui Educação Empreendedora em mais de 70% do município",
       identificador: "educacao_70_porcento",
-      peso: 10,
+      peso: 13,
       atendido: isAffirmative(item.educacao_70_porcento) || isAffirmative(item.municipio_ee_70) || isAffirmative(item.edu70)
     },
     {
       ordem: 2,
       ordem_str: "2º",
-      nome: "JEPP no município",
-      identificador: "jepp_municipio",
-      peso: 9,
-      atendido: isJeppAttended(item.jepp_municipio) || isJeppAttended(item.status_jepp) || isJeppAttended(item.jeppStatus)
+      nome: "Parceria com Secretária Municipal de Educação",
+      identificador: "parceria_secretaria_educacao",
+      peso: 12,
+      atendido: isAffirmative(item.parceria_secretaria_educacao) || isAffirmative(item.secretaria_educacao_possui) || isAffirmative(item.hasParceriaSecretariaEducacao) || isAffirmative(item.secretaria_educacao)
     },
     {
       ordem: 3,
       ordem_str: "3º",
-      nome: "Convênio / termo de parceria",
-      identificador: "convenio_parceria",
-      peso: 8,
-      atendido: isAffirmative(item.convenio_parceria) || isAffirmative(item.convenio_sebrae) || isAffirmative(item.hasConvenioSebrae)
+      nome: "JEPP no município",
+      identificador: "jepp_municipio",
+      peso: 11,
+      atendido: isJeppAttended(item.jepp_municipio) || isJeppAttended(item.status_jepp) || isJeppAttended(item.jeppStatus)
     },
     {
       ordem: 4,
       ordem_str: "4º",
-      nome: "Comitê e ações conjuntas",
-      identificador: "comite_acoes_conjuntas",
-      peso: 7,
-      atendido: isAffirmative(item.comite_acoes_conjuntas) || isAffirmative(item.comite_possui) || isAffirmative(item.hasCommittee)
+      nome: "Produto Despertar implantado",
+      identificador: "produto_despertar",
+      peso: 10,
+      atendido: isAffirmative(item.produto_despertar) || isAffirmative(item.despertar_possui) || isAffirmative(item.hasDespertar) || isAffirmative(item.produto_despertar_possui)
     },
     {
       ordem: 5,
       ordem_str: "5º",
-      nome: "Parceria com instituição de ensino superior",
-      identificador: "parceria_ies",
-      peso: 6,
-      atendido: isAffirmative(item.parceria_ies) || isAffirmative(item.ies_possui) || isAffirmative(item.hasIes)
+      nome: "Parceria com superintendência de ensino",
+      identificador: "parceria_superintendencia",
+      peso: 9,
+      atendido: isAffirmative(item.parceria_superintendencia) || isAffirmative(item.hasParceriaSuperintendencia) || isAffirmative(item.superintendencia_possui)
     },
     {
       ordem: 6,
       ordem_str: "6º",
-      nome: "Empresa simulada",
-      identificador: "empresa_simulada",
-      peso: 5,
-      atendido: isAffirmative(item.empresa_simulada) || isAffirmative(item.empresa_simulada_possui) || isAffirmative(item.hasEmpresaSimulada)
+      nome: "Parceria com instituição de ensino superior",
+      identificador: "parceria_ies",
+      peso: 8,
+      atendido: isAffirmative(item.parceria_ies) || isAffirmative(item.ies_possui) || isAffirmative(item.hasIes)
     },
     {
       ordem: 7,
       ordem_str: "7º",
-      nome: "Sistema de ensino Escola do Sebrae",
-      identificador: "escola_sebrae",
-      peso: 4,
-      atendido: isAffirmative(item.escola_sebrae) || isAffirmative(item.escola_sebrae_possui) || isAffirmative(item.hasEscolaSebrae)
+      nome: "Rede Aqui Tem Sebrae",
+      identificador: "rede_aqui_tem_sebrae",
+      peso: 7,
+      atendido: isAffirmative(item.rede_aqui_tem_sebrae) || isAffirmative(item.aqui_tem_sebrae_possui) || isAffirmative(item.hasRedeAquiTemSebrae) || isAffirmative(item.aqui_tem_sebrae)
     },
     {
       ordem: 8,
       ordem_str: "8º",
-      nome: "Cooperativa de crédito",
-      identificador: "cooperativa_credito",
-      peso: 3,
-      atendido: isAffirmative(item.cooperativa_credito) || isAffirmative(item.cooperativa_possui) || isAffirmative(item.hasCoop)
+      nome: "Convênio / termo de parceria",
+      identificador: "convenio_parceria",
+      peso: 6,
+      atendido: isAffirmative(item.convenio_parceria) || isAffirmative(item.convenio_sebrae) || isAffirmative(item.hasConvenioSebrae)
     },
     {
       ordem: 9,
       ordem_str: "9º",
-      nome: "Parceria com superintendência de ensino",
-      identificador: "parceria_superintendencia",
-      peso: 2,
-      atendido: isAffirmative(item.parceria_superintendencia) || isAffirmative(item.hasParceriaSuperintendencia)
+      nome: "Comitê e ações conjuntas",
+      identificador: "comite_acoes_conjuntas",
+      peso: 5,
+      atendido: isAffirmative(item.comite_acoes_conjuntas) || isAffirmative(item.comite_possui) || isAffirmative(item.hasCommittee)
     },
     {
       ordem: 10,
       ordem_str: "10º",
+      nome: "Empresa simulada",
+      identificador: "empresa_simulada",
+      peso: 4,
+      atendido: isAffirmative(item.empresa_simulada) || isAffirmative(item.empresa_simulada_possui) || isAffirmative(item.hasEmpresaSimulada)
+    },
+    {
+      ordem: 11,
+      ordem_str: "11º",
+      nome: "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+      identificador: "escola_sebrae",
+      peso: 3,
+      atendido: isAffirmative(item.escola_sebrae) || isAffirmative(item.escola_sebrae_possui) || isAffirmative(item.hasEscolaSebrae)
+    },
+    {
+      ordem: 12,
+      ordem_str: "12º",
+      nome: "Parceria com Cooperativa de Crédito",
+      identificador: "cooperativa_credito",
+      peso: 2,
+      atendido: isAffirmative(item.cooperativa_credito) || isAffirmative(item.cooperativa_possui) || isAffirmative(item.hasCoop)
+    },
+    {
+      ordem: 13,
+      ordem_str: "13º",
       nome: "Lei da educação empreendedora",
       identificador: "lei_educacao_empreendedora",
       peso: 1,
@@ -162,11 +186,11 @@ function calculateMunicipioDevelopmentIndex(item) {
     };
   });
 
-  const percentual = Math.round((pontuacaoBruta / 55.0) * 1000) / 10;
+  const percentual = Math.round((pontuacaoBruta / 91.0) * 1000) / 10;
   let classificacao = "Em Desenvolvimento";
   let classificacaoKey = "em_desenvolvimento";
 
-  if (pontuacaoBruta <= 38) {
+  if (pontuacaoBruta <= 63) {
     classificacao = "Em Desenvolvimento";
     classificacaoKey = "em_desenvolvimento";
   } else {
@@ -194,6 +218,9 @@ function calculateMunicipioDevelopmentIndex(item) {
     if (isAffirmative(item.parceria_superintendencia) || isAffirmative(item.hasParceriaSuperintendencia)) {
       derived.add("encontro_mediado");
     }
+    if (isAffirmative(item.parceria_secretaria_educacao) || isAffirmative(item.secretaria_educacao_possui) || isAffirmative(item.hasParceriaSecretariaEducacao)) {
+      derived.add("encontro_mediado");
+    }
     if (isAffirmative(item.lei_educacao_empreendedora) || isAffirmative(item.lei_possui) || isAffirmative(item.hasLaw)) {
       derived.add("encontro_mediado");
     }
@@ -211,7 +238,7 @@ function calculateMunicipioDevelopmentIndex(item) {
 
   return {
     pontuacao: pontuacaoBruta,
-    pontuacao_maxima: 55,
+    pontuacao_maxima: 91,
     percentual,
     classificacao,
     classificacao_key: classificacaoKey,
@@ -727,7 +754,7 @@ function renderCasesTable() {
     const indexBadge = devIndex ? `
       <div class="dev-index-badge ${devIndex.classificacao_key}" style="display: inline-flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 4px 8px; border-radius: 4px; box-sizing: border-box; width: 100%; max-width: 140px; margin: 0 auto;">
         <span class="dev-index-val ${devIndex.classificacao_key}" style="font-size: 0.75rem; font-weight: 800; text-align: center; width: 100%; display: block; padding: 0; background: transparent !important; border: none !important;">${escapeHtml(devIndex.classificacao)}</span>
-        <span class="dev-index-sub" style="font-size: 0.68rem; font-weight: 700; text-align: center; width: 100%; display: block; margin-top: 2px; opacity: 0.85;">${devIndex.pontuacao}/55 PTS (${devIndex.percentual}%)</span>
+        <span class="dev-index-sub" style="font-size: 0.68rem; font-weight: 700; text-align: center; width: 100%; display: block; margin-top: 2px; opacity: 0.85;">${devIndex.pontuacao}/${devIndex.pontuacao_maxima || 91} PTS (${devIndex.percentual}%)</span>
       </div>
     ` : `<span style="color: #94a3b8;">-</span>`;
 
@@ -1114,11 +1141,11 @@ function renderDevIndexCalculationMemory(item) {
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <div style="padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; display: flex; flex-direction: column; gap: 1px; ${isEmDesenv ? 'background: #e0f2fe; color: #0369a1; border: 2px solid #0284c7; box-shadow: 0 1px 4px rgba(2, 132, 199, 0.2);' : 'background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; opacity: 0.75;'}">
               <span>Em Desenvolvimento</span>
-              <small style="font-weight: 600; font-size: 0.68rem;">0 a 38 pts (0% - 69%)</small>
+              <small style="font-weight: 600; font-size: 0.68rem;">0 a 63 pts (0% - 69%)</small>
             </div>
             <div style="padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; display: flex; flex-direction: column; gap: 1px; ${isDesenvolvido ? 'background: #dcfce7; color: #15803d; border: 2px solid #22c55e; box-shadow: 0 1px 4px rgba(34, 197, 94, 0.2);' : 'background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; opacity: 0.75;'}">
               <span>Desenvolvido</span>
-              <small style="font-weight: 600; font-size: 0.68rem;">39 a 55 pts (70% - 100%)</small>
+              <small style="font-weight: 600; font-size: 0.68rem;">64 a 91 pts (70% - 100%)</small>
             </div>
           </div>
         </div>
@@ -1156,8 +1183,8 @@ function renderDevIndexCalculationMemory(item) {
             <tfoot>
               <tr style="background: #f8fafc; border-top: 2px solid #cbd5e1; font-weight: 800;">
                 <td colspan="2" style="padding: 10px 12px; color: #1e293b;">Total Consolidado</td>
-                <td style="padding: 10px; text-align: center; color: #0054a6;">55</td>
-                <td style="padding: 10px; text-align: center; color: #64748b;">${criterios.filter(c => c.atendido).length} / 10</td>
+                <td style="padding: 10px; text-align: center; color: #0054a6;">${pontuacao_maxima}</td>
+                <td style="padding: 10px; text-align: center; color: #64748b;">${criterios.filter(c => c.atendido).length} / ${criterios.length}</td>
                 <td style="padding: 10px 12px; text-align: right; color: #0054a6; font-size: 0.95rem;">${pontuacao} pts (${percentual}%)</td>
               </tr>
             </tfoot>
@@ -1238,7 +1265,7 @@ function renderMunicipalityFinalConsolidatedScore(item) {
   if (!Array.isArray(insts)) insts = [];
 
   const ptsIndice = devIndex ? devIndex.pontuacao : 0;
-  const ptsMaxIndice = devIndex ? devIndex.pontuacao_maxima : 55;
+  const ptsMaxIndice = devIndex ? devIndex.pontuacao_maxima : 91;
   const ptsInst = insts.length * 10;
   const ptsTotal = ptsIndice + ptsInst;
   const isDesenvolvido = devIndex && devIndex.classificacao_key === "desenvolvido";
@@ -1372,44 +1399,56 @@ function openMunicipalityDetails(id) {
       </div>
       <div class="indicators-summary-list">
         <div class="indicator-check-row">
-          <span>Programa JEPP</span>
-          ${getIndicatorBadge(item.status_jepp)}
+          <span>1º - Possui Educação Empreendedora em mais de 70% do município</span>
+          ${getIndicatorBadge(item.educacao_70_porcento || item.municipio_ee_70 || item.edu70)}
         </div>
         <div class="indicator-check-row">
-          <span>Possui Educação Empreendedora em mais de 70% do município?</span>
-          ${getIndicatorBadge(item.municipio_ee_70)}
+          <span>2º - Parceria com Secretária Municipal de Educação</span>
+          ${getIndicatorBadge(item.parceria_secretaria_educacao || item.secretaria_educacao_possui || item.hasParceriaSecretariaEducacao || item.secretaria_educacao)}
         </div>
         <div class="indicator-check-row">
-          <span>Convênio/termo de parceria com o Sebrae</span>
-          ${getIndicatorBadge(item.convenio_sebrae)}
+          <span>3º - JEPP no município</span>
+          ${getIndicatorBadge(item.status_jepp || item.jepp_municipio || item.jeppStatus)}
         </div>
         <div class="indicator-check-row">
-          <span>Parceria com superintendência de ensino</span>
-          ${getIndicatorBadge(item.parceria_superintendencia)}
+          <span>4º - Produto Despertar implantado</span>
+          ${getIndicatorBadge(item.produto_despertar || item.despertar_possui || item.hasDespertar)}
         </div>
         <div class="indicator-check-row">
-          <span>Cooperativa Escolar/Crédito</span>
-          ${getIndicatorBadge(item.cooperativa_possui)}
+          <span>5º - Parceria com superintendência de ensino</span>
+          ${getIndicatorBadge(item.parceria_superintendencia || item.hasParceriaSuperintendencia)}
         </div>
         <div class="indicator-check-row">
-          <span>Lei Municipal de Educação Empreendedora</span>
-          ${getIndicatorBadge(item.lei_possui)}
+          <span>6º - Parceria com instituição de ensino superior</span>
+          ${getIndicatorBadge(item.parceria_ies || item.ies_possui || item.hasIes)}
         </div>
         <div class="indicator-check-row">
-          <span>Comitê Gestor Municipal</span>
-          ${getIndicatorBadge(item.comite_possui)}
+          <span>7º - Rede Aqui Tem Sebrae</span>
+          ${getIndicatorBadge(item.rede_aqui_tem_sebrae || item.aqui_tem_sebrae_possui || item.hasRedeAquiTemSebrae)}
         </div>
         <div class="indicator-check-row">
-          <span>Parceria com Instituição de Ensino Superior</span>
-          ${getIndicatorBadge(item.ies_possui)}
+          <span>8º - Convênio / termo de parceria</span>
+          ${getIndicatorBadge(item.convenio_parceria || item.convenio_sebrae || item.hasConvenioSebrae)}
         </div>
         <div class="indicator-check-row">
-          <span>Empresa Simulada</span>
-          ${getIndicatorBadge(item.empresa_simulada)}
+          <span>9º - Comitê e ações conjuntas</span>
+          ${getIndicatorBadge(item.comite_acoes_conjuntas || item.comite_possui || item.hasCommittee)}
         </div>
         <div class="indicator-check-row">
-          <span>Sistema de Ensino Escola do Sebrae</span>
-          ${getIndicatorBadge(item.escola_sebrae)}
+          <span>10º - Empresa simulada</span>
+          ${getIndicatorBadge(item.empresa_simulada || item.empresa_simulada_possui || item.hasEmpresaSimulada)}
+        </div>
+        <div class="indicator-check-row">
+          <span>11º - Sistema de Ensino Escola do Sebrae (Cursos Técnicos)</span>
+          ${getIndicatorBadge(item.escola_sebrae || item.escola_sebrae_possui || item.hasEscolaSebrae)}
+        </div>
+        <div class="indicator-check-row">
+          <span>12º - Parceria com Cooperativa de Crédito</span>
+          ${getIndicatorBadge(item.cooperativa_credito || item.cooperativa_possui || item.hasCoop)}
+        </div>
+        <div class="indicator-check-row">
+          <span>13º - Lei da educação empreendedora</span>
+          ${getIndicatorBadge(item.lei_educacao_empreendedora || item.lei_possui || item.hasLaw)}
         </div>
       </div>
     </div>
@@ -1902,20 +1941,29 @@ function openEditMunicipalityModal(id) {
   document.getElementById("edit-mun-resp-tel").value = item.responsavel_telefone || item.solicitante_telefone || item.tecnico_telefone || "";
 
   // Indicators
-  document.getElementById("edit-mun-jepp").value = item.status_jepp || "Não";
-  document.getElementById("edit-mun-ee70").value = (item.municipio_ee_70 === 'sim' || item.municipio_ee_70 === true) ? "sim" : "nao";
-  if (document.getElementById("edit-mun-convenio")) {
-    document.getElementById("edit-mun-convenio").value = (item.convenio_sebrae === 'sim' || item.convenio_sebrae === true) ? "sim" : "nao";
+  document.getElementById("edit-mun-ee70").value = (item.municipio_ee_70 === 'sim' || item.municipio_ee_70 === true || item.educacao_70_porcento === true) ? "sim" : "nao";
+  if (document.getElementById("edit-mun-secretaria-educacao")) {
+    document.getElementById("edit-mun-secretaria-educacao").value = (item.parceria_secretaria_educacao === 'sim' || item.parceria_secretaria_educacao === true || item.secretaria_educacao_possui === true) ? "sim" : "nao";
+  }
+  document.getElementById("edit-mun-jepp").value = item.status_jepp || item.jepp_municipio || "Não";
+  if (document.getElementById("edit-mun-despertar")) {
+    document.getElementById("edit-mun-despertar").value = (item.produto_despertar === 'sim' || item.produto_despertar === true || item.despertar_possui === true) ? "sim" : "nao";
   }
   if (document.getElementById("edit-mun-superintendencia")) {
     document.getElementById("edit-mun-superintendencia").value = (item.parceria_superintendencia === 'sim' || item.parceria_superintendencia === true) ? "sim" : "nao";
   }
-  document.getElementById("edit-mun-cooperativa").value = (item.cooperativa_possui === 'sim' || item.cooperativa_possui === true) ? "sim" : "nao";
-  document.getElementById("edit-mun-lei").value = (item.lei_possui === 'sim' || item.lei_possui === true) ? "sim" : "nao";
-  document.getElementById("edit-mun-comite").value = (item.comite_possui === 'sim' || item.comite_possui === true) ? "sim" : "nao";
-  document.getElementById("edit-mun-ies").value = (item.ies_possui === 'sim' || item.ies_possui === true) ? "sim" : "nao";
+  document.getElementById("edit-mun-ies").value = (item.ies_possui === 'sim' || item.ies_possui === true || item.parceria_ies === true) ? "sim" : "nao";
+  if (document.getElementById("edit-mun-aqui-tem-sebrae")) {
+    document.getElementById("edit-mun-aqui-tem-sebrae").value = (item.rede_aqui_tem_sebrae === 'sim' || item.rede_aqui_tem_sebrae === true || item.aqui_tem_sebrae_possui === true) ? "sim" : "nao";
+  }
+  if (document.getElementById("edit-mun-convenio")) {
+    document.getElementById("edit-mun-convenio").value = (item.convenio_sebrae === 'sim' || item.convenio_sebrae === true || item.convenio_parceria === true) ? "sim" : "nao";
+  }
+  document.getElementById("edit-mun-comite").value = (item.comite_possui === 'sim' || item.comite_possui === true || item.comite_acoes_conjuntas === true) ? "sim" : "nao";
   document.getElementById("edit-mun-emp-sim").value = (item.empresa_simulada === 'sim' || item.empresa_simulada === true) ? "sim" : "nao";
   document.getElementById("edit-mun-esc-seb").value = (item.escola_sebrae === 'sim' || item.escola_sebrae === true) ? "sim" : "nao";
+  document.getElementById("edit-mun-cooperativa").value = (item.cooperativa_possui === 'sim' || item.cooperativa_possui === true || item.cooperativa_credito === true) ? "sim" : "nao";
+  document.getElementById("edit-mun-lei").value = (item.lei_possui === 'sim' || item.lei_possui === true || item.lei_educacao_empreendedora === true) ? "sim" : "nao";
 
   // Instrumentos Aplicados
   let insts = item.instrumentos_aplicados;
@@ -1948,6 +1996,7 @@ function syncEditMunicipalityInstruments() {
   const escSeb = document.getElementById("edit-mun-esc-seb")?.value;
   const convSeb = document.getElementById("edit-mun-convenio")?.value;
   const parcSup = document.getElementById("edit-mun-superintendencia")?.value;
+  const parcSec = document.getElementById("edit-mun-secretaria-educacao")?.value;
   const lei = document.getElementById("edit-mun-lei")?.value;
   const ies = document.getElementById("edit-mun-ies")?.value;
 
@@ -1963,7 +2012,7 @@ function syncEditMunicipalityInstruments() {
   if (empSim === "sim" || escSeb === "sim") {
     setChecked("edit-inst-curso");
   }
-  if (convSeb === "sim" || parcSup === "sim" || lei === "sim" || ies === "sim") {
+  if (convSeb === "sim" || parcSup === "sim" || parcSec === "sim" || lei === "sim" || ies === "sim") {
     setChecked("edit-inst-encontro-mediado");
   }
 }
@@ -2010,15 +2059,28 @@ async function handleSaveMunicipalityEdit(e) {
     responsavel_email: document.getElementById("edit-mun-resp-email").value.trim(),
     responsavel_telefone: document.getElementById("edit-mun-resp-tel").value.trim(),
     status_jepp: document.getElementById("edit-mun-jepp").value,
+    jepp_municipio: document.getElementById("edit-mun-jepp").value,
     municipio_ee_70: document.getElementById("edit-mun-ee70").value,
-    convenio_sebrae: document.getElementById("edit-mun-convenio") ? document.getElementById("edit-mun-convenio").value === "sim" : false,
+    educacao_70_porcento: document.getElementById("edit-mun-ee70").value === "sim",
+    parceria_secretaria_educacao: document.getElementById("edit-mun-secretaria-educacao") ? document.getElementById("edit-mun-secretaria-educacao").value === "sim" : false,
+    secretaria_educacao_possui: document.getElementById("edit-mun-secretaria-educacao") ? document.getElementById("edit-mun-secretaria-educacao").value === "sim" : false,
+    produto_despertar: document.getElementById("edit-mun-despertar") ? document.getElementById("edit-mun-despertar").value === "sim" : false,
+    despertar_possui: document.getElementById("edit-mun-despertar") ? document.getElementById("edit-mun-despertar").value === "sim" : false,
     parceria_superintendencia: document.getElementById("edit-mun-superintendencia") ? document.getElementById("edit-mun-superintendencia").value === "sim" : false,
-    cooperativa_possui: document.getElementById("edit-mun-cooperativa").value === "sim",
-    lei_possui: document.getElementById("edit-mun-lei").value === "sim",
-    comite_possui: document.getElementById("edit-mun-comite").value === "sim",
     ies_possui: document.getElementById("edit-mun-ies").value === "sim",
+    parceria_ies: document.getElementById("edit-mun-ies").value === "sim",
+    rede_aqui_tem_sebrae: document.getElementById("edit-mun-aqui-tem-sebrae") ? document.getElementById("edit-mun-aqui-tem-sebrae").value === "sim" : false,
+    aqui_tem_sebrae_possui: document.getElementById("edit-mun-aqui-tem-sebrae") ? document.getElementById("edit-mun-aqui-tem-sebrae").value === "sim" : false,
+    convenio_sebrae: document.getElementById("edit-mun-convenio") ? document.getElementById("edit-mun-convenio").value === "sim" : false,
+    convenio_parceria: document.getElementById("edit-mun-convenio") ? document.getElementById("edit-mun-convenio").value === "sim" : false,
+    comite_possui: document.getElementById("edit-mun-comite").value === "sim",
+    comite_acoes_conjuntas: document.getElementById("edit-mun-comite").value === "sim",
     empresa_simulada: document.getElementById("edit-mun-emp-sim").value === "sim",
     escola_sebrae: document.getElementById("edit-mun-esc-seb").value === "sim",
+    cooperativa_possui: document.getElementById("edit-mun-cooperativa").value === "sim",
+    cooperativa_credito: document.getElementById("edit-mun-cooperativa").value === "sim",
+    lei_possui: document.getElementById("edit-mun-lei").value === "sim",
+    lei_educacao_empreendedora: document.getElementById("edit-mun-lei").value === "sim",
     instrumentos_aplicados: selectedInsts,
     pontuacao_instrumentos: selectedInsts.length * 10,
     destaque_instrumentos: selectedInsts.length >= 3

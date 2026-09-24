@@ -13,40 +13,46 @@ class TestIndiceDesenvolvimento(unittest.TestCase):
     """Testes completos da regra de negócio e visualização do Índice de Desenvolvimento do Município."""
 
     def test_criteria_order_weights_and_sum(self):
-        """Verifica a ordem dos 10 critérios, seus pesos de 10 a 1 e soma total 55."""
+        """Verifica a ordem dos 13 critérios, seus pesos de 13 a 1 e soma total 91."""
         dummy_all_true = {
             "educacao_70_porcento": True,
+            "parceria_secretaria_educacao": True,
             "jepp_municipio": "Total",
+            "produto_despertar": True,
+            "parceria_superintendencia": True,
+            "parceria_ies": True,
+            "rede_aqui_tem_sebrae": True,
             "convenio_parceria": True,
             "comite_acoes_conjuntas": True,
-            "parceria_ies": True,
             "empresa_simulada": True,
             "escola_sebrae": True,
             "cooperativa_credito": True,
-            "parceria_superintendencia": True,
             "lei_educacao_empreendedora": True,
         }
         res = calculate_municipio_development_index(dummy_all_true)
-        self.assertEqual(res["pontuacao_maxima"], 55)
-        self.assertEqual(res["pontuacao"], 55)
+        self.assertEqual(res["pontuacao_maxima"], 91)
+        self.assertEqual(res["pontuacao"], 91)
         self.assertEqual(res["percentual"], 100.0)
         self.assertEqual(res["classificacao"], "Desenvolvido")
         self.assertEqual(res["classificacao_key"], "desenvolvido")
 
         criterios = res["criterios"]
-        self.assertEqual(len(criterios), 10)
+        self.assertEqual(len(criterios), 13)
 
         expected = [
-            (1, "1º", 10, "educacao_70_porcento"),
-            (2, "2º", 9, "jepp_municipio"),
-            (3, "3º", 8, "convenio_parceria"),
-            (4, "4º", 7, "comite_acoes_conjuntas"),
-            (5, "5º", 6, "parceria_ies"),
-            (6, "6º", 5, "empresa_simulada"),
-            (7, "7º", 4, "escola_sebrae"),
-            (8, "8º", 3, "cooperativa_credito"),
-            (9, "9º", 2, "parceria_superintendencia"),
-            (10, "10º", 1, "lei_educacao_empreendedora"),
+            (1, "1º", 13, "educacao_70_porcento"),
+            (2, "2º", 12, "parceria_secretaria_educacao"),
+            (3, "3º", 11, "jepp_municipio"),
+            (4, "4º", 10, "produto_despertar"),
+            (5, "5º", 9, "parceria_superintendencia"),
+            (6, "6º", 8, "parceria_ies"),
+            (7, "7º", 7, "rede_aqui_tem_sebrae"),
+            (8, "8º", 6, "convenio_parceria"),
+            (9, "9º", 5, "comite_acoes_conjuntas"),
+            (10, "10º", 4, "empresa_simulada"),
+            (11, "11º", 3, "escola_sebrae"),
+            (12, "12º", 2, "cooperativa_credito"),
+            (13, "13º", 1, "lei_educacao_empreendedora"),
         ]
 
         total_weights = 0
@@ -60,68 +66,48 @@ class TestIndiceDesenvolvimento(unittest.TestCase):
             self.assertEqual(c["pontos"], peso)
             total_weights += peso
 
-        self.assertEqual(total_weights, 55)
+        self.assertEqual(total_weights, 91)
 
     def test_score_cutoffs_and_tiers(self):
         """Valida as faixas de corte exatas:
-        - Início: 0 a 21 pts (0% a 39%)
-        - Em Desenvolvimento: 22 a 38 pts (40% a 69%)
-        - Desenvolvido: 39 a 55 pts (70% a 100%)
+        - Em Desenvolvimento: 0 a 63 pts (0% a 69.2%)
+        - Desenvolvido: 64 a 91 pts (70.3% a 100%)
         """
-        # 0 pontos -> Em Desenvolvimento (faixa unificada de 0 a 38 pontos)
+        # 0 pontos -> Em Desenvolvimento (faixa unificada de 0 a 63 pontos)
         res0 = calculate_municipio_development_index({})
         self.assertEqual(res0["pontuacao"], 0)
         self.assertEqual(res0["percentual"], 0.0)
         self.assertEqual(res0["classificacao"], "Em Desenvolvimento")
         self.assertEqual(res0["classificacao_key"], "em_desenvolvimento")
 
-        # 21 pontos (peso 10 + 8 + 3 = 21) -> Em Desenvolvimento
-        res21 = calculate_municipio_development_index({
-            "educacao_70_porcento": True,  # 10
-            "convenio_parceria": True,    # 8
-            "cooperativa_credito": True   # 3
+        # 63 pontos (13 + 12 + 11 + 10 + 9 + 8 = 63) -> Em Desenvolvimento (69.2% <= 70%)
+        res63 = calculate_municipio_development_index({
+            "educacao_70_porcento": True,          # 13
+            "parceria_secretaria_educacao": True,  # 12
+            "jepp_municipio": "Total",             # 11
+            "produto_despertar": True,             # 10
+            "parceria_superintendencia": True,     # 9
+            "parceria_ies": True                   # 8
         })
-        self.assertEqual(res21["pontuacao"], 21)
-        self.assertEqual(res21["percentual"], 38.2)
-        self.assertEqual(res21["classificacao"], "Em Desenvolvimento")
-        self.assertEqual(res21["classificacao_key"], "em_desenvolvimento")
+        self.assertEqual(res63["pontuacao"], 63)
+        self.assertEqual(res63["percentual"], 69.2)
+        self.assertEqual(res63["classificacao"], "Em Desenvolvimento")
+        self.assertEqual(res63["classificacao_key"], "em_desenvolvimento")
 
-        # 22 pontos (peso 10 + 9 + 3 = 22) -> Em Desenvolvimento
-        res22 = calculate_municipio_development_index({
-            "educacao_70_porcento": True,  # 10
-            "jepp_municipio": "Total",     # 9
-            "cooperativa_credito": True    # 3
+        # 64 pontos (63 + 1 = 64) -> Desenvolvido (70.3% > 70%)
+        res64 = calculate_municipio_development_index({
+            "educacao_70_porcento": True,          # 13
+            "parceria_secretaria_educacao": True,  # 12
+            "jepp_municipio": "Total",             # 11
+            "produto_despertar": True,             # 10
+            "parceria_superintendencia": True,     # 9
+            "parceria_ies": True,                  # 8
+            "lei_educacao_empreendedora": True     # 1
         })
-        self.assertEqual(res22["pontuacao"], 22)
-        self.assertEqual(res22["percentual"], 40.0)
-        self.assertEqual(res22["classificacao"], "Em Desenvolvimento")
-        self.assertEqual(res22["classificacao_key"], "em_desenvolvimento")
-
-        # 38 pontos (peso 10 + 9 + 8 + 7 + 4 = 38) -> Em Desenvolvimento
-        res38 = calculate_municipio_development_index({
-            "educacao_70_porcento": True,    # 10
-            "jepp_municipio": "Sim",         # 9
-            "convenio_parceria": True,      # 8
-            "comite_acoes_conjuntas": True,  # 7
-            "escola_sebrae": True           # 4
-        })
-        self.assertEqual(res38["pontuacao"], 38)
-        self.assertEqual(res38["percentual"], 69.1)
-        self.assertEqual(res38["classificacao"], "Em Desenvolvimento")
-        self.assertEqual(res38["classificacao_key"], "em_desenvolvimento")
-
-        # 39 pontos (peso 10 + 9 + 8 + 7 + 5 = 39) -> Desenvolvido
-        res39 = calculate_municipio_development_index({
-            "educacao_70_porcento": True,    # 10
-            "jepp_municipio": "Parcial",     # 9
-            "convenio_parceria": True,      # 8
-            "comite_acoes_conjuntas": True,  # 7
-            "empresa_simulada": True         # 5
-        })
-        self.assertEqual(res39["pontuacao"], 39)
-        self.assertEqual(res39["percentual"], 70.9)
-        self.assertEqual(res39["classificacao"], "Desenvolvido")
-        self.assertEqual(res39["classificacao_key"], "desenvolvido")
+        self.assertEqual(res64["pontuacao"], 64)
+        self.assertEqual(res64["percentual"], 70.3)
+        self.assertEqual(res64["classificacao"], "Desenvolvido")
+        self.assertEqual(res64["classificacao_key"], "desenvolvido")
 
     def test_jepp_flexibility(self):
         """Verifica que JEPP é pontuado quando Total, Parcial, Sim, True ou 1."""
@@ -129,7 +115,7 @@ class TestIndiceDesenvolvimento(unittest.TestCase):
             res = calculate_municipio_development_index({"jepp_municipio": val})
             jepp_crit = next(c for c in res["criterios"] if c["identificador"] == "jepp_municipio")
             self.assertTrue(jepp_crit["atendido"], f"JEPP com valor '{val}' deveria ser atendido")
-            self.assertEqual(jepp_crit["pontos"], 9)
+            self.assertEqual(jepp_crit["pontos"], 11)
 
         for val in ["Não", "nao", False, None, ""]:
             res = calculate_municipio_development_index({"jepp_municipio": val})

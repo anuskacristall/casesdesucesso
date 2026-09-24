@@ -1689,76 +1689,100 @@ function calculateMunicipioDevelopmentIndex(item) {
       ordem_str: "1º",
       nome: "Possui Educação Empreendedora em mais de 70% do município",
       identificador: "educacao_70_porcento",
-      peso: 10,
+      peso: 13,
       atendido: isAffirmative(item.educacao_70_porcento) || isAffirmative(item.municipio_ee_70) || isAffirmative(item.edu70)
     },
     {
       ordem: 2,
       ordem_str: "2º",
-      nome: "JEPP no município",
-      identificador: "jepp_municipio",
-      peso: 9,
-      atendido: isJeppAttended(item.jepp_municipio) || isJeppAttended(item.status_jepp) || isJeppAttended(item.jeppStatus)
+      nome: "Parceria com Secretária Municipal de Educação",
+      identificador: "parceria_secretaria_educacao",
+      peso: 12,
+      atendido: isAffirmative(item.parceria_secretaria_educacao) || isAffirmative(item.secretaria_educacao_possui) || isAffirmative(item.hasParceriaSecretariaEducacao) || isAffirmative(item.secretaria_educacao)
     },
     {
       ordem: 3,
       ordem_str: "3º",
-      nome: "Convênio / termo de parceria",
-      identificador: "convenio_parceria",
-      peso: 8,
-      atendido: isAffirmative(item.convenio_parceria) || isAffirmative(item.convenio_sebrae) || isAffirmative(item.hasConvenioSebrae)
+      nome: "JEPP no município",
+      identificador: "jepp_municipio",
+      peso: 11,
+      atendido: isJeppAttended(item.jepp_municipio) || isJeppAttended(item.status_jepp) || isJeppAttended(item.jeppStatus)
     },
     {
       ordem: 4,
       ordem_str: "4º",
-      nome: "Comitê e ações conjuntas",
-      identificador: "comite_acoes_conjuntas",
-      peso: 7,
-      atendido: isAffirmative(item.comite_acoes_conjuntas) || isAffirmative(item.comite_possui) || isAffirmative(item.hasCommittee)
+      nome: "Produto Despertar implantado",
+      identificador: "produto_despertar",
+      peso: 10,
+      atendido: isAffirmative(item.produto_despertar) || isAffirmative(item.despertar_possui) || isAffirmative(item.hasDespertar) || isAffirmative(item.produto_despertar_possui)
     },
     {
       ordem: 5,
       ordem_str: "5º",
-      nome: "Parceria com instituição de ensino superior",
-      identificador: "parceria_ies",
-      peso: 6,
-      atendido: isAffirmative(item.parceria_ies) || isAffirmative(item.ies_possui) || isAffirmative(item.hasIes)
+      nome: "Parceria com superintendência de ensino",
+      identificador: "parceria_superintendencia",
+      peso: 9,
+      atendido: isAffirmative(item.parceria_superintendencia) || isAffirmative(item.hasParceriaSuperintendencia) || isAffirmative(item.superintendencia_possui)
     },
     {
       ordem: 6,
       ordem_str: "6º",
-      nome: "Empresa simulada",
-      identificador: "empresa_simulada",
-      peso: 5,
-      atendido: isAffirmative(item.empresa_simulada) || isAffirmative(item.empresa_simulada_possui) || isAffirmative(item.hasEmpresaSimulada)
+      nome: "Parceria com instituição de ensino superior",
+      identificador: "parceria_ies",
+      peso: 8,
+      atendido: isAffirmative(item.parceria_ies) || isAffirmative(item.ies_possui) || isAffirmative(item.hasIes)
     },
     {
       ordem: 7,
       ordem_str: "7º",
-      nome: "Sistema de ensino Escola do Sebrae",
-      identificador: "escola_sebrae",
-      peso: 4,
-      atendido: isAffirmative(item.escola_sebrae) || isAffirmative(item.escola_sebrae_possui) || isAffirmative(item.hasEscolaSebrae)
+      nome: "Rede Aqui Tem Sebrae",
+      identificador: "rede_aqui_tem_sebrae",
+      peso: 7,
+      atendido: isAffirmative(item.rede_aqui_tem_sebrae) || isAffirmative(item.aqui_tem_sebrae_possui) || isAffirmative(item.hasRedeAquiTemSebrae) || isAffirmative(item.aqui_tem_sebrae)
     },
     {
       ordem: 8,
       ordem_str: "8º",
-      nome: "Cooperativa de crédito",
-      identificador: "cooperativa_credito",
-      peso: 3,
-      atendido: isAffirmative(item.cooperativa_credito) || isAffirmative(item.cooperativa_possui) || isAffirmative(item.hasCoop)
+      nome: "Convênio / termo de parceria",
+      identificador: "convenio_parceria",
+      peso: 6,
+      atendido: isAffirmative(item.convenio_parceria) || isAffirmative(item.convenio_sebrae) || isAffirmative(item.hasConvenioSebrae)
     },
     {
       ordem: 9,
       ordem_str: "9º",
-      nome: "Parceria com superintendência de ensino",
-      identificador: "parceria_superintendencia",
-      peso: 2,
-      atendido: isAffirmative(item.parceria_superintendencia) || isAffirmative(item.hasParceriaSuperintendencia)
+      nome: "Comitê e ações conjuntas",
+      identificador: "comite_acoes_conjuntas",
+      peso: 5,
+      atendido: isAffirmative(item.comite_acoes_conjuntas) || isAffirmative(item.comite_possui) || isAffirmative(item.hasCommittee)
     },
     {
       ordem: 10,
       ordem_str: "10º",
+      nome: "Empresa simulada",
+      identificador: "empresa_simulada",
+      peso: 4,
+      atendido: isAffirmative(item.empresa_simulada) || isAffirmative(item.empresa_simulada_possui) || isAffirmative(item.hasEmpresaSimulada)
+    },
+    {
+      ordem: 11,
+      ordem_str: "11º",
+      nome: "Sistema de Ensino Escola do Sebrae (Cursos Técnicos)",
+      identificador: "escola_sebrae",
+      peso: 3,
+      atendido: isAffirmative(item.escola_sebrae) || isAffirmative(item.escola_sebrae_possui) || isAffirmative(item.hasEscolaSebrae)
+    },
+    {
+      ordem: 12,
+      ordem_str: "12º",
+      nome: "Parceria com Cooperativa de Crédito",
+      identificador: "cooperativa_credito",
+      peso: 2,
+      atendido: isAffirmative(item.cooperativa_credito) || isAffirmative(item.cooperativa_possui) || isAffirmative(item.hasCoop)
+    },
+    {
+      ordem: 13,
+      ordem_str: "13º",
       nome: "Lei da educação empreendedora",
       identificador: "lei_educacao_empreendedora",
       peso: 1,
@@ -1776,11 +1800,11 @@ function calculateMunicipioDevelopmentIndex(item) {
     };
   });
 
-  const percentual = Math.round((pontuacaoBruta / 55.0) * 1000) / 10;
+  const percentual = Math.round((pontuacaoBruta / 91.0) * 1000) / 10;
   let classificacao = "Em Desenvolvimento";
   let classificacaoKey = "em_desenvolvimento";
 
-  if (pontuacaoBruta <= 38) {
+  if (pontuacaoBruta <= 63) {
     classificacao = "Em Desenvolvimento";
     classificacaoKey = "em_desenvolvimento";
   } else {
@@ -1808,6 +1832,9 @@ function calculateMunicipioDevelopmentIndex(item) {
     if (isAffirmative(item.parceria_superintendencia) || isAffirmative(item.hasParceriaSuperintendencia)) {
       derived.add("encontro_mediado");
     }
+    if (isAffirmative(item.parceria_secretaria_educacao) || isAffirmative(item.secretaria_educacao_possui) || isAffirmative(item.hasParceriaSecretariaEducacao)) {
+      derived.add("encontro_mediado");
+    }
     if (isAffirmative(item.lei_educacao_empreendedora) || isAffirmative(item.lei_possui) || isAffirmative(item.hasLaw)) {
       derived.add("encontro_mediado");
     }
@@ -1825,7 +1852,7 @@ function calculateMunicipioDevelopmentIndex(item) {
 
   return {
     pontuacao: pontuacaoBruta,
-    pontuacao_maxima: 55,
+    pontuacao_maxima: 91,
     percentual,
     classificacao,
     classificacao_key: classificacaoKey,
@@ -1860,7 +1887,7 @@ function createQuickLookCard(item) {
     <div class="popup-header">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px;">
         <span class="badge" style="font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; ${typeBadgeStyle}">${typeLabelStr}</span>
-        <div class="dev-index-badge dev-index-${devIdx.classificacao_key}" title="Pontuação: ${devIdx.pontuacao}/55 (${devIdx.percentual}%)" style="text-align: center; align-items: center; display: inline-flex; flex-direction: column;">
+        <div class="dev-index-badge dev-index-${devIdx.classificacao_key}" title="Pontuação: ${devIdx.pontuacao}/${devIdx.pontuacao_maxima || 91} (${devIdx.percentual}%)" style="text-align: center; align-items: center; display: inline-flex; flex-direction: column;">
           <span class="dev-index-sub" style="font-size: 0.60rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); line-height: 1; letter-spacing: 0.2px;">Índice do Município</span>
           <span class="dev-index-val" style="font-size: 0.72rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; ${devBadgeStyle}">${devIdx.classificacao}</span>
         </div>
@@ -2484,6 +2511,9 @@ function syncMunicipalityInstrumentsFromIndicators() {
   const iesEl = document.querySelector('input[name="municipality-ies"]:checked');
   const iesSim = iesEl && iesEl.value === "sim";
 
+  const secEducEl = document.querySelector('input[name="municipality-secretaria-educacao"]:checked');
+  const secEduc = secEducEl && secEducEl.value === "sim";
+
   const setChecked = (id) => {
     const el = document.getElementById(id);
     if (el) el.checked = true;
@@ -2496,7 +2526,7 @@ function syncMunicipalityInstrumentsFromIndicators() {
   if (empSim || escSeb) {
     setChecked("inst-curso");
   }
-  if (convSeb || parcSup || leiSim || iesSim) {
+  if (convSeb || parcSup || leiSim || iesSim || secEduc) {
     setChecked("inst-encontro-mediado");
   }
 
@@ -2643,6 +2673,15 @@ async function handleMunicipalitySubmit(e) {
   const parcSupEl = document.querySelector('input[name="municipality-parceria-superintendencia"]:checked');
   const hasParceriaSuperintendencia = parcSupEl ? parcSupEl.value === "sim" : false;
 
+  const secEducEl = document.querySelector('input[name="municipality-secretaria-educacao"]:checked');
+  const hasSecretariaEducacao = secEducEl ? secEducEl.value === "sim" : false;
+
+  const despertarEl = document.querySelector('input[name="municipality-produto-despertar"]:checked');
+  const hasProdutoDespertar = despertarEl ? despertarEl.value === "sim" : false;
+
+  const redeAquiEl = document.querySelector('input[name="municipality-rede-aqui-tem-sebrae"]:checked');
+  const hasRedeAquiTemSebrae = redeAquiEl ? redeAquiEl.value === "sim" : false;
+
   // Instrumentos aplicados no município
   const selectedInstruments = Array.from(
     document.querySelectorAll('input[name="municipality-instruments"]:checked')
@@ -2687,6 +2726,13 @@ async function handleMunicipalitySubmit(e) {
       responsavel_telefone: formatPhoneNumber(contactPhone),
       status_jepp: jeppStatus,
       municipio_ee_70: edu70,
+      educacao_70_porcento: edu70,
+      parceria_secretaria_educacao: hasSecretariaEducacao,
+      secretaria_educacao_possui: hasSecretariaEducacao,
+      produto_despertar: hasProdutoDespertar,
+      despertar_possui: hasProdutoDespertar,
+      rede_aqui_tem_sebrae: hasRedeAquiTemSebrae,
+      aqui_tem_sebrae_possui: hasRedeAquiTemSebrae,
       convenio_sebrae: hasConvenioSebrae,
       parceria_superintendencia: hasParceriaSuperintendencia,
       cooperativa_possui: hasCoop,
@@ -3227,6 +3273,7 @@ function bindEvents() {
       "municipality-convenio-sebrae",
       "municipality-escola-sebrae",
       "municipality-parceria-superintendencia",
+      "municipality-secretaria-educacao",
       "municipality-law",
       "municipality-ies"
     ];
@@ -4174,11 +4221,11 @@ function renderDevIndexCalculationMemory(item) {
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <div style="padding: 6px 10px; border-radius: 6px; font-size: 0.73rem; font-weight: 700; display: flex; flex-direction: column; gap: 1px; ${isEmDesenv ? 'background: #e0f2fe; color: #0369a1; border: 2px solid #0284c7; box-shadow: 0 1px 4px rgba(2, 132, 199, 0.2);' : 'background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; opacity: 0.75;'}">
               <span>Em Desenvolvimento</span>
-              <small style="font-weight: 600; font-size: 0.68rem;">0 a 38 pts (0% - 69%)</small>
+              <small style="font-weight: 600; font-size: 0.68rem;">0 a 63 pts (0% - 69.2%)</small>
             </div>
             <div style="padding: 6px 10px; border-radius: 6px; font-size: 0.73rem; font-weight: 700; display: flex; flex-direction: column; gap: 1px; ${isDesenvolvido ? 'background: #e0f2fe; color: #0054a6; border: 2px solid #0054a6; box-shadow: 0 1px 4px rgba(0, 84, 166, 0.2);' : 'background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; opacity: 0.75;'}">
               <span>Desenvolvido</span>
-              <small style="font-weight: 600; font-size: 0.68rem;">39 a 55 pts (70% - 100%)</small>
+              <small style="font-weight: 600; font-size: 0.68rem;">64 a 91 pts (70.3% - 100%)</small>
             </div>
           </div>
         </div>
@@ -4216,8 +4263,8 @@ function renderDevIndexCalculationMemory(item) {
             <tfoot>
               <tr style="background: #f8fafc; border-top: 2px solid #cbd5e1; font-weight: 800;">
                 <td colspan="2" style="padding: 10px 12px; color: #1e293b;">Total Consolidado</td>
-                <td style="padding: 10px; text-align: center; color: #0054a6;">55</td>
-                <td style="padding: 10px; text-align: center; color: #64748b;">${criterios.filter(c => c.atendido).length} / 10</td>
+                <td style="padding: 10px; text-align: center; color: #0054a6;">${pontuacao_maxima}</td>
+                <td style="padding: 10px; text-align: center; color: #64748b;">${criterios.filter(c => c.atendido).length} / ${criterios.length}</td>
                 <td style="padding: 10px 12px; text-align: right; color: #0054a6; font-size: 0.95rem;">${pontuacao} pts (${percentual}%)</td>
               </tr>
             </tfoot>
@@ -4244,17 +4291,17 @@ async function loadMunicipalitiesData() {
 
   const approved = (Array.isArray(allMunicipalities) ? allMunicipalities : []).filter(m => m.status === "approved");
 
-  // Municípios Desenvolvidos (pontuação >= 39)
+  // Municípios Desenvolvidos (pontuação >= 64 / classificacao_key === 'desenvolvido')
   developedMunicipalities = approved.filter(m => {
     const devIdx = calculateMunicipioDevelopmentIndex(m);
-    return devIdx && devIdx.pontuacao >= 39;
+    return devIdx && devIdx.classificacao_key === "desenvolvido";
   });
   developedMunicipalities.sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || "")));
 
-  // Municípios em Desenvolvimento (pontuação <= 38)
+  // Municípios em Desenvolvimento (pontuação <= 63 / classificacao_key === 'em_desenvolvimento')
   developingMunicipalities = approved.filter(m => {
     const devIdx = calculateMunicipioDevelopmentIndex(m);
-    return !devIdx || devIdx.pontuacao <= 38;
+    return !devIdx || devIdx.classificacao_key === "em_desenvolvimento";
   });
   developingMunicipalities.sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || "")));
 
@@ -4466,7 +4513,7 @@ function openReferenciaMunDetails(id) {
   if (!modal) return;
 
   const devIdx = calculateMunicipioDevelopmentIndex(item);
-  const isDev = devIdx && devIdx.pontuacao >= 39;
+  const isDev = devIdx && devIdx.classificacao_key === "desenvolvido";
 
   // Atualiza crachá de Regional
   const regBadge = document.getElementById("ref-mun-detail-regional-badge");
