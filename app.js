@@ -2042,8 +2042,34 @@ function openDetailsModal(id) {
   const displayMr = item.mr.trim().startsWith("MR") ? item.mr.trim() : `MR ${item.mr.trim()}`;
   document.getElementById("details-location-text").innerHTML = `<i data-lucide="map-pin"></i> ${item.municipio} - ${displayMr}`;
   
-  // Description / General Case summary
-  document.getElementById("details-descricao").innerText = item.descricao || item.studentSummary || "Sem descrição cadastrada.";
+  // Description / Top box setup based on Case Type (Estudante Empreendedor vs Professor)
+  const isEstudante = item.tipoCase === "estudante" || item.hasStudentCase;
+  const topTitleEl = document.getElementById("details-top-box-title");
+  const topEmpresaMeta = document.getElementById("details-top-empresa-meta");
+
+  if (isEstudante) {
+    if (topTitleEl) {
+      topTitleEl.innerHTML = `<i data-lucide="briefcase" style="width: 18px; height: 18px;"></i> <span id="details-top-box-title-text">DESCRIÇÃO DA EMPRESA</span>`;
+    }
+    if (topEmpresaMeta) {
+      topEmpresaMeta.style.display = "flex";
+      const nomeEmp = item.empresaNome || item.empresa_nome || "";
+      const tipoEmp = item.empresaTipo || item.empresa_tipo || "";
+      document.getElementById("details-top-empresa-nome").innerText = nomeEmp || "Não informado";
+      document.getElementById("details-top-empresa-tipo").innerText = tipoEmp || "Não informado";
+    }
+    const empDesc = item.empresaDescricao || item.empresa_descricao || item.descricao || item.studentSummary;
+    document.getElementById("details-descricao").innerText = empDesc || "Sem descrição cadastrada.";
+  } else {
+    // Professor
+    if (topTitleEl) {
+      topTitleEl.innerHTML = `<i data-lucide="book-open" style="width: 18px; height: 18px;"></i> <span id="details-top-box-title-text">RESUMO DO PROJETO</span>`;
+    }
+    if (topEmpresaMeta) {
+      topEmpresaMeta.style.display = "none";
+    }
+    document.getElementById("details-descricao").innerText = item.descricao || "Sem resumo do projeto cadastrado.";
+  }
   
   // Set badge regional text & styling
   const regionalBadge = document.getElementById("details-regional-badge");
@@ -2178,41 +2204,14 @@ function openDetailsModal(id) {
     }
   }
 
-  // Enterprise details box setup
+  // Enterprise details box in left column: hidden since company info is now in top box for Estudante, and Professor has no enterprise
   const empresaBox = document.getElementById("details-empresa-box");
   if (empresaBox) {
-    const nomeEmp = item.empresaNome || item.empresa_nome || "";
-    const tipoEmp = item.empresaTipo || item.empresa_tipo || "";
-    const descEmp = item.empresaDescricao || item.empresa_descricao || "";
-
-    if (nomeEmp || tipoEmp || descEmp) {
-      empresaBox.style.display = "block";
-      document.getElementById("details-empresa-nome").innerText = nomeEmp || "Não informado";
-      document.getElementById("details-empresa-tipo").innerText = tipoEmp || "Não informado";
-      document.getElementById("details-empresa-descricao").innerText = descEmp || "Não informada";
-    } else {
-      empresaBox.style.display = "none";
-    }
+    empresaBox.style.display = "none";
   }
 
   // Helper to check if indicator is affirmative
   const isAffirmative = (v) => v === true || String(v || "").trim().toLowerCase() === "sim" || String(v || "").trim().toLowerCase() === "true" || String(v || "").trim().toLowerCase() === "sim (total)";
-
-  // JEPP Status Badge
-  const jeppBadge = document.getElementById("details-jepp");
-  if (jeppBadge) {
-    const jeppVal = String(item.jeppStatus || item.status_jepp || "").trim().toLowerCase();
-    if (jeppVal === "sim" || jeppVal === "sim (total)" || jeppVal === "total" || jeppVal === "totalmente implantado" || jeppVal.includes("total")) {
-      jeppBadge.innerText = "Totalmente implantado";
-      jeppBadge.className = "badge bg-centro";
-    } else if (jeppVal === "parcial" || jeppVal === "em implantação" || jeppVal === "em implantacao" || jeppVal.includes("parcial") || jeppVal.includes("implantação") || jeppVal.includes("implantacao")) {
-      jeppBadge.innerText = "Em implantação";
-      jeppBadge.className = "badge bg-centro-oeste";
-    } else {
-      jeppBadge.innerText = "Não implantado";
-      jeppBadge.className = "badge bg-rio-doce";
-    }
-  }
 
   // Helper to format Sim / Não badges
   const setYesNoBadge = (elementId, isSim) => {
@@ -2221,6 +2220,10 @@ function openDetailsModal(id) {
     el.innerText = isSim ? "Sim" : "Não";
     el.className = "badge " + (isSim ? "bg-centro" : "bg-rio-doce");
   };
+
+  // JEPP Status Badge (estritamente binário Sim / Não)
+  const isJeppSim = isAffirmative(item.jeppStatus) || isAffirmative(item.status_jepp);
+  setYesNoBadge("details-jepp", isJeppSim);
 
   // EE > 70% Indicator
   setYesNoBadge("details-edu-70", isAffirmative(item.edu70) || isAffirmative(item.municipio_ee_70));
@@ -2248,6 +2251,63 @@ function openDetailsModal(id) {
 
   // Parceria Superintendência Indicator
   setYesNoBadge("details-superintendencia-status", isAffirmative(item.parceria_superintendencia) || isAffirmative(item.hasParceriaSuperintendencia));
+
+  // Render municipality applied instruments in case modal
+  const caseInstContainer = document.getElementById("details-case-mun-instruments");
+  if (caseInstContainer) {
+    const normCity = (s) => String(s || "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const munTarget = normCity(item.municipio);
+    const munData = (allMunicipalities || []).find(m => normCity(m.nome || m.municipio) === munTarget)
+      || (developedMunicipalities || []).find(m => normCity(m.nome || m.municipio) === munTarget)
+      || (developingMunicipalities || []).find(m => normCity(m.nome || m.municipio) === munTarget);
+
+    let insts = item.instrumentos_aplicados || (munData && munData.instrumentos_aplicados) || [];
+    if (typeof insts === "string") {
+      try { insts = JSON.parse(insts); } catch (e) { insts = insts.split(",").map(s => s.trim()).filter(Boolean); }
+    }
+    if (!Array.isArray(insts)) insts = [];
+
+    const priorityOrder = ["material_didatico", "oficina", "curso", "encontro_mediado", "palestra"];
+    insts.sort((a, b) => priorityOrder.indexOf(a) - priorityOrder.indexOf(b));
+
+    const labels = {
+      material_didatico: "Aplicação de Material Didático",
+      oficina: "Oficina",
+      curso: "Curso",
+      encontro_mediado: "Encontro Mediado",
+      palestra: "Palestra"
+    };
+
+    const hasDestaque = insts.length >= 3;
+
+    const pillsHtml = insts.length > 0
+      ? insts.map(code => `
+          <span class="instrument-pill" style="font-size: 0.8rem; padding: 4px 10px;">
+            <i data-lucide="check" style="width: 13px; height: 13px;"></i>
+            <span>${escapeHtml(labels[code] || code)}</span>
+          </span>
+        `).join("")
+      : `<span style="color: #94a3b8; font-size: 0.82rem; font-style: italic;">Nenhum instrumento informado para este município</span>`;
+
+    caseInstContainer.innerHTML = `
+      <div class="case-mun-instruments-box">
+        <div class="case-mun-instruments-header">
+          <div class="case-mun-instruments-title">
+            <i data-lucide="layers" style="width: 17px; height: 17px;"></i>
+            <span>Instrumentos Aplicados no Município</span>
+          </div>
+          ${hasDestaque ? `
+            <span class="badge" style="background: #fefce8; color: #854d0e; border: 1.5px solid #fde047; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+              <i data-lucide="award" style="width: 13px; height: 13px; color: #ca8a04;"></i> Destaque
+            </span>
+          ` : ""}
+        </div>
+        <div class="case-mun-instruments-grid" style="display: flex; flex-wrap: wrap; gap: 8px;">
+          ${pillsHtml}
+        </div>
+      </div>
+    `;
+  }
 
   // Open Modal
   document.getElementById("details-modal").classList.add("active");
@@ -2305,6 +2365,10 @@ function openRegisterPanel() {
   // Toggle student and professor fieldset visibility based on register type
   const studentFieldset = document.getElementById("student-details-fieldset");
   const professorFieldset = document.getElementById("professor-details-fieldset");
+  const empreendimentoFieldset = document.getElementById("empreendimento-fieldset");
+  const descLabel = document.getElementById("form-descricao-label") || document.querySelector('label[for="form-descricao"]');
+  const descInput = document.getElementById("form-descricao");
+
   const profNome = document.getElementById("form-professor-nome");
   const profEmail = document.getElementById("form-professor-email");
   const profTel = document.getElementById("form-professor-contato");
@@ -2315,6 +2379,9 @@ function openRegisterPanel() {
   if (currentRegisterType === 'estudante') {
     if (studentFieldset) studentFieldset.style.display = "flex";
     if (professorFieldset) professorFieldset.style.display = "none";
+    if (empreendimentoFieldset) empreendimentoFieldset.style.display = "block";
+    if (descLabel) descLabel.textContent = "Descrição da Empresa *";
+    if (descInput) descInput.placeholder = "Descreva a atuação da empresa, produtos/serviços e modelo de negócio do estudante...";
     if (studNome) { studNome.required = true; studNome.value = ""; }
     if (studEmail) { studEmail.required = true; studEmail.value = ""; }
     if (studTel) { studTel.required = true; studTel.value = ""; }
@@ -2325,6 +2392,9 @@ function openRegisterPanel() {
     // Professor
     if (studentFieldset) studentFieldset.style.display = "none";
     if (professorFieldset) professorFieldset.style.display = "flex";
+    if (empreendimentoFieldset) empreendimentoFieldset.style.display = "none";
+    if (descLabel) descLabel.textContent = "Resumo do Projeto *";
+    if (descInput) descInput.placeholder = "Descreva o projeto pedagógico desenvolvido com os alunos, objetivos e metodologia...";
     if (profNome) { profNome.required = true; profNome.value = ""; }
     if (profEmail) { profEmail.required = true; profEmail.value = ""; }
     if (profTel) { profTel.required = true; profTel.value = ""; }
@@ -2364,14 +2434,11 @@ function closeRegisterPanel() {
 function updateMunicipalityInstrumentsUI() {
   const checkboxes = document.querySelectorAll('input[name="municipality-instruments"]:checked');
   const count = checkboxes.length;
-  const scoreBadge = document.getElementById("instruments-score-badge");
   const destaqueBanner = document.getElementById("instruments-destaque-banner");
 
-  if (scoreBadge) {
-    scoreBadge.textContent = `${count * 10} pontos`;
-  }
   if (destaqueBanner) {
     destaqueBanner.style.display = count >= 3 ? "flex" : "none";
+    if (typeof lucide !== "undefined") lucide.createIcons({ root: destaqueBanner });
   }
 }
 
@@ -2516,11 +2583,6 @@ async function handleMunicipalitySubmit(e) {
   const jeppRadio = document.querySelector('input[name="municipality-jepp-status"]:checked');
   const jeppStatus = jeppRadio && jeppRadio.value === "sim" ? "Sim" : "Não";
 
-  const nivelEnsinoEl = document.getElementById("municipality-nivel-ensino");
-  const nivelEnsino = nivelEnsinoEl ? nivelEnsinoEl.value : "";
-  const dependenciaAdmEl = document.getElementById("municipality-dependencia-adm");
-  const dependenciaAdm = dependenciaAdmEl ? dependenciaAdmEl.value : "";
-
   // Space String validation on required fields
   const requiredFields = [
     { name: "Nome do Município", val: name, id: "municipality-name" },
@@ -2609,8 +2671,6 @@ async function handleMunicipalitySubmit(e) {
       nome: name,
       regional,
       mr,
-      nivel_ensino: nivelEnsino,
-      dependencia_adm: dependenciaAdm,
       responsavel_nome: contactName,
       responsavel_email: contactEmail,
       responsavel_telefone: formatPhoneNumber(contactPhone),
@@ -4023,7 +4083,9 @@ function renderPublicMunicipalityInstruments(item) {
   }
   if (!Array.isArray(insts)) insts = [];
 
-  const pontuacao = insts.length * 10;
+  const priorityOrder = ["material_didatico", "oficina", "curso", "encontro_mediado", "palestra"];
+  insts.sort((a, b) => priorityOrder.indexOf(a) - priorityOrder.indexOf(b));
+
   const hasDestaque = insts.length >= 3;
 
   const labels = {
@@ -4039,7 +4101,6 @@ function renderPublicMunicipalityInstruments(item) {
         <span class="instrument-pill">
           <i data-lucide="check" style="width: 14px; height: 14px;"></i>
           <span>${escapeHtml(labels[code] || code)}</span>
-          <span class="instrument-pill-pts">+10 pts</span>
         </span>
       `).join("")
     : `<span style="color: #94a3b8; font-size: 0.85rem; font-style: italic;">Nenhum instrumento informado</span>`;
@@ -4051,13 +4112,10 @@ function renderPublicMunicipalityInstruments(item) {
           <i data-lucide="layers" style="width: 18px; height: 18px;"></i>
           <span>Instrumentos Aplicados no Município</span>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span class="badge" style="background: #eff6ff; color: #0054a6; border: 1px solid #bfdbfe; font-size: 0.8rem; font-weight: 700;">
-            ${pontuacao} pontos (${insts.length}/5)
-          </span>
+        <div>
           ${hasDestaque ? `
-            <span class="badge" style="background: #fefce8; color: #854d0e; border: 1.5px solid #fde047; font-weight: 700;">
-              ⭐ Destaque
+            <span class="badge" style="background: #fefce8; color: #854d0e; border: 1.5px solid #fde047; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+              <i data-lucide="award" style="width: 14px; height: 14px; color: #ca8a04;"></i> Destaque
             </span>
           ` : ""}
         </div>
@@ -4473,7 +4531,7 @@ function openReferenciaMunDetails(id) {
             <span>Responsável pelo Cadastro</span>
           </div>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
           <div class="detail-item">
             <span class="detail-label" style="display: block; font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 600; margin-bottom: 3px;">Nome</span>
             <span class="detail-value" style="font-weight: 700; color: #1e293b;">${escapeHtml(respNome)}</span>
@@ -4481,13 +4539,13 @@ function openReferenciaMunDetails(id) {
           <div class="detail-item">
             <span class="detail-label" style="display: block; font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 600; margin-bottom: 3px;">E-mail</span>
             <span class="detail-value">
-              ${respEmail ? `<a href="mailto:${escapeHtml(respEmail)}" style="color: #0054a6; font-weight: 600; text-decoration: none;"><i data-lucide="mail" style="width: 13px; height: 13px; vertical-align: -2px;"></i> ${escapeHtml(respEmail)}</a>` : "Não informado"}
+              ${respEmail ? `<a href="mailto:${escapeHtml(respEmail)}" style="color: #0054a6; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; word-break: break-all;"><i data-lucide="mail" style="width: 14px; height: 14px; flex-shrink: 0;"></i> <span>${escapeHtml(respEmail)}</span></a>` : "Não informado"}
             </span>
           </div>
           <div class="detail-item">
             <span class="detail-label" style="display: block; font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 600; margin-bottom: 3px;">Telefone / WhatsApp</span>
             <span class="detail-value">
-              ${respTel ? `<a href="tel:${escapeHtml(respTel.replace(/[^0-9+]/g, ''))}" style="color: #1e293b; font-weight: 600; text-decoration: none;"><i data-lucide="phone" style="width: 13px; height: 13px; vertical-align: -2px;"></i> ${escapeHtml(respTel)}</a>` : "Não informado"}
+              ${respTel ? `<a href="tel:${escapeHtml(respTel.replace(/[^0-9+]/g, ''))}" style="color: #1e293b; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;"><i data-lucide="phone" style="width: 14px; height: 14px; flex-shrink: 0;"></i> <span>${escapeHtml(respTel)}</span></a>` : "Não informado"}
             </span>
           </div>
         </div>

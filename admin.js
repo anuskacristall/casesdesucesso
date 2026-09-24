@@ -1178,6 +1178,9 @@ function renderAdminMunicipalityInstruments(item) {
   }
   if (!Array.isArray(insts)) insts = [];
 
+  const priorityOrder = ["material_didatico", "oficina", "curso", "encontro_mediado", "palestra"];
+  insts.sort((a, b) => priorityOrder.indexOf(a) - priorityOrder.indexOf(b));
+
   const pontuacao = insts.length * 10;
   const hasDestaque = insts.length >= 3;
 
@@ -1211,14 +1214,60 @@ function renderAdminMunicipalityInstruments(item) {
             ${pontuacao} pontos (${insts.length}/5)
           </span>
           ${hasDestaque ? `
-            <span class="badge" style="background: #fefce8; color: #854d0e; border: 1.5px solid #fde047; font-weight: 700;">
-              ⭐ Destaque
+            <span class="badge" style="background: #fefce8; color: #854d0e; border: 1.5px solid #fde047; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+              <i data-lucide="award" style="width: 14px; height: 14px; color: #ca8a04;"></i> Destaque
             </span>
           ` : ""}
         </div>
       </div>
       <div class="instruments-pills-container">
         ${pillsHtml}
+      </div>
+    </div>
+  `;
+}
+
+function renderMunicipalityFinalConsolidatedScore(item) {
+  const devIndex = calculateMunicipioDevelopmentIndex(item);
+  let insts = item.instrumentos_aplicados;
+  if (!insts && insts !== []) {
+    insts = devIndex && devIndex.instrumentos_aplicados ? devIndex.instrumentos_aplicados : [];
+  } else if (typeof insts === "string") {
+    try { insts = JSON.parse(insts); } catch (e) { insts = insts.split(",").map(s => s.trim()).filter(Boolean); }
+  }
+  if (!Array.isArray(insts)) insts = [];
+
+  const ptsIndice = devIndex ? devIndex.pontuacao : 0;
+  const ptsMaxIndice = devIndex ? devIndex.pontuacao_maxima : 55;
+  const ptsInst = insts.length * 10;
+  const ptsTotal = ptsIndice + ptsInst;
+  const isDesenvolvido = devIndex && devIndex.classificacao_key === "desenvolvido";
+
+  return `
+    <div class="admin-detail-card" style="background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); border: 2px solid #86efac; border-radius: 10px; padding: 18px; margin-top: 16px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+        <div>
+          <div style="font-size: 0.82rem; font-weight: 800; text-transform: uppercase; color: #047857; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
+            <i data-lucide="award" style="width: 18px; height: 18px; color: #15803d;"></i>
+            <span>Pontuação Final: Índice de Desenvolvimento + Instrumentos Aplicados</span>
+          </div>
+          <div style="font-size: 1.6rem; font-weight: 800; color: #0f172a; margin-top: 4px; line-height: 1.2;">
+            ${ptsTotal} <span style="font-size: 1rem; font-weight: 600; color: #64748b;">pontos totais</span>
+          </div>
+          <div style="font-size: 0.85rem; color: #334155; margin-top: 4px; line-height: 1.4;">
+            Memória: <strong>${ptsIndice} pts</strong> (Índice de Desenvolvimento: ${ptsIndice}/${ptsMaxIndice}) + <strong>${ptsInst} pts</strong> (${insts.length} Instrumentos Aplicados: ${ptsInst}/50 pts)
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <span class="badge" style="background: ${isDesenvolvido ? '#dcfce7' : '#e0f2fe'}; color: ${isDesenvolvido ? '#15803d' : '#0369a1'}; border: 1.5px solid ${isDesenvolvido ? '#86efac' : '#7dd3fc'}; font-weight: 800; font-size: 0.85rem; padding: 6px 12px; border-radius: 8px;">
+            ${isDesenvolvido ? 'Município Desenvolvido' : 'Município em Desenvolvimento'}
+          </span>
+          ${insts.length >= 3 ? `
+            <span class="badge" style="background: #fefce8; color: #854d0e; border: 1.5px solid #fde047; font-weight: 800; font-size: 0.85rem; padding: 6px 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 5px;">
+              <i data-lucide="award" style="width: 14px; height: 14px; color: #ca8a04;"></i> Destaque em Instrumentos
+            </span>
+          ` : ""}
+        </div>
       </div>
     </div>
   `;
@@ -1366,6 +1415,7 @@ function openMunicipalityDetails(id) {
     </div>
     ${renderAdminMunicipalityInstruments(item)}
     ${renderDevIndexCalculationMemory(item)}
+    ${renderMunicipalityFinalConsolidatedScore(item)}
   `;
 
   actions.innerHTML = `

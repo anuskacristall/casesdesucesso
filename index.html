@@ -45,7 +45,7 @@
   <script src="lib/lucide.min.js"></script>
   
   <!-- Style Sheet -->
-  <link rel="stylesheet" href="style.css?v=25">
+  <link rel="stylesheet" href="style.css?v=26">
 </head>
 <body class="light-theme">
   <!-- Login View -->
@@ -222,7 +222,7 @@
             </div>
             <div class="referencia-btn-texts">
               <span class="referencia-btn-title">Municípios de Referência</span>
-              <span class="referencia-btn-sub">Em Educação Empreendedora</span>
+              <span class="referencia-btn-sub">Alto Índice de Desenvolvimento</span>
             </div>
           </div>
           <div class="referencia-btn-right">
@@ -239,7 +239,7 @@
             </div>
             <div class="referencia-btn-texts">
               <span class="referencia-btn-title">Municípios em Desenvolvimento</span>
-              <span class="referencia-btn-sub">Cidades em evolução nos indicadores</span>
+              <span class="referencia-btn-sub">Em Educação Empreendedora</span>
             </div>
           </div>
           <div class="referencia-btn-right">
@@ -319,7 +319,7 @@
             <input type="text" id="form-titulo" placeholder="Ex: Horta Orgânica Comunitária ou Reciclagem IoT" required>
           </div>
           <div class="form-group">
-            <label for="form-descricao">Descrição / Resumo Geral do Case *</label>
+            <label for="form-descricao" id="form-descricao-label">Descrição / Resumo Geral do Case *</label>
             <textarea id="form-descricao" placeholder="Descreva o escopo geral do projeto de educação empreendedora no município..." required style="min-height: 85px; resize: vertical;"></textarea>
           </div>
         </fieldset>
@@ -591,8 +591,16 @@
       <!-- Scrollable Body -->
       <div class="modal-body">
         
-        <!-- Descrição Geral do Case -->
+        <!-- Descrição Geral / Resumo do Projeto / Descrição da Empresa -->
         <div id="details-descricao-box" class="detail-box glass-box" style="margin-bottom: 16px; padding: 20px;">
+          <h3 id="details-top-box-title" style="margin: 0 0 12px 0; font-size: 0.95rem; font-weight: 700; color: var(--accent-color); text-transform: uppercase; letter-spacing: 0.4px; display: flex; align-items: center; gap: 8px;">
+            <i data-lucide="file-text" style="width: 18px; height: 18px;"></i>
+            <span id="details-top-box-title-text">Resumo do Projeto</span>
+          </h3>
+          <div id="details-top-empresa-meta" style="display: none; flex-wrap: wrap; gap: 16px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border-glass); font-size: 0.95rem; color: var(--text-primary);">
+            <span><strong>Nome da Empresa:</strong> <span id="details-top-empresa-nome">-</span></span>
+            <span><strong>Tipo de Negócio:</strong> <span id="details-top-empresa-tipo">-</span></span>
+          </div>
           <p id="details-descricao" class="summary-text" style="font-size: 1.15rem; line-height: 1.6; color: var(--text-primary); white-space: pre-line; margin: 0;"></p>
         </div>
         
@@ -764,6 +772,9 @@
               </div>
 
             </div>
+
+            <!-- Instrumentos Aplicados no Município -->
+            <div id="details-case-mun-instruments" style="margin-top: 16px;"></div>
           </div>
 
         </div>
@@ -911,28 +922,6 @@
             <div class="form-group flex-1">
               <label for="municipality-mr">Microrregião (MR) *</label>
               <input type="text" id="municipality-mr" required placeholder="Ex: MR Belo Horizonte">
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group flex-1">
-              <label for="municipality-nivel-ensino">Nível de Ensino *</label>
-              <select id="municipality-nivel-ensino" required>
-                <option value="" disabled selected>Selecione o nível de ensino...</option>
-                <option value="Fundamental">Fundamental</option>
-                <option value="Médio">Médio</option>
-                <option value="Superior">Superior</option>
-                <option value="Técnico">Técnico</option>
-              </select>
-            </div>
-            <div class="form-group flex-1">
-              <label for="municipality-dependencia-adm">Dependência Administrativa *</label>
-              <select id="municipality-dependencia-adm" required>
-                <option value="" disabled selected>Selecione a dependência...</option>
-                <option value="Municipal">Municipal</option>
-                <option value="Estadual">Estadual</option>
-                <option value="Privado">Privado</option>
-              </select>
             </div>
           </div>
         </fieldset>
@@ -1140,21 +1129,13 @@
             <span style="display: inline-flex; align-items: center; gap: 8px;">
               <i data-lucide="layers"></i> Instrumentos Aplicados no Município
             </span>
-            <span id="instruments-score-badge" class="badge" style="background: #eff6ff; color: #0054a6; border: 1px solid #bfdbfe; font-size: 0.76rem; font-weight: 700;">
-              0 pontos
-            </span>
           </legend>
-
-          <p style="font-size: 0.84rem; color: var(--text-muted); margin: 0 0 14px 0;">
-            Cada instrumento selecionado soma <strong>10 pontos</strong>. Selecione no mínimo <strong>3 instrumentos</strong> para obter destaque.
-          </p>
 
           <div class="instruments-checkbox-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
             <label class="instrument-checkbox-card">
               <input type="checkbox" name="municipality-instruments" value="material_didatico" id="inst-mat-didatico">
               <div class="instrument-card-info">
                 <span class="instrument-card-title">Aplicação de Material Didático</span>
-                <span class="instrument-card-pts">+10 pts</span>
               </div>
             </label>
 
@@ -1162,7 +1143,6 @@
               <input type="checkbox" name="municipality-instruments" value="oficina" id="inst-oficina">
               <div class="instrument-card-info">
                 <span class="instrument-card-title">Oficina</span>
-                <span class="instrument-card-pts">+10 pts</span>
               </div>
             </label>
 
@@ -1170,7 +1150,6 @@
               <input type="checkbox" name="municipality-instruments" value="curso" id="inst-curso">
               <div class="instrument-card-info">
                 <span class="instrument-card-title">Curso</span>
-                <span class="instrument-card-pts">+10 pts</span>
               </div>
             </label>
 
@@ -1178,7 +1157,6 @@
               <input type="checkbox" name="municipality-instruments" value="encontro_mediado" id="inst-encontro-mediado">
               <div class="instrument-card-info">
                 <span class="instrument-card-title">Encontro Mediado</span>
-                <span class="instrument-card-pts">+10 pts</span>
               </div>
             </label>
 
@@ -1186,7 +1164,6 @@
               <input type="checkbox" name="municipality-instruments" value="palestra" id="inst-palestra">
               <div class="instrument-card-info">
                 <span class="instrument-card-title">Palestra</span>
-                <span class="instrument-card-pts">+10 pts</span>
               </div>
             </label>
           </div>
@@ -1194,7 +1171,7 @@
           <!-- Destaque alert/badge container -->
           <div id="instruments-destaque-banner" style="display: none; margin-top: 12px; padding: 10px 14px; background: #fefce8; border: 1.5px solid #fde047; border-radius: 8px; align-items: center; gap: 8px; color: #854d0e; font-size: 0.85rem; font-weight: 600;">
             <i data-lucide="award" style="width: 18px; height: 18px; color: #ca8a04;"></i>
-            <span>⭐ Município com Destaque em Instrumentos (3 ou mais instrumentos aplicados)!</span>
+            <span>Município com Destaque (3 ou mais instrumentos aplicados)!</span>
           </div>
         </fieldset>
 
@@ -1363,6 +1340,6 @@
   <script src="config.js"></script>
 
   <!-- Script Principal -->
-  <script src="app.js?v=44"></script>
+  <script src="app.js?v=45"></script>
 </body>
 </html>

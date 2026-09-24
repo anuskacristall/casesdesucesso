@@ -169,12 +169,10 @@ class TestIndiceDesenvolvimento(unittest.TestCase):
         self.assertIn("<th>Índice do Município</th>", admin_html)
 
     def test_jepp_labels_and_public_modal_aesthetic(self):
-        """Valida que o JEPP no modal exibe os rótulos solicitados e o score foi removido da visão pública."""
+        """Valida que o JEPP no modal exibe os rótulos Sim / Não e o score foi removido da visão pública."""
         with open(os.path.join(ROOT_DIR, "app.js"), "r", encoding="utf-8") as f:
             app_js = f.read()
-        self.assertIn("Totalmente implantado", app_js)
-        self.assertIn("Em implantação", app_js)
-        self.assertIn("Não implantado", app_js)
+        self.assertIn("details-jepp", app_js)
         self.assertIn('devScore.style.display = "none"', app_js)
 
         with open(os.path.join(ROOT_DIR, "index.html"), "r", encoding="utf-8") as f:

@@ -3345,64 +3345,69 @@ body.dark-theme .export-menu-item:hover {
   box-sizing: border-box;
 }
 
-/* Botão 1: Municípios de Referência (Azulado Nobre) */
+/* Botão 1: Municípios de Referência (Destaque Principal com Azul Profundo) */
 .btn-referencia-muns {
-  background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
-  border: 1.5px solid #93c5fd;
-  box-shadow: 0 3px 10px rgba(0, 84, 166, 0.08);
+  background: linear-gradient(135deg, #004b94 0%, #002c59 100%);
+  border: 1.5px solid #1e40af;
+  box-shadow: 0 4px 14px rgba(0, 75, 148, 0.25);
+  color: #ffffff;
 }
 
 .btn-referencia-muns:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 84, 166, 0.16);
+  box-shadow: 0 6px 20px rgba(0, 75, 148, 0.35);
   border-color: #3b82f6;
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  background: linear-gradient(135deg, #0054a6 0%, #003366 100%);
 }
 
 .btn-referencia-muns .referencia-btn-icon {
   width: 36px;
   height: 36px;
   border-radius: 9px;
-  background: #0054a6;
-  color: #ffffff;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fbbf24;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(0, 84, 166, 0.25);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .btn-referencia-muns .referencia-btn-title {
-  font-size: 0.94rem;
-  font-weight: 700;
-  color: #0f3661;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #ffffff;
   line-height: 1.2;
+  letter-spacing: 0.2px;
 }
 
 .btn-referencia-muns .referencia-btn-sub {
-  font-size: 0.72rem;
-  color: #475569;
+  font-size: 0.73rem;
+  color: #bfdbfe;
+  font-weight: 500;
 }
 
 .btn-referencia-muns .referencia-count-badge {
-  background: #0054a6;
-  color: #ffffff;
-  font-size: 0.75rem;
+  background: #ffffff;
+  color: #004b94;
+  font-size: 0.78rem;
   font-weight: 800;
-  padding: 2px 8px;
+  padding: 3px 9px;
   border-radius: 999px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 .btn-referencia-muns .referencia-arrow {
   width: 17px;
   height: 17px;
-  color: #0054a6;
+  color: #bfdbfe;
   transition: transform 0.2s ease;
 }
 
 .btn-referencia-muns:hover .referencia-arrow {
   transform: translateX(3px);
+  color: #ffffff;
 }
 
 /* Botão 2: Municípios em Desenvolvimento (Ciano / Sky Blue) */
@@ -3613,9 +3618,9 @@ body.dark-theme .export-menu-item:hover {
 }
 
 .mun-indicator-badge.nao {
-  background: #f1f5f9;
-  color: #64748b;
-  border: 1px solid #cbd5e1;
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
 }
 
 .mun-indicator-badge.parcial {
@@ -3718,6 +3723,37 @@ body.dark-theme .export-menu-item:hover {
   border-radius: 4px;
   font-size: 0.72rem;
   font-weight: 800;
+}
+
+/* Instrumentos no Modal de Detalhes do Case */
+.case-mun-instruments-box {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--border-radius-md);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.case-mun-instruments-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border-glass);
+  padding-bottom: 8px;
+}
+
+.case-mun-instruments-title {
+  margin: 0;
+  color: var(--accent-color);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.96rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
 }
 
 
