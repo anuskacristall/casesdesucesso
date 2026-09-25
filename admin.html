@@ -474,6 +474,7 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
+      position: relative;
     }
 
     .mun-filter-item label {
@@ -494,30 +495,188 @@
       color: #64748b;
     }
 
-    .mun-filter-item select {
-      appearance: none !important;
-      -webkit-appearance: none !important;
-      -moz-appearance: none !important;
-      background-color: #f8fafc !important;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
-      background-repeat: no-repeat !important;
-      background-position: right 12px center !important;
-      background-size: 16px !important;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      padding: 8px 36px 8px 12px !important;
-      font-size: 0.85rem;
-      color: #1e293b;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      cursor: pointer;
+    /* Custom Multiselect Component */
+    .mun-multiselect {
+      position: relative;
       width: 100%;
     }
 
-    .mun-filter-item select:focus {
+    .mun-multiselect-btn {
+      width: 100%;
+      box-sizing: border-box;
+      background-color: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s ease;
+      text-align: left;
+      min-height: 38px;
+    }
+
+    .mun-multiselect-btn:hover {
+      background-color: #ffffff;
+      border-color: #94a3b8;
+    }
+
+    .mun-multiselect.active .mun-multiselect-btn,
+    .mun-multiselect-btn:focus {
+      background-color: #ffffff;
       border-color: #0054a6;
       box-shadow: 0 0 0 3px rgba(0, 84, 166, 0.1);
-      background-color: #ffffff !important;
+    }
+
+    .mun-multiselect-btn-text {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 500;
+    }
+
+    .mun-multiselect-btn-badge {
+      background-color: #0054a6;
+      color: #ffffff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+
+    .mun-multiselect-btn-icon {
+      width: 15px;
+      height: 15px;
+      color: #64748b;
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .mun-multiselect.active .mun-multiselect-btn-icon {
+      transform: rotate(180deg);
+      color: #0054a6;
+    }
+
+    .mun-multiselect-menu {
+      position: absolute;
+      top: calc(100% + 5px);
+      left: 0;
+      width: 100%;
+      min-width: 250px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.06);
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      max-height: 290px;
+      animation: munFadeDown 0.15s ease-out;
+    }
+
+    .mun-multiselect.active .mun-multiselect-menu {
+      display: flex;
+    }
+
+    @keyframes munFadeDown {
+      from {
+        opacity: 0;
+        transform: translateY(-5px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .mun-multiselect-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 12px;
+      border-bottom: 1px solid #f1f5f9;
+      background: #f8fafc;
+      border-top-left-radius: 9px;
+      border-top-right-radius: 9px;
+      gap: 6px;
+    }
+
+    .mun-multiselect-action-btn {
+      background: none;
+      border: none;
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: #0054a6;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: background 0.15s ease;
+    }
+
+    .mun-multiselect-action-btn:hover {
+      background: #e0f2fe;
+    }
+
+    .mun-multiselect-action-btn.btn-clear {
+      color: #64748b;
+    }
+
+    .mun-multiselect-action-btn.btn-clear:hover {
+      color: #be123c;
+      background: #ffe4e6;
+    }
+
+    .mun-multiselect-list {
+      overflow-y: auto;
+      max-height: 230px;
+      padding: 4px 0;
+    }
+
+    .mun-multiselect-list::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .mun-multiselect-list::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    .mun-multiselect-option {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 12px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 0.82rem;
+      color: #1e293b;
+      transition: background 0.15s ease;
+    }
+
+    .mun-multiselect-option:hover {
+      background-color: #f1f5f9;
+    }
+
+    .mun-multiselect-option.checked {
+      background-color: #f0f7ff;
+      font-weight: 600;
+      color: #0054a6;
+    }
+
+    .mun-multiselect-option input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      accent-color: #0054a6;
+      cursor: pointer;
+      margin: 0;
+      flex-shrink: 0;
     }
 
     /* Content Cards & Tables */
@@ -1525,91 +1684,163 @@
           <div class="mun-filters-grid">
             <!-- 1. Regional -->
             <div class="mun-filter-item">
-              <label for="filter-mun-regional">
+              <label>
                 <i data-lucide="map-pin"></i>
                 Regional SEBRAE
               </label>
-              <select id="filter-mun-regional" onchange="handleMunFilterChange()">
-                <option value="all">Todas as Regionais</option>
-                <option value="Centro">Centro</option>
-                <option value="Centro-Oeste e Sudoeste">Centro-Oeste e Sudoeste</option>
-                <option value="Jequitinhonha e Mucuri">Jequitinhonha e Mucuri</option>
-                <option value="Noroeste e Alto Paranaíba">Noroeste e Alto Paranaíba</option>
-                <option value="Norte">Norte</option>
-                <option value="Rio Doce e Vale do Aço">Rio Doce e Vale do Aço</option>
-                <option value="Sul">Sul</option>
-                <option value="Triângulo">Triângulo</option>
-                <option value="Zona da Mata e Vertentes">Zona da Mata e Vertentes</option>
-              </select>
+              <div class="mun-multiselect" id="mun-ms-regional">
+                <button type="button" class="mun-multiselect-btn" onclick="toggleMunMultiselect('mun-ms-regional', event)">
+                  <span class="mun-multiselect-btn-text" id="mun-ms-regional-text">Todas as Regionais</span>
+                  <span class="mun-multiselect-btn-badge" id="mun-ms-regional-badge" style="display:none;">0</span>
+                  <i data-lucide="chevron-down" class="mun-multiselect-btn-icon"></i>
+                </button>
+                <div class="mun-multiselect-menu" onclick="event.stopPropagation()">
+                  <div class="mun-multiselect-actions">
+                    <button type="button" class="mun-multiselect-action-btn" onclick="selectAllMunMultiselect('mun-ms-regional', true)">Marcar Todas</button>
+                    <button type="button" class="mun-multiselect-action-btn btn-clear" onclick="selectAllMunMultiselect('mun-ms-regional', false)">Limpar</button>
+                  </div>
+                  <div class="mun-multiselect-list" id="mun-ms-regional-list">
+                    <label class="mun-multiselect-option"><input type="checkbox" value="Centro" onchange="onMunMultiselectChange('mun-ms-regional')"> Centro</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="Centro-Oeste e Sudoeste" onchange="onMunMultiselectChange('mun-ms-regional')"> Centro-Oeste e Sudoeste</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="Jequitinhonha e Mucuri" onchange="onMunMultiselectChange('mun-ms-regional')"> Jequitinhonha e Mucuri</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="Noroeste e Alto Paranaíba" onchange="onMunMultiselectChange('mun-ms-regional')"> Noroeste e Alto Paranaíba</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="Norte" onchange="onMunMultiselectChange('mun-ms-regional')"> Norte</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="Rio Doce e Vale do Aço" onchange="onMunMultiselectChange('mun-ms-regional')"> Rio Doce e Vale do Aço</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="Sul" onchange="onMunMultiselectChange('mun-ms-regional')"> Sul</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="Triângulo" onchange="onMunMultiselectChange('mun-ms-regional')"> Triângulo</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="Zona da Mata e Vertentes" onchange="onMunMultiselectChange('mun-ms-regional')"> Zona da Mata e Vertentes</label>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- 2. Classificação / Índice -->
             <div class="mun-filter-item">
-              <label for="filter-mun-tier">
+              <label>
                 <i data-lucide="award"></i>
                 Classificação do Índice
               </label>
-              <select id="filter-mun-tier" onchange="handleMunFilterChange()">
-                <option value="all">Todas as Classificações</option>
-                <option value="desenvolvido">Desenvolvido (64 a 91 pts)</option>
-                <option value="em_desenvolvimento">Em Desenvolvimento (0 a 63 pts)</option>
-              </select>
+              <div class="mun-multiselect" id="mun-ms-tier">
+                <button type="button" class="mun-multiselect-btn" onclick="toggleMunMultiselect('mun-ms-tier', event)">
+                  <span class="mun-multiselect-btn-text" id="mun-ms-tier-text">Todas as Classificações</span>
+                  <span class="mun-multiselect-btn-badge" id="mun-ms-tier-badge" style="display:none;">0</span>
+                  <i data-lucide="chevron-down" class="mun-multiselect-btn-icon"></i>
+                </button>
+                <div class="mun-multiselect-menu" onclick="event.stopPropagation()">
+                  <div class="mun-multiselect-actions">
+                    <button type="button" class="mun-multiselect-action-btn" onclick="selectAllMunMultiselect('mun-ms-tier', true)">Marcar Todas</button>
+                    <button type="button" class="mun-multiselect-action-btn btn-clear" onclick="selectAllMunMultiselect('mun-ms-tier', false)">Limpar</button>
+                  </div>
+                  <div class="mun-multiselect-list" id="mun-ms-tier-list">
+                    <label class="mun-multiselect-option"><input type="checkbox" value="desenvolvido" onchange="onMunMultiselectChange('mun-ms-tier')"> Desenvolvido (64 a 91 pts)</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="em_desenvolvimento" onchange="onMunMultiselectChange('mun-ms-tier')"> Em Desenvolvimento (0 a 63 pts)</label>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- 3. Instrumentos Aplicados -->
             <div class="mun-filter-item">
-              <label for="filter-mun-instrumento">
+              <label>
                 <i data-lucide="wrench"></i>
                 Instrumento Aplicado
               </label>
-              <select id="filter-mun-instrumento" onchange="handleMunFilterChange()">
-                <option value="all">Todos os Instrumentos</option>
-                <option value="destaque">Com Destaque (≥ 25 pts)</option>
-                <option value="material_didatico">Material Didático (+10 pts)</option>
-                <option value="oficina">Oficina (+10 pts)</option>
-                <option value="curso">Curso (+10 pts)</option>
-                <option value="encontro_mediado">Encontro Mediado (+10 pts)</option>
-                <option value="palestra">Palestra (+5 pts)</option>
-                <option value="sem_instrumentos">Sem Instrumentos</option>
-              </select>
+              <div class="mun-multiselect" id="mun-ms-instrumento">
+                <button type="button" class="mun-multiselect-btn" onclick="toggleMunMultiselect('mun-ms-instrumento', event)">
+                  <span class="mun-multiselect-btn-text" id="mun-ms-instrumento-text">Todos os Instrumentos</span>
+                  <span class="mun-multiselect-btn-badge" id="mun-ms-instrumento-badge" style="display:none;">0</span>
+                  <i data-lucide="chevron-down" class="mun-multiselect-btn-icon"></i>
+                </button>
+                <div class="mun-multiselect-menu" onclick="event.stopPropagation()">
+                  <div class="mun-multiselect-actions">
+                    <button type="button" class="mun-multiselect-action-btn" onclick="selectAllMunMultiselect('mun-ms-instrumento', true)">Marcar Todos</button>
+                    <button type="button" class="mun-multiselect-action-btn btn-clear" onclick="selectAllMunMultiselect('mun-ms-instrumento', false)">Limpar</button>
+                  </div>
+                  <div class="mun-multiselect-list" id="mun-ms-instrumento-list">
+                    <label class="mun-multiselect-option"><input type="checkbox" value="destaque" onchange="onMunMultiselectChange('mun-ms-instrumento')"> Com Destaque (≥ 25 pts)</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="material_didatico" onchange="onMunMultiselectChange('mun-ms-instrumento')"> Material Didático (+10 pts)</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="oficina" onchange="onMunMultiselectChange('mun-ms-instrumento')"> Oficina (+10 pts)</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="curso" onchange="onMunMultiselectChange('mun-ms-instrumento')"> Curso (+10 pts)</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="encontro_mediado" onchange="onMunMultiselectChange('mun-ms-instrumento')"> Encontro Mediado (+10 pts)</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="palestra" onchange="onMunMultiselectChange('mun-ms-instrumento')"> Palestra (+5 pts)</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="sem_instrumentos" onchange="onMunMultiselectChange('mun-ms-instrumento')"> Sem Instrumentos</label>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- 4. Indicador Atendido -->
             <div class="mun-filter-item">
-              <label for="filter-mun-indicador">
+              <label>
                 <i data-lucide="check-circle-2"></i>
                 Indicador Atendido (Exigir 'Sim')
               </label>
-              <select id="filter-mun-indicador" onchange="handleMunFilterChange()">
-                <option value="all">Qualquer Indicador</option>
-                <option value="educacao_70_porcento">1º - EE em mais de 70% do município (13 pts)</option>
-                <option value="parceria_secretaria_educacao">2º - Parceria com Secretária Municipal de Educação (12 pts)</option>
-                <option value="jepp_municipio">3º - JEPP no município (11 pts)</option>
-                <option value="produto_despertar">4º - Produto Despertar implantado (10 pts)</option>
-                <option value="parceria_superintendencia">5º - Parceria com superintendência de ensino (9 pts)</option>
-                <option value="parceria_ies">6º - Parceria com instituição de ensino superior (8 pts)</option>
-                <option value="rede_aqui_tem_sebrae">7º - Rede Aqui Tem Sebrae (7 pts)</option>
-                <option value="convenio_parceria">8º - Convênio / termo de parceria (6 pts)</option>
-                <option value="comite_acoes_conjuntas">9º - Comitê e ações conjuntas (5 pts)</option>
-                <option value="empresa_simulada">10º - Empresa simulada (4 pts)</option>
-                <option value="escola_sebrae">11º - Sistema Escola do Sebrae / Cursos Técnicos (3 pts)</option>
-                <option value="cooperativa_credito">12º - Parceria com Cooperativa de Crédito (2 pts)</option>
-                <option value="lei_educacao_empreendedora">13º - Lei da educação empreendedora (1 pt)</option>
-              </select>
+              <div class="mun-multiselect" id="mun-ms-indicador">
+                <button type="button" class="mun-multiselect-btn" onclick="toggleMunMultiselect('mun-ms-indicador', event)">
+                  <span class="mun-multiselect-btn-text" id="mun-ms-indicador-text">Qualquer Indicador</span>
+                  <span class="mun-multiselect-btn-badge" id="mun-ms-indicador-badge" style="display:none;">0</span>
+                  <i data-lucide="chevron-down" class="mun-multiselect-btn-icon"></i>
+                </button>
+                <div class="mun-multiselect-menu" onclick="event.stopPropagation()">
+                  <div class="mun-multiselect-actions">
+                    <button type="button" class="mun-multiselect-action-btn" onclick="selectAllMunMultiselect('mun-ms-indicador', true)">Marcar Todos</button>
+                    <button type="button" class="mun-multiselect-action-btn btn-clear" onclick="selectAllMunMultiselect('mun-ms-indicador', false)">Limpar</button>
+                  </div>
+                  <div class="mun-multiselect-list" id="mun-ms-indicador-list">
+                    <label class="mun-multiselect-option"><input type="checkbox" value="educacao_70_porcento" onchange="onMunMultiselectChange('mun-ms-indicador')"> 1º - EE &gt; 70% (13 pts)</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="parceria_secretaria_educacao" onchange="onMunMultiselectChange('mun-ms-indicador')"> 2º - Parceria Sec. Educação (12 pts)</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="jepp_municipio" onchange="onMunMultiselectChange('mun-ms-indicador')"> 3º - JEPP no município (11 pts)</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="produto_despertar" onchange="onMunMultiselectChange('mun-ms-indicador')"> 4º - Produto Despertar (10 pts)</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="parceria_superintendencia" onchange="onMunMultiselectChange('mun-ms-indicador')"> 5º - Parceria Superintendência (9 pts)</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="parceria_ies" onchange="onMunMultiselectChange('mun-ms-indicador')"> 6º - Parceria com IES (8 pts)</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="rede_aqui_tem_sebrae" onchange="onMunMultiselectChange('mun-ms-indicador')"> 7º - Rede Aqui Tem Sebrae (7 pts)</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="convenio_parceria" onchange="onMunMultiselectChange('mun-ms-indicador')"> 8º - Convênio / Termo (6 pts)</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="comite_acoes_conjuntas" onchange="onMunMultiselectChange('mun-ms-indicador')"> 9º - Comitê Gestor (5 pts)</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="empresa_simulada" onchange="onMunMultiselectChange('mun-ms-indicador')"> 10º - Empresa Simulada (4 pts)</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="escola_sebrae" onchange="onMunMultiselectChange('mun-ms-indicador')"> 11º - Escola Sebrae / Cursos (3 pts)</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="cooperativa_credito" onchange="onMunMultiselectChange('mun-ms-indicador')"> 12º - Cooperativa de Crédito (2 pts)</label>
+                    <label class="mun-multiselect-option"><input type="checkbox" value="lei_educacao_empreendedora" onchange="onMunMultiselectChange('mun-ms-indicador')"> 13º - Lei Educação Empreendedora (1 pt)</label>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- 5. Indicadores Visíveis na Tabela -->
             <div class="mun-filter-item">
-              <label for="filter-mun-visible-indicators">
+              <label>
                 <i data-lucide="eye"></i>
                 Indicadores que quero ver
               </label>
-              <select id="filter-mun-visible-indicators" onchange="handleMunFilterChange()">
-                <option value="all">Todos os 13 Indicadores</option>
-                <option value="sim_only">Apenas os que o município possui (Sim)</option>
-                <option value="top5">Top 5 Indicadores (1º ao 5º)</option>
-                <option value="parcerias">Parcerias Institucionais</option>
-              </select>
+              <div class="mun-multiselect" id="mun-ms-visible">
+                <button type="button" class="mun-multiselect-btn" onclick="toggleMunMultiselect('mun-ms-visible', event)">
+                  <span class="mun-multiselect-btn-text" id="mun-ms-visible-text">Todos os 13 Indicadores</span>
+                  <span class="mun-multiselect-btn-badge" id="mun-ms-visible-badge" style="display:none;">13</span>
+                  <i data-lucide="chevron-down" class="mun-multiselect-btn-icon"></i>
+                </button>
+                <div class="mun-multiselect-menu" onclick="event.stopPropagation()">
+                  <div class="mun-multiselect-actions" style="flex-wrap: wrap;">
+                    <button type="button" class="mun-multiselect-action-btn" onclick="setPresetVisibleIndicators('all')">Todos</button>
+                    <button type="button" class="mun-multiselect-action-btn" onclick="setPresetVisibleIndicators('top5')">Top 5</button>
+                    <button type="button" class="mun-multiselect-action-btn" onclick="setPresetVisibleIndicators('parcerias')">Parcerias</button>
+                    <button type="button" class="mun-multiselect-action-btn btn-clear" onclick="selectAllMunMultiselect('mun-ms-visible', false)">Limpar</button>
+                  </div>
+                  <div class="mun-multiselect-list" id="mun-ms-visible-list">
+                    <label class="mun-multiselect-option checked"><input type="checkbox" value="educacao_70_porcento" checked onchange="onMunMultiselectChange('mun-ms-visible')"> 1º - EE &gt; 70%</label>
+                    <label class="mun-multiselect-option checked"><input type="checkbox" value="parceria_secretaria_educacao" checked onchange="onMunMultiselectChange('mun-ms-visible')"> 2º - Sec. Educação</label>
+                    <label class="mun-multiselect-option checked"><input type="checkbox" value="jepp_municipio" checked onchange="onMunMultiselectChange('mun-ms-visible')"> 3º - JEPP</label>
+                    <label class="mun-multiselect-option checked"><input type="checkbox" value="produto_despertar" checked onchange="onMunMultiselectChange('mun-ms-visible')"> 4º - Despertar</label>
+                    <label class="mun-multiselect-option checked"><input type="checkbox" value="parceria_superintendencia" checked onchange="onMunMultiselectChange('mun-ms-visible')"> 5º - Superintendência</label>
+                    <label class="mun-multiselect-option checked"><input type="checkbox" value="parceria_ies" checked onchange="onMunMultiselectChange('mun-ms-visible')"> 6º - Parceria IES</label>
+                    <label class="mun-multiselect-option checked"><input type="checkbox" value="rede_aqui_tem_sebrae" checked onchange="onMunMultiselectChange('mun-ms-visible')"> 7º - Aqui Tem Sebrae</label>
+                    <label class="mun-multiselect-option checked"><input type="checkbox" value="convenio_parceria" checked onchange="onMunMultiselectChange('mun-ms-visible')"> 8º - Convênio</label>
+                    <label class="mun-multiselect-option checked"><input type="checkbox" value="comite_acoes_conjuntas" checked onchange="onMunMultiselectChange('mun-ms-visible')"> 9º - Comitê Gestor</label>
+                    <label class="mun-multiselect-option checked"><input type="checkbox" value="empresa_simulada" checked onchange="onMunMultiselectChange('mun-ms-visible')"> 10º - Emp. Simulada</label>
+                    <label class="mun-multiselect-option checked"><input type="checkbox" value="escola_sebrae" checked onchange="onMunMultiselectChange('mun-ms-visible')"> 11º - Escola Sebrae</label>
+                    <label class="mun-multiselect-option checked"><input type="checkbox" value="cooperativa_credito" checked onchange="onMunMultiselectChange('mun-ms-visible')"> 12º - Cooperativa</label>
+                    <label class="mun-multiselect-option checked"><input type="checkbox" value="lei_educacao_empreendedora" checked onchange="onMunMultiselectChange('mun-ms-visible')"> 13º - Lei EE</label>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2048,6 +2279,6 @@
   <script src="config.js"></script>
 
   <!-- Admin Controller -->
-  <script src="admin.js?v=32"></script>
+  <script src="admin.js?v=33"></script>
 </body>
 </html>

@@ -558,12 +558,44 @@ function handleAdminSearch() {
   renderCurrentAdminTab();
 }
 
-// Municipality Advanced Filters State
-let currentMunRegionalFilter = "all";
-let currentMunTierFilter = "all";
-let currentMunInstrumentFilter = "all";
-let currentMunIndicatorFilter = "all";
-let currentMunVisibleIndicatorsMode = "all";
+// Municipality Advanced Filters State (Multi-select Sets)
+const ALL_CRITERIA_KEYS = [
+  "educacao_70_porcento",
+  "parceria_secretaria_educacao",
+  "jepp_municipio",
+  "produto_despertar",
+  "parceria_superintendencia",
+  "parceria_ies",
+  "rede_aqui_tem_sebrae",
+  "convenio_parceria",
+  "comite_acoes_conjuntas",
+  "empresa_simulada",
+  "escola_sebrae",
+  "cooperativa_credito",
+  "lei_educacao_empreendedora"
+];
+
+const CRITERIA_SHORT_LABELS = {
+  educacao_70_porcento: "EE &gt; 70%",
+  parceria_secretaria_educacao: "Sec. Educação",
+  jepp_municipio: "JEPP",
+  produto_despertar: "Despertar",
+  parceria_superintendencia: "Superintendência",
+  parceria_ies: "IES",
+  rede_aqui_tem_sebrae: "Aqui Tem Sebrae",
+  convenio_parceria: "Convênio",
+  comite_acoes_conjuntas: "Comitê Gestor",
+  empresa_simulada: "Emp. Simulada",
+  escola_sebrae: "Escola Sebrae",
+  cooperativa_credito: "Cooperativa",
+  lei_educacao_empreendedora: "Lei EE"
+};
+
+let selectedMunRegionais = new Set();
+let selectedMunTiers = new Set();
+let selectedMunInstrumentos = new Set();
+let selectedMunIndicadores = new Set();
+let selectedMunVisibleIndicators = new Set(ALL_CRITERIA_KEYS);
 
 const REGIONAL_NORMALIZATION = {
   "centro": "Centro",
@@ -592,40 +624,212 @@ function normalizeRegionalName(reg) {
   return REGIONAL_NORMALIZATION[key] || reg;
 }
 
-function handleMunFilterChange() {
-  const regSel = document.getElementById("filter-mun-regional");
-  const tierSel = document.getElementById("filter-mun-tier");
-  const instSel = document.getElementById("filter-mun-instrumento");
-  const indSel = document.getElementById("filter-mun-indicador");
-  const visSel = document.getElementById("filter-mun-visible-indicators");
+function toggleMunMultiselect(id, event) {
+  if (event) {
+    event.stopPropagation();
+  }
+  const target = document.getElementById(id);
+  const wasActive = target ? target.classList.contains("active") : false;
 
-  if (regSel) currentMunRegionalFilter = regSel.value;
-  if (tierSel) currentMunTierFilter = tierSel.value;
-  if (instSel) currentMunInstrumentFilter = instSel.value;
-  if (indSel) currentMunIndicatorFilter = indSel.value;
-  if (visSel) currentMunVisibleIndicatorsMode = visSel.value;
+  // Fecha todos os outros dropdowns
+  document.querySelectorAll(".mun-multiselect").forEach((el) => {
+    el.classList.remove("active");
+  });
+
+  if (target && !wasActive) {
+    target.classList.add("active");
+  }
+}
+
+// Fechamento ao clicar fora
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".mun-multiselect")) {
+    document.querySelectorAll(".mun-multiselect").forEach((el) => {
+      el.classList.remove("active");
+    });
+  }
+});
+
+function onMunMultiselectChange(id) {
+  const container = document.getElementById(id);
+  if (!container) return;
+
+  const checkboxes = container.querySelectorAll('.mun-multiselect-list input[type="checkbox"]');
+  const checkedValues = [];
+
+  checkboxes.forEach((cb) => {
+    const parent = cb.closest(".mun-multiselect-option");
+    if (cb.checked) {
+      checkedValues.push(cb.value);
+      if (parent) parent.classList.add("checked");
+    } else {
+      if (parent) parent.classList.remove("checked");
+    }
+  });
+
+  if (id === "mun-ms-regional") {
+    selectedMunRegionais = new Set(checkedValues);
+    updateMultiselectButtonDisplay(id, checkedValues.length, checkedValues, "Todas as Regionais", "regionais");
+  } else if (id === "mun-ms-tier") {
+    selectedMunTiers = new Set(checkedValues);
+    const labels = checkedValues.map((v) => (v === "desenvolvido" ? "Desenvolvido" : "Em Desenv."));
+    updateMultiselectButtonDisplay(id, checkedValues.length, labels, "Todas as Classificações", "classificações");
+  } else if (id === "mun-ms-instrumento") {
+    selectedMunInstrumentos = new Set(checkedValues);
+    const INSTRUMENT_SHORT_LABELS = {
+      destaque: "Com Destaque",
+      material_didatico: "Mat. Didático",
+      oficina: "Oficina",
+      curso: "Curso",
+      encontro_mediado: "Encontro Med.",
+      palestra: "Palestra",
+      sem_instrumentos: "Sem Instr."
+    };
+    const labels = checkedValues.map((v) => INSTRUMENT_SHORT_LABELS[v] || v);
+    updateMultiselectButtonDisplay(id, checkedValues.length, labels, "Todos os Instrumentos", "instrumentos");
+  } else if (id === "mun-ms-indicador") {
+    selectedMunIndicadores = new Set(checkedValues);
+    const labels = checkedValues.map((k) => CRITERIA_SHORT_LABELS[k] || k);
+    updateMultiselectButtonDisplay(id, checkedValues.length, labels, "Qualquer Indicador", "indicadores");
+  } else if (id === "mun-ms-visible") {
+    selectedMunVisibleIndicators = new Set(checkedValues);
+    const count = checkedValues.length;
+    const textEl = document.getElementById(`${id}-text`);
+    const badgeEl = document.getElementById(`${id}-badge`);
+    if (textEl) {
+      if (count === ALL_CRITERIA_KEYS.length) {
+        textEl.textContent = "Todos os 13 Indicadores";
+      } else if (count === 0) {
+        textEl.textContent = "Nenhum Indicador";
+      } else {
+        textEl.textContent = `${count} selecionado${count > 1 ? "s" : ""}`;
+      }
+    }
+    if (badgeEl) {
+      badgeEl.textContent = count;
+      badgeEl.style.display = count > 0 && count < ALL_CRITERIA_KEYS.length ? "inline-block" : "none";
+    }
+  }
 
   renderMunicipalitiesTable();
 }
 
+function updateMultiselectButtonDisplay(id, count, labels, defaultText, pluralNoun) {
+  const textEl = document.getElementById(`${id}-text`);
+  const badgeEl = document.getElementById(`${id}-badge`);
+  if (!textEl) return;
+
+  if (count === 0) {
+    textEl.textContent = defaultText;
+    if (badgeEl) badgeEl.style.display = "none";
+  } else if (count === 1) {
+    textEl.textContent = labels[0];
+    if (badgeEl) {
+      badgeEl.textContent = "1";
+      badgeEl.style.display = "inline-block";
+    }
+  } else {
+    textEl.textContent = `${count} ${pluralNoun} selecionada${count > 1 ? "s" : ""}`;
+    if (badgeEl) {
+      badgeEl.textContent = count;
+      badgeEl.style.display = "inline-block";
+    }
+  }
+}
+
+function selectAllMunMultiselect(id, selectAll) {
+  const container = document.getElementById(id);
+  if (!container) return;
+
+  const checkboxes = container.querySelectorAll('.mun-multiselect-list input[type="checkbox"]');
+  checkboxes.forEach((cb) => {
+    cb.checked = selectAll;
+    const parent = cb.closest(".mun-multiselect-option");
+    if (parent) {
+      if (selectAll) parent.classList.add("checked");
+      else parent.classList.remove("checked");
+    }
+  });
+
+  onMunMultiselectChange(id);
+}
+
+function setPresetVisibleIndicators(preset) {
+  const container = document.getElementById("mun-ms-visible");
+  if (!container) return;
+
+  let targetKeys = [];
+  if (preset === "all") {
+    targetKeys = [...ALL_CRITERIA_KEYS];
+  } else if (preset === "top5") {
+    targetKeys = ALL_CRITERIA_KEYS.slice(0, 5);
+  } else if (preset === "parcerias") {
+    targetKeys = ["parceria_secretaria_educacao", "parceria_superintendencia", "parceria_ies", "cooperativa_credito", "convenio_parceria"];
+  }
+
+  const targetSet = new Set(targetKeys);
+  const checkboxes = container.querySelectorAll('.mun-multiselect-list input[type="checkbox"]');
+  checkboxes.forEach((cb) => {
+    const isTarget = targetSet.has(cb.value);
+    cb.checked = isTarget;
+    const parent = cb.closest(".mun-multiselect-option");
+    if (parent) {
+      if (isTarget) parent.classList.add("checked");
+      else parent.classList.remove("checked");
+    }
+  });
+
+  onMunMultiselectChange("mun-ms-visible");
+}
+
 function clearMunicipalityFilters() {
-  currentMunRegionalFilter = "all";
-  currentMunTierFilter = "all";
-  currentMunInstrumentFilter = "all";
-  currentMunIndicatorFilter = "all";
-  currentMunVisibleIndicatorsMode = "all";
+  selectedMunRegionais.clear();
+  selectedMunTiers.clear();
+  selectedMunInstrumentos.clear();
+  selectedMunIndicadores.clear();
+  selectedMunVisibleIndicators = new Set(ALL_CRITERIA_KEYS);
 
-  const regSel = document.getElementById("filter-mun-regional");
-  const tierSel = document.getElementById("filter-mun-tier");
-  const instSel = document.getElementById("filter-mun-instrumento");
-  const indSel = document.getElementById("filter-mun-indicador");
-  const visSel = document.getElementById("filter-mun-visible-indicators");
+  // Desmarcar nos primeiros 4 dropdowns
+  ["mun-ms-regional", "mun-ms-tier", "mun-ms-instrumento", "mun-ms-indicador"].forEach((id) => {
+    const container = document.getElementById(id);
+    if (!container) return;
+    container.querySelectorAll('.mun-multiselect-list input[type="checkbox"]').forEach((cb) => {
+      cb.checked = false;
+      const parent = cb.closest(".mun-multiselect-option");
+      if (parent) parent.classList.remove("checked");
+    });
+  });
 
-  if (regSel) regSel.value = "all";
-  if (tierSel) tierSel.value = "all";
-  if (instSel) instSel.value = "all";
-  if (indSel) indSel.value = "all";
-  if (visSel) visSel.value = "all";
+  // Re-marcar todos em Indicadores Visíveis
+  const visContainer = document.getElementById("mun-ms-visible");
+  if (visContainer) {
+    visContainer.querySelectorAll('.mun-multiselect-list input[type="checkbox"]').forEach((cb) => {
+      cb.checked = true;
+      const parent = cb.closest(".mun-multiselect-option");
+      if (parent) parent.classList.add("checked");
+    });
+  }
+
+  // Resetar textos e badges
+  const resetMap = [
+    { text: "mun-ms-regional-text", badge: "mun-ms-regional-badge", label: "Todas as Regionais" },
+    { text: "mun-ms-tier-text", badge: "mun-ms-tier-badge", label: "Todas as Classificações" },
+    { text: "mun-ms-instrumento-text", badge: "mun-ms-instrumento-badge", label: "Todos os Instrumentos" },
+    { text: "mun-ms-indicador-text", badge: "mun-ms-indicador-badge", label: "Qualquer Indicador" },
+    { text: "mun-ms-visible-text", badge: "mun-ms-visible-badge", label: "Todos os 13 Indicadores" }
+  ];
+
+  resetMap.forEach((item) => {
+    const t = document.getElementById(item.text);
+    const b = document.getElementById(item.badge);
+    if (t) t.textContent = item.label;
+    if (b) b.style.display = "none";
+  });
+
+  // Resetar campo de busca
+  const searchInput = document.getElementById("admin-search-input");
+  if (searchInput) searchInput.value = "";
+  adminSearchQuery = "";
 
   renderMunicipalitiesTable();
 }
@@ -667,44 +871,54 @@ function renderMunicipalitiesTable() {
     });
   }
 
-  // 3. Apply Regional Filter
-  if (currentMunRegionalFilter !== "all") {
+  // 3. Apply Regional Filter (Multi-select Acumulativo)
+  if (selectedMunRegionais.size > 0) {
     items = items.filter((m) => {
       const norm = normalizeRegionalName(m.regional);
-      return norm === currentMunRegionalFilter || String(m.regional || "").toLowerCase().includes(currentMunRegionalFilter.toLowerCase());
+      if (selectedMunRegionais.has(norm)) return true;
+      for (const reg of selectedMunRegionais) {
+        if (norm.toLowerCase().includes(reg.toLowerCase()) || String(m.regional || "").toLowerCase().includes(reg.toLowerCase())) {
+          return true;
+        }
+      }
+      return false;
     });
   }
 
-  // 4. Apply Tier / Classificacao Filter
-  if (currentMunTierFilter !== "all") {
+  // 4. Apply Tier / Classificacao Filter (Multi-select Acumulativo)
+  if (selectedMunTiers.size > 0) {
     items = items.filter((m) => {
       const score = calculateMunicipioDevelopmentIndex(m);
-      return score && score.classificacao_key === currentMunTierFilter;
+      return score && selectedMunTiers.has(score.classificacao_key);
     });
   }
 
-  // 5. Apply Instrument Filter
-  if (currentMunInstrumentFilter !== "all") {
+  // 5. Apply Instrument Filter (Multi-select Acumulativo)
+  if (selectedMunInstrumentos.size > 0) {
     items = items.filter((m) => {
       const score = calculateMunicipioDevelopmentIndex(m);
       if (!score) return false;
-      if (currentMunInstrumentFilter === "destaque") {
-        return score.destaque_instrumentos === true;
+      if (selectedMunInstrumentos.has("destaque") && score.destaque_instrumentos === true) {
+        return true;
       }
-      if (currentMunInstrumentFilter === "sem_instrumentos") {
-        return !score.instrumentos_aplicados || score.instrumentos_aplicados.length === 0;
+      if (selectedMunInstrumentos.has("sem_instrumentos") && (!score.instrumentos_aplicados || score.instrumentos_aplicados.length === 0)) {
+        return true;
       }
-      return Array.isArray(score.instrumentos_aplicados) && score.instrumentos_aplicados.includes(currentMunInstrumentFilter);
+      if (Array.isArray(score.instrumentos_aplicados)) {
+        for (const inst of score.instrumentos_aplicados) {
+          if (selectedMunInstrumentos.has(inst)) return true;
+        }
+      }
+      return false;
     });
   }
 
-  // 6. Apply Indicator Filter
-  if (currentMunIndicatorFilter !== "all") {
+  // 6. Apply Indicator Filter (Multi-select Acumulativo: atende a QUALQUER um dos indicadores selecionados)
+  if (selectedMunIndicadores.size > 0) {
     items = items.filter((m) => {
       const score = calculateMunicipioDevelopmentIndex(m);
       if (!score || !Array.isArray(score.criterios)) return false;
-      const crit = score.criterios.find((c) => c.identificador === currentMunIndicatorFilter);
-      return crit && crit.atendido === true;
+      return score.criterios.some((c) => c.atendido && selectedMunIndicadores.has(c.identificador));
     });
   }
 
@@ -729,22 +943,6 @@ function renderMunicipalitiesTable() {
     if (typeof lucide !== "undefined") lucide.createIcons();
     return;
   }
-
-  const CRITERIA_SHORT_LABELS = {
-    educacao_70_porcento: "EE &gt; 70%",
-    parceria_secretaria_educacao: "Sec. Educação",
-    jepp_municipio: "JEPP",
-    produto_despertar: "Despertar",
-    parceria_superintendencia: "Superintendência",
-    parceria_ies: "IES",
-    rede_aqui_tem_sebrae: "Aqui Tem Sebrae",
-    convenio_parceria: "Convênio",
-    comite_acoes_conjuntas: "Comitê Gestor",
-    empresa_simulada: "Emp. Simulada",
-    escola_sebrae: "Escola Sebrae",
-    cooperativa_credito: "Cooperativa",
-    lei_educacao_empreendedora: "Lei EE"
-  };
 
   const INSTRUMENT_LABELS = {
     material_didatico: "Mat. Didático (+10)",
@@ -773,16 +971,8 @@ function renderMunicipalitiesTable() {
       destaque_instrumentos: false
     };
 
-    // Filter which criteria to display in table according to user preference
-    let visibleCriterios = scoreData.criterios || [];
-    if (currentMunVisibleIndicatorsMode === "sim_only") {
-      visibleCriterios = visibleCriterios.filter((c) => c.atendido);
-    } else if (currentMunVisibleIndicatorsMode === "top5") {
-      visibleCriterios = visibleCriterios.filter((c) => c.ordem <= 5);
-    } else if (currentMunVisibleIndicatorsMode === "parcerias") {
-      const parceriasKeys = ["parceria_secretaria_educacao", "parceria_superintendencia", "parceria_ies", "cooperativa_credito", "convenio_parceria"];
-      visibleCriterios = visibleCriterios.filter((c) => parceriasKeys.includes(c.identificador));
-    }
+    // Filter which criteria to display in table according to selectedMunVisibleIndicators
+    let visibleCriterios = (scoreData.criterios || []).filter((c) => selectedMunVisibleIndicators.has(c.identificador));
 
     const indBadges = visibleCriterios.map((c) => {
       const cls = c.atendido ? "sim" : "nao";
