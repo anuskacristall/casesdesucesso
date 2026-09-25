@@ -996,9 +996,6 @@ function renderMunicipalitiesTable() {
       visibleCriterios = visibleCriterios.filter((c) => c.atendido);
     }
 
-    const atendidosCount = (scoreData.criterios || []).filter((c) => c.atendido).length;
-    const totalCount = (scoreData.criterios || []).length || 13;
-
     const indBadges = visibleCriterios.map((c) => {
       const cls = c.atendido ? "sim" : "nao";
       const icon = c.atendido ? "✓" : "✗";
@@ -1010,10 +1007,6 @@ function renderMunicipalitiesTable() {
     const indicatorsHtml = visibleCriterios.length > 0
       ? `
         <div style="width: 275px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; padding: 3px 6px; background: #f8fafc; border-radius: 5px; font-size: 0.72rem; font-weight: 700; color: #475569; border: 1px solid #e2e8f0;">
-            <span style="color: ${atendidosCount >= 7 ? '#166534' : '#64748b'};">${atendidosCount} de ${totalCount} atendidos</span>
-            <span style="color: ${scoreData.pontuacao >= 64 ? '#166534' : '#854d0e'};">${scoreData.pontuacao} pts</span>
-          </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3px;">
             ${indBadges.join("")}
           </div>
