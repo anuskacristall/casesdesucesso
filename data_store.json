@@ -401,11 +401,11 @@
           }
         ],
         "instrumentos_aplicados": [
-          "encontro_mediado",
-          "material_didatico",
-          "oficina"
+          "curso",
+          "oficina",
+          "palestra"
         ],
-        "pontuacao_instrumentos": 30,
+        "pontuacao_instrumentos": 25,
         "destaque_instrumentos": true
       },
       "indice_pontuacao": 84,
@@ -413,11 +413,11 @@
       "indice_classificacao": "Desenvolvido",
       "indice_classificacao_key": "desenvolvido",
       "instrumentos_aplicados": [
-        "encontro_mediado",
-        "material_didatico",
-        "oficina"
+        "curso",
+        "oficina",
+        "palestra"
       ],
-      "pontuacao_instrumentos": 30,
+      "pontuacao_instrumentos": 25,
       "destaque_instrumentos": true
     },
     {
@@ -573,24 +573,22 @@
           }
         ],
         "instrumentos_aplicados": [
-          "encontro_mediado",
-          "material_didatico",
-          "oficina"
+          "oficina",
+          "palestra"
         ],
-        "pontuacao_instrumentos": 30,
-        "destaque_instrumentos": true
+        "pontuacao_instrumentos": 15,
+        "destaque_instrumentos": false
       },
       "indice_pontuacao": 51,
       "indice_percentual": 56.0,
       "indice_classificacao": "Em Desenvolvimento",
       "indice_classificacao_key": "em_desenvolvimento",
       "instrumentos_aplicados": [
-        "encontro_mediado",
-        "material_didatico",
-        "oficina"
+        "oficina",
+        "palestra"
       ],
-      "pontuacao_instrumentos": 30,
-      "destaque_instrumentos": true
+      "pontuacao_instrumentos": 15,
+      "destaque_instrumentos": false
     },
     {
       "id": "mun-diamantina",
@@ -745,24 +743,20 @@
           }
         ],
         "instrumentos_aplicados": [
-          "encontro_mediado",
-          "material_didatico",
-          "oficina"
+          "palestra"
         ],
-        "pontuacao_instrumentos": 30,
-        "destaque_instrumentos": true
+        "pontuacao_instrumentos": 5,
+        "destaque_instrumentos": false
       },
       "indice_pontuacao": 51,
       "indice_percentual": 56.0,
       "indice_classificacao": "Em Desenvolvimento",
       "indice_classificacao_key": "em_desenvolvimento",
       "instrumentos_aplicados": [
-        "encontro_mediado",
-        "material_didatico",
-        "oficina"
+        "palestra"
       ],
-      "pontuacao_instrumentos": 30,
-      "destaque_instrumentos": true
+      "pontuacao_instrumentos": 5,
+      "destaque_instrumentos": false
     },
     {
       "id": "mun-divinopolis",
@@ -917,11 +911,11 @@
           }
         ],
         "instrumentos_aplicados": [
-          "encontro_mediado",
+          "curso",
           "material_didatico",
-          "oficina"
+          "palestra"
         ],
-        "pontuacao_instrumentos": 30,
+        "pontuacao_instrumentos": 25,
         "destaque_instrumentos": true
       },
       "indice_pontuacao": 49,
@@ -929,11 +923,11 @@
       "indice_classificacao": "Em Desenvolvimento",
       "indice_classificacao_key": "em_desenvolvimento",
       "instrumentos_aplicados": [
-        "encontro_mediado",
+        "curso",
         "material_didatico",
-        "oficina"
+        "palestra"
       ],
-      "pontuacao_instrumentos": 30,
+      "pontuacao_instrumentos": 25,
       "destaque_instrumentos": true
     },
     {
@@ -1090,11 +1084,10 @@
         ],
         "instrumentos_aplicados": [
           "encontro_mediado",
-          "material_didatico",
-          "oficina"
+          "palestra"
         ],
-        "pontuacao_instrumentos": 30,
-        "destaque_instrumentos": true
+        "pontuacao_instrumentos": 15,
+        "destaque_instrumentos": false
       },
       "indice_pontuacao": 82,
       "indice_percentual": 90.1,
@@ -1102,11 +1095,10 @@
       "indice_classificacao_key": "desenvolvido",
       "instrumentos_aplicados": [
         "encontro_mediado",
-        "material_didatico",
-        "oficina"
+        "palestra"
       ],
-      "pontuacao_instrumentos": 30,
-      "destaque_instrumentos": true
+      "pontuacao_instrumentos": 15,
+      "destaque_instrumentos": false
     },
     {
       "id": "mun-ipatinga",
@@ -1609,11 +1601,11 @@
           }
         ],
         "instrumentos_aplicados": [
-          "encontro_mediado",
           "material_didatico",
-          "oficina"
+          "oficina",
+          "palestra"
         ],
-        "pontuacao_instrumentos": 30,
+        "pontuacao_instrumentos": 25,
         "destaque_instrumentos": true
       },
       "indice_pontuacao": 53,
@@ -1621,11 +1613,11 @@
       "indice_classificacao": "Em Desenvolvimento",
       "indice_classificacao_key": "em_desenvolvimento",
       "instrumentos_aplicados": [
-        "encontro_mediado",
         "material_didatico",
-        "oficina"
+        "oficina",
+        "palestra"
       ],
-      "pontuacao_instrumentos": 30,
+      "pontuacao_instrumentos": 25,
       "destaque_instrumentos": true
     },
     {
@@ -1781,24 +1773,20 @@
           }
         ],
         "instrumentos_aplicados": [
-          "encontro_mediado",
-          "material_didatico",
-          "oficina"
+          "palestra"
         ],
-        "pontuacao_instrumentos": 30,
-        "destaque_instrumentos": true
+        "pontuacao_instrumentos": 5,
+        "destaque_instrumentos": false
       },
       "indice_pontuacao": 49,
       "indice_percentual": 53.8,
       "indice_classificacao": "Em Desenvolvimento",
       "indice_classificacao_key": "em_desenvolvimento",
       "instrumentos_aplicados": [
-        "encontro_mediado",
-        "material_didatico",
-        "oficina"
+        "palestra"
       ],
-      "pontuacao_instrumentos": 30,
-      "destaque_instrumentos": true
+      "pontuacao_instrumentos": 5,
+      "destaque_instrumentos": false
     },
     {
       "id": "mun-patos-de-minas",
@@ -2128,10 +2116,10 @@
         ],
         "instrumentos_aplicados": [
           "encontro_mediado",
-          "material_didatico",
-          "oficina"
+          "oficina",
+          "palestra"
         ],
-        "pontuacao_instrumentos": 30,
+        "pontuacao_instrumentos": 25,
         "destaque_instrumentos": true
       },
       "indice_pontuacao": 49,
@@ -2140,10 +2128,10 @@
       "indice_classificacao_key": "em_desenvolvimento",
       "instrumentos_aplicados": [
         "encontro_mediado",
-        "material_didatico",
-        "oficina"
+        "oficina",
+        "palestra"
       ],
-      "pontuacao_instrumentos": 30,
+      "pontuacao_instrumentos": 25,
       "destaque_instrumentos": true
     },
     {
@@ -2471,24 +2459,20 @@
           }
         ],
         "instrumentos_aplicados": [
-          "encontro_mediado",
-          "material_didatico",
-          "oficina"
+          "palestra"
         ],
-        "pontuacao_instrumentos": 30,
-        "destaque_instrumentos": true
+        "pontuacao_instrumentos": 5,
+        "destaque_instrumentos": false
       },
       "indice_pontuacao": 53,
       "indice_percentual": 58.2,
       "indice_classificacao": "Em Desenvolvimento",
       "indice_classificacao_key": "em_desenvolvimento",
       "instrumentos_aplicados": [
-        "encontro_mediado",
-        "material_didatico",
-        "oficina"
+        "palestra"
       ],
-      "pontuacao_instrumentos": 30,
-      "destaque_instrumentos": true
+      "pontuacao_instrumentos": 5,
+      "destaque_instrumentos": false
     },
     {
       "id": "mun-uberaba",
@@ -2643,11 +2627,11 @@
           }
         ],
         "instrumentos_aplicados": [
-          "encontro_mediado",
-          "material_didatico",
-          "oficina"
+          "curso",
+          "oficina",
+          "palestra"
         ],
-        "pontuacao_instrumentos": 30,
+        "pontuacao_instrumentos": 25,
         "destaque_instrumentos": true
       },
       "indice_pontuacao": 84,
@@ -2655,11 +2639,11 @@
       "indice_classificacao": "Desenvolvido",
       "indice_classificacao_key": "desenvolvido",
       "instrumentos_aplicados": [
-        "encontro_mediado",
-        "material_didatico",
-        "oficina"
+        "curso",
+        "oficina",
+        "palestra"
       ],
-      "pontuacao_instrumentos": 30,
+      "pontuacao_instrumentos": 25,
       "destaque_instrumentos": true
     },
     {
@@ -3026,19 +3010,11 @@
       "escola_sebrae": true
     },
     "seed-2": {
-      "tipo_case": "professor",
-      "professor_nome": "Profª. Camila Guimarães Silva",
-      "professor_email": "camila.guimaraes@pousoalegre.mg.gov.br",
-      "professor_telefone": "(35) 99888-7766",
-      "nivel_ensino": "Fundamental",
-      "dependencia_adm": "Municipal",
-      "empresa_nome": "HortaViva Educacional",
-      "empresa_tipo": "Agroecologia / Alimentação Saudável",
-      "empresa_descricao": "Metodologia pedagógica e minifazenda agroecológica com comercialização de hortaliças frescas para a comunidade e formação alimentar consciente.",
-      "convenio_sebrae": true,
-      "parceria_superintendencia": true,
-      "empresa_simulada": false,
-      "escola_sebrae": false
+      "instrumentos_aplicados": [
+        "curso",
+        "oficina",
+        "palestra"
+      ]
     },
     "seed-3": {
       "tipo_case": "estudante",
@@ -3086,19 +3062,11 @@
       "escola_sebrae": false
     },
     "seed-6": {
-      "tipo_case": "professor",
-      "professor_nome": "Prof. Marcelo Antunes Dias",
-      "professor_email": "marcelo.antunes@educacao.mg.gov.br",
-      "professor_telefone": "(37) 98822-4455",
-      "nivel_ensino": "Médio",
-      "dependencia_adm": "Estadual",
-      "empresa_nome": "Ludus Histórica Jogos Educativos",
-      "empresa_tipo": "Educação / Jogos e Gamificação",
-      "empresa_descricao": "Metodologia docente de ensino de história e educação financeira regional por meio de jogos de tabuleiro didáticos desenvolvidos em sala de aula.",
-      "convenio_sebrae": true,
-      "parceria_superintendencia": true,
-      "empresa_simulada": false,
-      "escola_sebrae": false
+      "instrumentos_aplicados": [
+        "curso",
+        "material_didatico",
+        "palestra"
+      ]
     },
     "seed-7": {
       "tipo_case": "estudante",
@@ -3116,19 +3084,9 @@
       "escola_sebrae": false
     },
     "seed-8": {
-      "tipo_case": "estudante",
-      "estudante_nome": "Guilherme Sampaio Ramos",
-      "estudante_email": "guilherme.ramos@educa.teofilootoni.mg.gov.br",
-      "estudante_telefone": "(33) 98844-3322",
-      "nivel_ensino": "Fundamental",
-      "dependencia_adm": "Municipal",
-      "empresa_nome": "Rota Verde Ecoturismo Escolar",
-      "empresa_tipo": "Turismo Sustentável e Guiamento",
-      "empresa_descricao": "Mini-agência jovem idealizada por alunos para planejar e ofertar roteiros guiados de ecoturismo pelas belezas naturais e históricas do Vale do Mucuri.",
-      "convenio_sebrae": true,
-      "parceria_superintendencia": true,
-      "empresa_simulada": false,
-      "escola_sebrae": false
+      "instrumentos_aplicados": [
+        "palestra"
+      ]
     },
     "seed-9": {
       "tipo_case": "estudante",
@@ -3176,19 +3134,10 @@
       "escola_sebrae": false
     },
     "seed-12": {
-      "tipo_case": "professor",
-      "professor_nome": "Prof. Pajé Arakém Kariri",
-      "professor_email": "arakem.kariri@educacao.mg.gov.br",
-      "professor_telefone": "(33) 99922-1133",
-      "nivel_ensino": "Fundamental",
-      "dependencia_adm": "Estadual",
-      "empresa_nome": "Arte Ancestral Xucuru",
-      "empresa_tipo": "Economia Criativa / Artesanato Indígena",
-      "empresa_descricao": "Iniciativa pedagógica de etnoempreendedorismo valorizando a produção artesanal ancestral com biojoias e cerâmicas tradicionais com certificado de origem.",
-      "convenio_sebrae": true,
-      "parceria_superintendencia": true,
-      "empresa_simulada": false,
-      "escola_sebrae": false
+      "instrumentos_aplicados": [
+        "oficina",
+        "palestra"
+      ]
     },
     "seed-13": {
       "tipo_case": "estudante",
@@ -3251,19 +3200,11 @@
       "escola_sebrae": false
     },
     "seed-17": {
-      "tipo_case": "estudante",
-      "estudante_nome": "Gabriel Henrique Moreira",
-      "estudante_email": "gabriel.moreira@aluno.mg.gov.br",
-      "estudante_telefone": "(31) 99344-5566",
-      "nivel_ensino": "Médio",
-      "dependencia_adm": "Estadual",
-      "empresa_nome": "HidroSmart Folhosas Urbanas",
-      "empresa_tipo": "Horticultura Tecnológica / Hidroponia",
-      "empresa_descricao": "Cultivo inteligente de alfaces e temperos hidropônicos com recirculação de água controlada por Arduino e abastecimento da merenda escolar comunitária.",
-      "convenio_sebrae": true,
-      "parceria_superintendencia": true,
-      "empresa_simulada": false,
-      "escola_sebrae": false
+      "instrumentos_aplicados": [
+        "material_didatico",
+        "oficina",
+        "palestra"
+      ]
     },
     "seed-18": {
       "tipo_case": "estudante",
@@ -3296,19 +3237,9 @@
       "escola_sebrae": false
     },
     "seed-20": {
-      "tipo_case": "estudante",
-      "estudante_nome": "Matheus Vieira Barreto",
-      "estudante_email": "matheus.barreto@aluno.mg.gov.br",
-      "estudante_telefone": "(37) 99933-2244",
-      "nivel_ensino": "Médio",
-      "dependencia_adm": "Estadual",
-      "empresa_nome": "EduGamer Studio Cooperativo",
-      "empresa_tipo": "Desenvolvimento de Jogos Digitais",
-      "empresa_descricao": "Startup cooperativa estudantil que desenvolve jogos digitais educativos e gamificados sobre história mineira, ecologia e matemática financeira.",
-      "convenio_sebrae": true,
-      "parceria_superintendencia": true,
-      "empresa_simulada": true,
-      "escola_sebrae": false
+      "instrumentos_aplicados": [
+        "palestra"
+      ]
     },
     "seed-21": {
       "tipo_case": "professor",

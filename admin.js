@@ -1001,13 +1001,13 @@ function renderMunicipalitiesTable() {
       const icon = c.atendido ? "✓" : "✗";
       const statusText = c.atendido ? "Sim" : "Não";
       const label = CRITERIA_SHORT_LABELS[c.identificador] || c.identificador;
-      return `<span class="mini-badge ${cls}" title="${c.ordem_str} - ${c.nome} (${c.peso} pts): ${statusText}" style="display:inline-flex; align-items:center; justify-content:center; gap:3px; font-size:0.68rem; padding: 2px 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center;"><span style="font-weight:700;">${icon}</span> ${label}</span>`;
+      return `<span class="mini-badge ${cls}" title="${c.ordem_str} - ${c.nome} (${c.peso} pts): ${statusText}" style="display:inline-flex; align-items:center; gap:2px; font-size:0.66rem; padding: 2px 4px; white-space:nowrap; border-radius:3px;"><span style="font-weight:700;">${icon}</span> ${label}</span>`;
     });
 
     const indicatorsHtml = visibleCriterios.length > 0
       ? `
-        <div style="width: 275px;">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3px;">
+        <div style="max-width: 195px;">
+          <div style="display: flex; flex-wrap: wrap; gap: 3px;">
             ${indBadges.join("")}
           </div>
         </div>
@@ -1025,7 +1025,7 @@ function renderMunicipalitiesTable() {
       : (scoreData.pontuacao_instrumentos > 0 ? `<small style="color:#64748b; font-size:0.72rem; font-weight:600; padding: 2px 4px;">Total: ${scoreData.pontuacao_instrumentos} pts</small>` : `<span style="color:#94a3b8; font-size:0.75rem;">Nenhum</span>`);
 
     const instrumentosHtml = `
-      <div style="display: flex; flex-wrap: wrap; gap: 4px; width: 170px; align-items: center;">
+      <div style="display: flex; flex-wrap: wrap; gap: 3px; max-width: 135px; align-items: center;">
         ${instBadges.length > 0 ? instBadges.join("") : ""}
         ${destaqueBadge}
       </div>
@@ -1036,27 +1036,27 @@ function renderMunicipalitiesTable() {
       : `<span style="font-size: 0.73rem; font-weight: 700; color: #854d0e; background: #fef9c3; padding: 2px 7px; border-radius: 4px; border: 1px solid #fef08a;">${scoreData.pontuacao} pts • Em Desenv.</span>`;
 
     const actions = `
-      <div class="row-actions" style="justify-content: flex-end;">
+      <div class="row-actions">
         ${status === "pending" ? `
           <button class="btn-action btn-approve" onclick="approveMunicipality('${escapeHtml(item.id)}')" title="Aprovar Município">
-            <i data-lucide="check" style="width: 14px; height: 14px;"></i>
+            <i data-lucide="check"></i>
             <span>Aprovar</span>
           </button>
           <button class="btn-action btn-reject" onclick="rejectMunicipality('${escapeHtml(item.id)}')" title="Rejeitar Solicitação">
-            <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+            <i data-lucide="x"></i>
             <span>Rejeitar</span>
           </button>
         ` : ""}
         <button class="btn-action btn-edit" onclick="openEditMunicipalityModal('${escapeHtml(item.id)}')" title="Editar Município">
-          <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i>
+          <i data-lucide="edit-3"></i>
           <span>Editar</span>
         </button>
         <button class="btn-action btn-delete" onclick="deleteMunicipality('${escapeHtml(item.id)}')" title="Excluir Município">
-          <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+          <i data-lucide="trash-2"></i>
           <span>Excluir</span>
         </button>
         <button class="btn-action btn-details" onclick="openMunicipalityDetails('${escapeHtml(item.id)}')" title="Ver Detalhes">
-          <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+          <i data-lucide="eye"></i>
           <span>Detalhes</span>
         </button>
       </div>
@@ -1082,7 +1082,7 @@ function renderMunicipalitiesTable() {
         </td>
         <td>${instrumentosHtml}</td>
         <td><span class="badge-status ${statusCfg.class}">${statusCfg.label}</span></td>
-        <td style="text-align: right;">${actions}</td>
+        <td style="text-align: center;">${actions}</td>
       </tr>
     `;
   }).join("");
@@ -1162,38 +1162,38 @@ function renderCasesTable() {
     const isParentRejected = parentMun && parentMun.status === "rejected";
 
     const actions = `
-      <div class="row-actions" style="justify-content: flex-end;">
+      <div class="row-actions">
         ${status === "pending" ? (
           isParentRejected ? `
             <button class="btn-action disabled" disabled title="Aprovação Bloqueada: O município '${escapeHtml(parentMun.nome)}' está REJEITADO. Aprove o município primeiro." style="opacity: 0.55; cursor: not-allowed; background: #fef2f2; border-color: #fca5a5; color: #b91c1c;">
-              <i data-lucide="shield-alert" style="width: 14px; height: 14px; color: #ef4444;"></i>
+              <i data-lucide="shield-alert"></i>
               <span>Bloqueado</span>
             </button>
             <button class="btn-action btn-reject" onclick="rejectCase('${escapeHtml(item.id)}')" title="Rejeitar Case">
-              <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+              <i data-lucide="x"></i>
               <span>Rejeitar</span>
             </button>
           ` : `
             <button class="btn-action btn-approve" onclick="approveCase('${escapeHtml(item.id)}')" title="Aprovar Case">
-              <i data-lucide="check" style="width: 14px; height: 14px;"></i>
+              <i data-lucide="check"></i>
               <span>Aprovar</span>
             </button>
             <button class="btn-action btn-reject" onclick="rejectCase('${escapeHtml(item.id)}')" title="Rejeitar Case">
-              <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+              <i data-lucide="x"></i>
               <span>Rejeitar</span>
             </button>
           `
         ) : ""}
         <button class="btn-action btn-edit" onclick="openEditCaseModal('${escapeHtml(item.id)}')" title="Editar Case">
-          <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i>
+          <i data-lucide="edit-3"></i>
           <span>Editar</span>
         </button>
         <button class="btn-action btn-delete" onclick="deleteCase('${escapeHtml(item.id)}')" title="Excluir Case">
-          <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+          <i data-lucide="trash-2"></i>
           <span>Excluir</span>
         </button>
         <button class="btn-action btn-details" onclick="openCaseDetails('${escapeHtml(item.id)}')" title="Ver Detalhes">
-          <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+          <i data-lucide="eye"></i>
           <span>Detalhes</span>
         </button>
       </div>
@@ -1211,7 +1211,7 @@ function renderCasesTable() {
           <span class="badge-status ${statusCfg.class}">${statusCfg.label}</span>
           ${isParentRejected ? `<div style="margin-top: 4px;"><span class="badge-status rejected" style="font-size: 0.65rem; padding: 2px 6px; display: inline-flex; align-items: center; gap: 3px;" title="Município Pai '${escapeHtml(parentMun.nome)}' está REJEITADO"><i data-lucide="shield-alert" style="width: 10px; height: 10px;"></i> Mun. Rejeitado</span></div>` : ""}
         </td>
-        <td style="text-align: right;">${actions}</td>
+        <td style="text-align: center;">${actions}</td>
       </tr>
     `;
   }).join("");
