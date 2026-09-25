@@ -19,7 +19,7 @@
   </script>
 
   <!-- Base App Styles -->
-  <link rel="stylesheet" href="style.css?v=20">
+  <link rel="stylesheet" href="style.css?v=21">
 
   <!-- Admin Dedicated Styles -->
   <style>
@@ -495,10 +495,17 @@
     }
 
     .mun-filter-item select {
-      background: #f8fafc;
+      appearance: none !important;
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      background-color: #f8fafc !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+      background-repeat: no-repeat !important;
+      background-position: right 12px center !important;
+      background-size: 16px !important;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
-      padding: 8px 12px;
+      padding: 8px 36px 8px 12px !important;
       font-size: 0.85rem;
       color: #1e293b;
       outline: none;
@@ -510,7 +517,7 @@
     .mun-filter-item select:focus {
       border-color: #0054a6;
       box-shadow: 0 0 0 3px rgba(0, 84, 166, 0.1);
-      background: #ffffff;
+      background-color: #ffffff !important;
     }
 
     /* Content Cards & Tables */
@@ -682,7 +689,7 @@
       font-size: 0.88rem;
       border-radius: 8px;
       border: 1px solid #cbd5e1;
-      background: #f8fafc;
+      background-color: #f8fafc;
       color: #0f172a;
       outline: none;
       transition: all 0.2s ease;
@@ -690,9 +697,26 @@
     }
 
     .form-input:focus {
-      background: #ffffff;
+      background-color: #ffffff;
       border-color: #0054a6;
       box-shadow: 0 0 0 3px rgba(0, 84, 166, 0.12);
+    }
+
+    select.form-input {
+      appearance: none !important;
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      background-color: #f8fafc !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+      background-repeat: no-repeat !important;
+      background-position: right 12px center !important;
+      background-size: 16px !important;
+      padding-right: 36px !important;
+      cursor: pointer;
+    }
+
+    select.form-input:focus {
+      background-color: #ffffff !important;
     }
 
     /* Row Action Buttons */
@@ -1075,11 +1099,15 @@
       width: 105px !important;
       min-width: 105px !important;
       max-width: 105px !important;
-      padding: 6px 10px !important;
+      padding: 6px 26px 6px 10px !important;
+      background-color: #ffffff !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+      background-repeat: no-repeat !important;
+      background-position: right 8px center !important;
+      background-size: 14px !important;
       font-size: 0.84rem !important;
       font-weight: 600;
       color: #0f172a;
-      background-color: #ffffff;
       border: 1px solid #cbd5e1;
       border-radius: 6px;
       cursor: pointer;
