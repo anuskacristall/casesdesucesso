@@ -233,8 +233,15 @@ function calculateMunicipioDevelopmentIndex(item) {
   }
   if (!Array.isArray(insts)) insts = [];
 
-  const pontuacao_instrumentos = insts.length * 10;
-  const destaque_instrumentos = insts.length >= 3;
+  const INSTRUMENTO_PESOS = {
+    material_didatico: 10,
+    oficina: 10,
+    curso: 10,
+    encontro_mediado: 10,
+    palestra: 5
+  };
+  const pontuacao_instrumentos = insts.reduce((sum, code) => sum + (INSTRUMENTO_PESOS[code] !== undefined ? INSTRUMENTO_PESOS[code] : (code === "palestra" ? 5 : 10)), 0);
+  const destaque_instrumentos = pontuacao_instrumentos >= 25;
 
   return {
     pontuacao: pontuacaoBruta,
@@ -1208,8 +1215,8 @@ function renderAdminMunicipalityInstruments(item) {
   const priorityOrder = ["material_didatico", "oficina", "curso", "encontro_mediado", "palestra"];
   insts.sort((a, b) => priorityOrder.indexOf(a) - priorityOrder.indexOf(b));
 
-  const pontuacao = insts.length * 10;
-  const hasDestaque = insts.length >= 3;
+  const pontuacao = insts.reduce((sum, code) => sum + (code === "palestra" ? 5 : 10), 0);
+  const hasDestaque = pontuacao >= 25;
 
   const labels = {
     material_didatico: "Aplicação de Material Didático",
@@ -1224,7 +1231,7 @@ function renderAdminMunicipalityInstruments(item) {
         <span class="instrument-pill">
           <i data-lucide="check" style="width: 14px; height: 14px;"></i>
           <span>${escapeHtml(labels[code] || code)}</span>
-          <span class="instrument-pill-pts">+10 pts</span>
+          <span class="instrument-pill-pts">+${code === "palestra" ? 5 : 10} pts</span>
         </span>
       `).join("")
     : `<span style="color: #94a3b8; font-size: 0.85rem; font-style: italic;">Nenhum instrumento informado</span>`;
@@ -1266,7 +1273,7 @@ function renderMunicipalityFinalConsolidatedScore(item) {
 
   const ptsIndice = devIndex ? devIndex.pontuacao : 0;
   const ptsMaxIndice = devIndex ? devIndex.pontuacao_maxima : 91;
-  const ptsInst = insts.length * 10;
+  const ptsInst = insts.reduce((sum, code) => sum + (code === "palestra" ? 5 : 10), 0);
   const ptsTotal = ptsIndice + ptsInst;
   const isDesenvolvido = devIndex && devIndex.classificacao_key === "desenvolvido";
 
@@ -1282,14 +1289,14 @@ function renderMunicipalityFinalConsolidatedScore(item) {
             ${ptsTotal} <span style="font-size: 1rem; font-weight: 600; color: #64748b;">pontos totais</span>
           </div>
           <div style="font-size: 0.85rem; color: #334155; margin-top: 4px; line-height: 1.4;">
-            Memória: <strong>${ptsIndice} pts</strong> (Índice de Desenvolvimento: ${ptsIndice}/${ptsMaxIndice}) + <strong>${ptsInst} pts</strong> (${insts.length} Instrumentos Aplicados: ${ptsInst}/50 pts)
+            Memória: <strong>${ptsIndice} pts</strong> (Índice de Desenvolvimento: ${ptsIndice}/${ptsMaxIndice}) + <strong>${ptsInst} pts</strong> (${insts.length} Instrumentos Aplicados: ${ptsInst}/45 pts)
           </div>
         </div>
         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
           <span class="badge" style="background: ${isDesenvolvido ? '#dcfce7' : '#e0f2fe'}; color: ${isDesenvolvido ? '#15803d' : '#0369a1'}; border: 1.5px solid ${isDesenvolvido ? '#86efac' : '#7dd3fc'}; font-weight: 800; font-size: 0.85rem; padding: 6px 12px; border-radius: 8px;">
             ${isDesenvolvido ? 'Município Desenvolvido' : 'Município em Desenvolvimento'}
           </span>
-          ${insts.length >= 3 ? `
+          ${ptsInst >= 25 ? `
             <span class="badge" style="background: #fefce8; color: #854d0e; border: 1.5px solid #fde047; font-weight: 800; font-size: 0.85rem; padding: 6px 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 5px;">
               <i data-lucide="award" style="width: 14px; height: 14px; color: #ca8a04;"></i> Destaque em Instrumentos
             </span>
@@ -2082,8 +2089,8 @@ async function handleSaveMunicipalityEdit(e) {
     lei_possui: document.getElementById("edit-mun-lei").value === "sim",
     lei_educacao_empreendedora: document.getElementById("edit-mun-lei").value === "sim",
     instrumentos_aplicados: selectedInsts,
-    pontuacao_instrumentos: selectedInsts.length * 10,
-    destaque_instrumentos: selectedInsts.length >= 3
+    pontuacao_instrumentos: selectedInsts.reduce((sum, code) => sum + (code === "palestra" ? 5 : 10), 0),
+    destaque_instrumentos: selectedInsts.reduce((sum, code) => sum + (code === "palestra" ? 5 : 10), 0) >= 25
   };
 
   Object.assign(item, updatedFields);

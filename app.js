@@ -1847,8 +1847,15 @@ function calculateMunicipioDevelopmentIndex(item) {
   }
   if (!Array.isArray(insts)) insts = [];
 
-  const pontuacao_instrumentos = insts.length * 10;
-  const destaque_instrumentos = insts.length >= 3;
+  const INSTRUMENTO_PESOS = {
+    material_didatico: 10,
+    oficina: 10,
+    curso: 10,
+    encontro_mediado: 10,
+    palestra: 5
+  };
+  const pontuacao_instrumentos = insts.reduce((sum, code) => sum + (INSTRUMENTO_PESOS[code] !== undefined ? INSTRUMENTO_PESOS[code] : (code === "palestra" ? 5 : 10)), 0);
+  const destaque_instrumentos = pontuacao_instrumentos >= 25;
 
   return {
     pontuacao: pontuacaoBruta,
@@ -2305,7 +2312,8 @@ function openDetailsModal(id) {
       palestra: "Palestra"
     };
 
-    const hasDestaque = insts.length >= 3;
+    const instScore = insts.reduce((sum, code) => sum + (code === "palestra" ? 5 : 10), 0);
+    const hasDestaque = instScore >= 25;
 
     const pillsHtml = insts.length > 0
       ? insts.map(code => `
@@ -2471,11 +2479,14 @@ function closeRegisterPanel() {
 
 function updateMunicipalityInstrumentsUI() {
   const checkboxes = document.querySelectorAll('input[name="municipality-instruments"]:checked');
-  const count = checkboxes.length;
+  let totalPts = 0;
+  checkboxes.forEach(cb => {
+    totalPts += cb.value === "palestra" ? 5 : 10;
+  });
   const destaqueBanner = document.getElementById("instruments-destaque-banner");
 
   if (destaqueBanner) {
-    destaqueBanner.style.display = count >= 3 ? "flex" : "none";
+    destaqueBanner.style.display = totalPts >= 25 ? "flex" : "none";
     if (typeof lucide !== "undefined") lucide.createIcons({ root: destaqueBanner });
   }
 }
@@ -2686,8 +2697,8 @@ async function handleMunicipalitySubmit(e) {
   const selectedInstruments = Array.from(
     document.querySelectorAll('input[name="municipality-instruments"]:checked')
   ).map(cb => cb.value);
-  const pontuacaoInstrumentos = selectedInstruments.length * 10;
-  const destaqueInstrumentos = selectedInstruments.length >= 3;
+  const pontuacaoInstrumentos = selectedInstruments.reduce((sum, code) => sum + (code === "palestra" ? 5 : 10), 0);
+  const destaqueInstrumentos = pontuacaoInstrumentos >= 25;
 
   // Validação de telefone com DDD entre parênteses
   if (!isValidPhone(contactPhone)) {
@@ -4148,7 +4159,8 @@ function renderPublicMunicipalityInstruments(item) {
   const priorityOrder = ["material_didatico", "oficina", "curso", "encontro_mediado", "palestra"];
   insts.sort((a, b) => priorityOrder.indexOf(a) - priorityOrder.indexOf(b));
 
-  const hasDestaque = insts.length >= 3;
+  const instScore = insts.reduce((sum, code) => sum + (code === "palestra" ? 5 : 10), 0);
+  const hasDestaque = instScore >= 25;
 
   const labels = {
     material_didatico: "Aplicação de Material Didático",

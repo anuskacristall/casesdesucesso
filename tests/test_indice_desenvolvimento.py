@@ -175,29 +175,40 @@ class TestIndiceDesenvolvimento(unittest.TestCase):
         self.assertIn(".indicator-toggle > label", style_css)
 
     def test_instrumentos_score_and_destaque(self):
-        """Valida que cada instrumento vale 10 pontos e no mínimo 3 concedem Destaque."""
+        """Valida que palestra vale 5 pontos, demais valem 10, e destaque é concedido a partir de 25 pontos."""
         # 0 instrumentos
         res0 = calculate_municipio_development_index({"instrumentos_aplicados": []})
         self.assertEqual(res0["instrumentos_aplicados"], [])
         self.assertEqual(res0["pontuacao_instrumentos"], 0)
         self.assertFalse(res0["destaque_instrumentos"])
 
-        # 2 instrumentos (20 pts, sem destaque)
+        # 2 instrumentos sem palestra (10 + 10 = 20 pts, sem destaque pois < 25)
         res2 = calculate_municipio_development_index({"instrumentos_aplicados": ["material_didatico", "oficina"]})
         self.assertEqual(len(res2["instrumentos_aplicados"]), 2)
         self.assertEqual(res2["pontuacao_instrumentos"], 20)
         self.assertFalse(res2["destaque_instrumentos"])
 
-        # 3 instrumentos (30 pts, com destaque)
+        # 2 instrumentos com palestra (10 + 5 = 15 pts, sem destaque)
+        res_pal_2 = calculate_municipio_development_index({"instrumentos_aplicados": ["curso", "palestra"]})
+        self.assertEqual(res_pal_2["pontuacao_instrumentos"], 15)
+        self.assertFalse(res_pal_2["destaque_instrumentos"])
+
+        # 3 instrumentos com palestra (10 + 10 + 5 = 25 pts, exatamente no limite de destaque!)
+        res_pal_3 = calculate_municipio_development_index({"instrumentos_aplicados": ["curso", "oficina", "palestra"]})
+        self.assertEqual(len(res_pal_3["instrumentos_aplicados"]), 3)
+        self.assertEqual(res_pal_3["pontuacao_instrumentos"], 25)
+        self.assertTrue(res_pal_3["destaque_instrumentos"])
+
+        # 3 instrumentos de 10 pts (10 + 10 + 10 = 30 pts, com destaque)
         res3 = calculate_municipio_development_index({"instrumentos_aplicados": ["material_didatico", "oficina", "curso"]})
         self.assertEqual(len(res3["instrumentos_aplicados"]), 3)
         self.assertEqual(res3["pontuacao_instrumentos"], 30)
         self.assertTrue(res3["destaque_instrumentos"])
 
-        # 5 instrumentos (50 pts, com destaque)
+        # 5 instrumentos (10 + 10 + 10 + 10 + 5 = 45 pts, com destaque)
         res5 = calculate_municipio_development_index({"instrumentos_aplicados": ["material_didatico", "oficina", "curso", "encontro_mediado", "palestra"]})
         self.assertEqual(len(res5["instrumentos_aplicados"]), 5)
-        self.assertEqual(res5["pontuacao_instrumentos"], 50)
+        self.assertEqual(res5["pontuacao_instrumentos"], 45)
         self.assertTrue(res5["destaque_instrumentos"])
 
         # Auto-derivação a partir dos indicadores quando instrumentos_aplicados é None

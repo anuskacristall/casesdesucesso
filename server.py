@@ -444,8 +444,15 @@ def calculate_municipio_development_index(item: dict) -> dict:
     if not isinstance(insts, list):
         insts = []
 
-    pontuacao_inst = len(insts) * 10
-    destaque_inst = len(insts) >= 3
+    INSTRUMENTO_PESOS = {
+        "material_didatico": 10,
+        "oficina": 10,
+        "curso": 10,
+        "encontro_mediado": 10,
+        "palestra": 5
+    }
+    pontuacao_inst = sum(INSTRUMENTO_PESOS.get(i, 5 if i == "palestra" else 10) for i in insts)
+    destaque_inst = pontuacao_inst >= 25
 
     return {
         "pontuacao": pontuacao_bruta,
