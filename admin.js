@@ -558,6 +558,78 @@ function handleAdminSearch() {
   renderCurrentAdminTab();
 }
 
+// Municipality Advanced Filters State
+let currentMunRegionalFilter = "all";
+let currentMunTierFilter = "all";
+let currentMunInstrumentFilter = "all";
+let currentMunIndicatorFilter = "all";
+let currentMunVisibleIndicatorsMode = "all";
+
+const REGIONAL_NORMALIZATION = {
+  "centro": "Centro",
+  "centro-oeste e sudoeste": "Centro-Oeste e Sudoeste",
+  "centro-oeste": "Centro-Oeste e Sudoeste",
+  "centrooeste": "Centro-Oeste e Sudoeste",
+  "jequitinhonha e mucuri": "Jequitinhonha e Mucuri",
+  "jequitinhonha/mucuri": "Jequitinhonha e Mucuri",
+  "noroeste e alto paranaíba": "Noroeste e Alto Paranaíba",
+  "noroeste e alto paranaiba": "Noroeste e Alto Paranaíba",
+  "noroeste": "Noroeste e Alto Paranaíba",
+  "norte": "Norte",
+  "rio doce e vale do aço": "Rio Doce e Vale do Aço",
+  "rio doce e vale do aco": "Rio Doce e Vale do Aço",
+  "rio doce": "Rio Doce e Vale do Aço",
+  "sul": "Sul",
+  "triângulo": "Triângulo",
+  "triangulo": "Triângulo",
+  "zona da mata e vertentes": "Zona da Mata e Vertentes",
+  "zona da mata": "Zona da Mata e Vertentes"
+};
+
+function normalizeRegionalName(reg) {
+  if (!reg) return "";
+  const key = String(reg).trim().toLowerCase();
+  return REGIONAL_NORMALIZATION[key] || reg;
+}
+
+function handleMunFilterChange() {
+  const regSel = document.getElementById("filter-mun-regional");
+  const tierSel = document.getElementById("filter-mun-tier");
+  const instSel = document.getElementById("filter-mun-instrumento");
+  const indSel = document.getElementById("filter-mun-indicador");
+  const visSel = document.getElementById("filter-mun-visible-indicators");
+
+  if (regSel) currentMunRegionalFilter = regSel.value;
+  if (tierSel) currentMunTierFilter = tierSel.value;
+  if (instSel) currentMunInstrumentFilter = instSel.value;
+  if (indSel) currentMunIndicatorFilter = indSel.value;
+  if (visSel) currentMunVisibleIndicatorsMode = visSel.value;
+
+  renderMunicipalitiesTable();
+}
+
+function clearMunicipalityFilters() {
+  currentMunRegionalFilter = "all";
+  currentMunTierFilter = "all";
+  currentMunInstrumentFilter = "all";
+  currentMunIndicatorFilter = "all";
+  currentMunVisibleIndicatorsMode = "all";
+
+  const regSel = document.getElementById("filter-mun-regional");
+  const tierSel = document.getElementById("filter-mun-tier");
+  const instSel = document.getElementById("filter-mun-instrumento");
+  const indSel = document.getElementById("filter-mun-indicador");
+  const visSel = document.getElementById("filter-mun-visible-indicators");
+
+  if (regSel) regSel.value = "all";
+  if (tierSel) tierSel.value = "all";
+  if (instSel) instSel.value = "all";
+  if (indSel) indSel.value = "all";
+  if (visSel) visSel.value = "all";
+
+  renderMunicipalitiesTable();
+}
+
 function renderCurrentAdminTab() {
   if (currentAdminTab === "municipalities") {
     renderMunicipalitiesTable();
@@ -576,12 +648,12 @@ function renderMunicipalitiesTable() {
 
   let items = [...loadedMunicipalities];
 
-  // Apply Status Filter
+  // 1. Apply Status Filter
   if (currentStatusFilter !== "all") {
     items = items.filter((m) => (m.status || "pending") === currentStatusFilter);
   }
 
-  // Apply Search Query
+  // 2. Apply Search Query
   if (adminSearchQuery) {
     items = items.filter((m) => {
       const q = adminSearchQuery;
@@ -595,14 +667,61 @@ function renderMunicipalitiesTable() {
     });
   }
 
+  // 3. Apply Regional Filter
+  if (currentMunRegionalFilter !== "all") {
+    items = items.filter((m) => {
+      const norm = normalizeRegionalName(m.regional);
+      return norm === currentMunRegionalFilter || String(m.regional || "").toLowerCase().includes(currentMunRegionalFilter.toLowerCase());
+    });
+  }
+
+  // 4. Apply Tier / Classificacao Filter
+  if (currentMunTierFilter !== "all") {
+    items = items.filter((m) => {
+      const score = calculateMunicipioDevelopmentIndex(m);
+      return score && score.classificacao_key === currentMunTierFilter;
+    });
+  }
+
+  // 5. Apply Instrument Filter
+  if (currentMunInstrumentFilter !== "all") {
+    items = items.filter((m) => {
+      const score = calculateMunicipioDevelopmentIndex(m);
+      if (!score) return false;
+      if (currentMunInstrumentFilter === "destaque") {
+        return score.destaque_instrumentos === true;
+      }
+      if (currentMunInstrumentFilter === "sem_instrumentos") {
+        return !score.instrumentos_aplicados || score.instrumentos_aplicados.length === 0;
+      }
+      return Array.isArray(score.instrumentos_aplicados) && score.instrumentos_aplicados.includes(currentMunInstrumentFilter);
+    });
+  }
+
+  // 6. Apply Indicator Filter
+  if (currentMunIndicatorFilter !== "all") {
+    items = items.filter((m) => {
+      const score = calculateMunicipioDevelopmentIndex(m);
+      if (!score || !Array.isArray(score.criterios)) return false;
+      const crit = score.criterios.find((c) => c.identificador === currentMunIndicatorFilter);
+      return crit && crit.atendido === true;
+    });
+  }
+
+  // Update dynamic count badge
+  const countBadge = document.getElementById("mun-filtered-count-badge");
+  if (countBadge) {
+    countBadge.textContent = `Mostrando ${items.length} de ${loadedMunicipalities.length} municípios`;
+  }
+
   if (items.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7">
+        <td colspan="8">
           <div class="admin-state-box">
             <i data-lucide="inbox"></i>
             <h4>Nenhuma solicitação de município encontrada</h4>
-            <p>Tente ajustar os filtros de status ou a busca.</p>
+            <p>Tente ajustar os filtros ou a busca.</p>
           </div>
         </td>
       </tr>
@@ -610,6 +729,30 @@ function renderMunicipalitiesTable() {
     if (typeof lucide !== "undefined") lucide.createIcons();
     return;
   }
+
+  const CRITERIA_SHORT_LABELS = {
+    educacao_70_porcento: "EE &gt; 70%",
+    parceria_secretaria_educacao: "Sec. Educação",
+    jepp_municipio: "JEPP",
+    produto_despertar: "Despertar",
+    parceria_superintendencia: "Superintendência",
+    parceria_ies: "IES",
+    rede_aqui_tem_sebrae: "Aqui Tem Sebrae",
+    convenio_parceria: "Convênio",
+    comite_acoes_conjuntas: "Comitê Gestor",
+    empresa_simulada: "Emp. Simulada",
+    escola_sebrae: "Escola Sebrae",
+    cooperativa_credito: "Cooperativa",
+    lei_educacao_empreendedora: "Lei EE"
+  };
+
+  const INSTRUMENT_LABELS = {
+    material_didatico: "Mat. Didático (+10)",
+    oficina: "Oficina (+10)",
+    curso: "Curso (+10)",
+    encontro_mediado: "Encontro Med. (+10)",
+    palestra: "Palestra (+5)"
+  };
 
   tbody.innerHTML = items.map((item) => {
     const status = item.status || "pending";
@@ -621,34 +764,59 @@ function renderMunicipalitiesTable() {
       ? `<strong>${escapeHtml(item.responsavel_nome || item.solicitante_nome || item.tecnico_nome)}</strong><br><small style="color:#64748b;">${escapeHtml(item.responsavel_email || item.solicitante_email || item.tecnico_email || "")} ${(item.responsavel_telefone || item.solicitante_telefone || item.tecnico_telefone) ? `• ${escapeHtml(item.responsavel_telefone || item.solicitante_telefone || item.tecnico_telefone)}` : ""}</small>`
       : `<span style="color:#94a3b8;">Não informado</span>`;
 
-    // Indicators: exibição completa com verde para SIM e avermelhado para NÃO
-    const isValSim = (v) => v === true || v === 1 || String(v || "").trim().toLowerCase() === "sim" || String(v || "").trim().toLowerCase() === "true" || String(v || "").trim().toLowerCase() === "total";
+    const scoreData = calculateMunicipioDevelopmentIndex(item) || {
+      pontuacao: 0,
+      classificacao: "Em Desenvolvimento",
+      criterios: [],
+      instrumentos_aplicados: [],
+      pontuacao_instrumentos: 0,
+      destaque_instrumentos: false
+    };
 
-    const jeppSim = isValSim(item.status_jepp);
-    const jeppBadge = jeppSim
-      ? `<span class="mini-badge sim" title="Programa JEPP: Sim">JEPP: Sim</span>`
-      : `<span class="mini-badge nao" title="Programa JEPP: Não">JEPP: Não</span>`;
+    // Filter which criteria to display in table according to user preference
+    let visibleCriterios = scoreData.criterios || [];
+    if (currentMunVisibleIndicatorsMode === "sim_only") {
+      visibleCriterios = visibleCriterios.filter((c) => c.atendido);
+    } else if (currentMunVisibleIndicatorsMode === "top5") {
+      visibleCriterios = visibleCriterios.filter((c) => c.ordem <= 5);
+    } else if (currentMunVisibleIndicatorsMode === "parcerias") {
+      const parceriasKeys = ["parceria_secretaria_educacao", "parceria_superintendencia", "parceria_ies", "cooperativa_credito", "convenio_parceria"];
+      visibleCriterios = visibleCriterios.filter((c) => parceriasKeys.includes(c.identificador));
+    }
 
-    const indDefinitions = [
-      { key: item.municipio_ee_70, label: "EE &gt; 70%", title: "Educação Empreendedora em mais de 70% do município" },
-      { key: item.convenio_sebrae, label: "Convênio Sebrae", title: "Convênio/termo de parceria com o Sebrae" },
-      { key: item.parceria_superintendencia, label: "Parceria Superintendência", title: "Parceria com superintendência de ensino" },
-      { key: item.cooperativa_possui, label: "Cooperativa", title: "Cooperativa Escolar/Crédito" },
-      { key: item.lei_possui, label: "Lei EE", title: "Lei Municipal de Educação Empreendedora" },
-      { key: item.comite_possui, label: "Comitê Gestor", title: "Comitê Gestor Municipal" },
-      { key: item.ies_possui, label: "Parceria IES", title: "Parceria com Instituição de Ensino Superior" },
-      { key: item.empresa_simulada, label: "Emp. Simulada", title: "Empresa Simulada" },
-      { key: item.escola_sebrae, label: "Escola do Sebrae", title: "Sistema de Ensino Escola do Sebrae" }
-    ];
-
-    const indBadges = indDefinitions.map(def => {
-      const isSim = isValSim(def.key);
-      const cls = isSim ? "sim" : "nao";
-      const statusText = isSim ? "Sim" : "Não";
-      return `<span class="mini-badge ${cls}" title="${def.title}: ${statusText}">${def.label}</span>`;
+    const indBadges = visibleCriterios.map((c) => {
+      const cls = c.atendido ? "sim" : "nao";
+      const statusText = c.atendido ? "Sim" : "Não";
+      const label = CRITERIA_SHORT_LABELS[c.identificador] || c.identificador;
+      return `<span class="mini-badge ${cls}" title="${c.ordem_str} - ${c.nome} (${c.peso} pts): ${statusText}">${label}</span>`;
     });
 
-    const indicatorsHtml = `<div style="display: flex; flex-wrap: wrap; gap: 4px; max-width: 320px;">${jeppBadge}${indBadges.join("")}</div>`;
+    const indicatorsHtml = visibleCriterios.length > 0
+      ? `<div style="display: flex; flex-wrap: wrap; gap: 4px; max-width: 320px;">${indBadges.join("")}</div>`
+      : `<span style="color:#94a3b8; font-size: 0.78rem;">Nenhum no filtro</span>`;
+
+    // Instruments badges & Destaque
+    const instBadges = (scoreData.instrumentos_aplicados || []).map((code) => {
+      const label = INSTRUMENT_LABELS[code] || code;
+      return `<span class="mini-badge" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:0.72rem;">${label}</span>`;
+    });
+
+    const destaqueBadge = scoreData.destaque_instrumentos
+      ? `<span class="mini-badge" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-weight:700; display:inline-flex; align-items:center; gap:3px;"><i data-lucide="award" style="width:11px; height:11px;"></i> Destaque (${scoreData.pontuacao_instrumentos} pts)</span>`
+      : (scoreData.pontuacao_instrumentos > 0 ? `<small style="color:#64748b; font-size:0.72rem; font-weight:600;">Total: ${scoreData.pontuacao_instrumentos} pts</small>` : `<span style="color:#94a3b8; font-size:0.75rem;">Nenhum</span>`);
+
+    const instrumentosHtml = `
+      <div style="display: flex; flex-direction: column; gap: 4px; min-width: 140px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 3px;">
+          ${instBadges.length > 0 ? instBadges.join("") : ""}
+        </div>
+        <div>${destaqueBadge}</div>
+      </div>
+    `;
+
+    const tierBadge = scoreData.pontuacao >= 64
+      ? `<span style="font-size: 0.73rem; font-weight: 700; color: #166534; background: #dcfce7; padding: 2px 7px; border-radius: 4px; border: 1px solid #86efac;">${scoreData.pontuacao} pts • Desenvolvido</span>`
+      : `<span style="font-size: 0.73rem; font-weight: 700; color: #854d0e; background: #fef9c3; padding: 2px 7px; border-radius: 4px; border: 1px solid #fef08a;">${scoreData.pontuacao} pts • Em Desenv.</span>`;
 
     const actions = `
       <div class="row-actions" style="justify-content: flex-end;">
@@ -680,7 +848,14 @@ function renderMunicipalitiesTable() {
     return `
       <tr>
         <td><span class="protocol-code">${escapeHtml(protocol)}</span></td>
-        <td><strong style="color: #0054a6; font-size: 0.95rem;">${escapeHtml(munName)}</strong></td>
+        <td>
+          <div>
+            <strong style="color: #0054a6; font-size: 0.95rem;">${escapeHtml(munName)}</strong>
+            <div style="margin-top: 4px;">
+              ${tierBadge}
+            </div>
+          </div>
+        </td>
         <td>${regionalMr}</td>
         <td>${contact}</td>
         <td>
@@ -688,6 +863,7 @@ function renderMunicipalitiesTable() {
             ${indicatorsHtml}
           </div>
         </td>
+        <td>${instrumentosHtml}</td>
         <td><span class="badge-status ${statusCfg.class}">${statusCfg.label}</span></td>
         <td style="text-align: right;">${actions}</td>
       </tr>

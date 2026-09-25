@@ -390,6 +390,129 @@
       color: #0f172a;
     }
 
+    /* Advanced Municipality Filters Card */
+    .admin-mun-filters-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+
+    .mun-filters-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .mun-filters-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .mun-filters-title i,
+    .mun-filters-title svg {
+      color: #0054a6;
+      width: 18px;
+      height: 18px;
+    }
+
+    .mun-filters-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mun-filtered-count-badge {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #0284c7;
+      background: #e0f2fe;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid #bae6fd;
+    }
+
+    .btn-clear-filters {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #64748b;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-clear-filters:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+      border-color: #94a3b8;
+    }
+
+    .mun-filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+    }
+
+    .mun-filter-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .mun-filter-item label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .mun-filter-item label i,
+    .mun-filter-item label svg {
+      width: 13px;
+      height: 13px;
+      color: #64748b;
+    }
+
+    .mun-filter-item select {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      color: #1e293b;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .mun-filter-item select:focus {
+      border-color: #0054a6;
+      box-shadow: 0 0 0 3px rgba(0, 84, 166, 0.1);
+      background: #ffffff;
+    }
+
     /* Content Cards & Tables */
     .admin-table-card {
       background: #ffffff;
@@ -1354,31 +1477,142 @@
       </div>
 
       <!-- Tab Content 1: Municipalities -->
-      <section id="admin-tab-content-municipalities" class="admin-table-card">
-        <div class="admin-table-wrap">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Protocolo</th>
-                <th>Município</th>
-                <th>Regional / MR</th>
-                <th>Responsável</th>
-                <th>Indicadores</th>
-                <th>Status</th>
-                <th style="text-align: right;">Ações</th>
-              </tr>
-            </thead>
-            <tbody id="admin-municipalities-tbody">
-              <tr>
-                <td colspan="7">
-                  <div class="admin-state-box">
-                    <i data-lucide="loader" class="animate-spin"></i>
-                    <h4>Carregando solicitações...</h4>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <section id="admin-tab-content-municipalities">
+        <!-- Advanced Filters for Municipalities -->
+        <div id="admin-mun-filters-card" class="admin-mun-filters-card">
+          <div class="mun-filters-header">
+            <div class="mun-filters-title">
+              <i data-lucide="sliders-horizontal"></i>
+              <span>Filtros Avançados de Municípios</span>
+            </div>
+            <div class="mun-filters-actions">
+              <span id="mun-filtered-count-badge" class="mun-filtered-count-badge">Mostrando 0 municípios</span>
+              <button type="button" id="btn-clear-mun-filters" class="btn-clear-filters" onclick="clearMunicipalityFilters()" title="Redefinir todos os filtros">
+                <i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i>
+                <span>Limpar Filtros</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="mun-filters-grid">
+            <!-- 1. Regional -->
+            <div class="mun-filter-item">
+              <label for="filter-mun-regional">
+                <i data-lucide="map-pin"></i>
+                Regional SEBRAE
+              </label>
+              <select id="filter-mun-regional" onchange="handleMunFilterChange()">
+                <option value="all">Todas as Regionais</option>
+                <option value="Centro">Centro</option>
+                <option value="Centro-Oeste e Sudoeste">Centro-Oeste e Sudoeste</option>
+                <option value="Jequitinhonha e Mucuri">Jequitinhonha e Mucuri</option>
+                <option value="Noroeste e Alto Paranaíba">Noroeste e Alto Paranaíba</option>
+                <option value="Norte">Norte</option>
+                <option value="Rio Doce e Vale do Aço">Rio Doce e Vale do Aço</option>
+                <option value="Sul">Sul</option>
+                <option value="Triângulo">Triângulo</option>
+                <option value="Zona da Mata e Vertentes">Zona da Mata e Vertentes</option>
+              </select>
+            </div>
+
+            <!-- 2. Classificação / Índice -->
+            <div class="mun-filter-item">
+              <label for="filter-mun-tier">
+                <i data-lucide="award"></i>
+                Classificação do Índice
+              </label>
+              <select id="filter-mun-tier" onchange="handleMunFilterChange()">
+                <option value="all">Todas as Classificações</option>
+                <option value="desenvolvido">Desenvolvido (64 a 91 pts)</option>
+                <option value="em_desenvolvimento">Em Desenvolvimento (0 a 63 pts)</option>
+              </select>
+            </div>
+
+            <!-- 3. Instrumentos Aplicados -->
+            <div class="mun-filter-item">
+              <label for="filter-mun-instrumento">
+                <i data-lucide="wrench"></i>
+                Instrumento Aplicado
+              </label>
+              <select id="filter-mun-instrumento" onchange="handleMunFilterChange()">
+                <option value="all">Todos os Instrumentos</option>
+                <option value="destaque">Com Destaque (≥ 25 pts)</option>
+                <option value="material_didatico">Material Didático (+10 pts)</option>
+                <option value="oficina">Oficina (+10 pts)</option>
+                <option value="curso">Curso (+10 pts)</option>
+                <option value="encontro_mediado">Encontro Mediado (+10 pts)</option>
+                <option value="palestra">Palestra (+5 pts)</option>
+                <option value="sem_instrumentos">Sem Instrumentos</option>
+              </select>
+            </div>
+
+            <!-- 4. Indicador Atendido -->
+            <div class="mun-filter-item">
+              <label for="filter-mun-indicador">
+                <i data-lucide="check-circle-2"></i>
+                Indicador Atendido (Exigir 'Sim')
+              </label>
+              <select id="filter-mun-indicador" onchange="handleMunFilterChange()">
+                <option value="all">Qualquer Indicador</option>
+                <option value="educacao_70_porcento">1º - EE em mais de 70% do município (13 pts)</option>
+                <option value="parceria_secretaria_educacao">2º - Parceria com Secretária Municipal de Educação (12 pts)</option>
+                <option value="jepp_municipio">3º - JEPP no município (11 pts)</option>
+                <option value="produto_despertar">4º - Produto Despertar implantado (10 pts)</option>
+                <option value="parceria_superintendencia">5º - Parceria com superintendência de ensino (9 pts)</option>
+                <option value="parceria_ies">6º - Parceria com instituição de ensino superior (8 pts)</option>
+                <option value="rede_aqui_tem_sebrae">7º - Rede Aqui Tem Sebrae (7 pts)</option>
+                <option value="convenio_parceria">8º - Convênio / termo de parceria (6 pts)</option>
+                <option value="comite_acoes_conjuntas">9º - Comitê e ações conjuntas (5 pts)</option>
+                <option value="empresa_simulada">10º - Empresa simulada (4 pts)</option>
+                <option value="escola_sebrae">11º - Sistema Escola do Sebrae / Cursos Técnicos (3 pts)</option>
+                <option value="cooperativa_credito">12º - Parceria com Cooperativa de Crédito (2 pts)</option>
+                <option value="lei_educacao_empreendedora">13º - Lei da educação empreendedora (1 pt)</option>
+              </select>
+            </div>
+
+            <!-- 5. Indicadores Visíveis na Tabela -->
+            <div class="mun-filter-item">
+              <label for="filter-mun-visible-indicators">
+                <i data-lucide="eye"></i>
+                Indicadores que quero ver
+              </label>
+              <select id="filter-mun-visible-indicators" onchange="handleMunFilterChange()">
+                <option value="all">Todos os 13 Indicadores</option>
+                <option value="sim_only">Apenas os que o município possui (Sim)</option>
+                <option value="top5">Top 5 Indicadores (1º ao 5º)</option>
+                <option value="parcerias">Parcerias Institucionais</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-table-card">
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Protocolo</th>
+                  <th>Município &amp; Índice</th>
+                  <th>Regional / MR</th>
+                  <th>Responsável</th>
+                  <th>Indicadores</th>
+                  <th>Instrumentos</th>
+                  <th>Status</th>
+                  <th style="text-align: right;">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="admin-municipalities-tbody">
+                <tr>
+                  <td colspan="8">
+                    <div class="admin-state-box">
+                      <i data-lucide="loader" class="animate-spin"></i>
+                      <h4>Carregando solicitações...</h4>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -1786,6 +2020,6 @@
   <script src="config.js"></script>
 
   <!-- Admin Controller -->
-  <script src="admin.js?v=31"></script>
+  <script src="admin.js?v=32"></script>
 </body>
 </html>
