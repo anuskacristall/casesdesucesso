@@ -716,7 +716,7 @@
       border-bottom: 1px solid #f1f5f9;
       font-size: 0.88rem;
       color: #1e293b;
-      vertical-align: middle;
+      vertical-align: top;
     }
 
     table.admin-table tbody tr:hover {
@@ -1820,6 +1820,7 @@
                 <div class="mun-multiselect-menu" onclick="event.stopPropagation()">
                   <div class="mun-multiselect-actions" style="flex-wrap: wrap;">
                     <button type="button" class="mun-multiselect-action-btn" onclick="setPresetVisibleIndicators('all')">Todos</button>
+                    <button type="button" class="mun-multiselect-action-btn" id="btn-toggle-positive-ind" onclick="toggleOnlyPositiveIndicators()" style="color: #16a34a; font-weight: 700;">Apenas Sim</button>
                     <button type="button" class="mun-multiselect-action-btn" onclick="setPresetVisibleIndicators('top5')">Top 5</button>
                     <button type="button" class="mun-multiselect-action-btn" onclick="setPresetVisibleIndicators('parcerias')">Parcerias</button>
                     <button type="button" class="mun-multiselect-action-btn btn-clear" onclick="selectAllMunMultiselect('mun-ms-visible', false)">Limpar</button>
@@ -1850,14 +1851,14 @@
             <table class="admin-table">
               <thead>
                 <tr>
-                  <th>Protocolo</th>
-                  <th>Município &amp; Índice</th>
-                  <th>Regional / MR</th>
-                  <th>Responsável</th>
-                  <th>Indicadores</th>
-                  <th>Instrumentos</th>
-                  <th>Status</th>
-                  <th style="text-align: right;">Ações</th>
+                  <th style="width: 95px;">Protocolo</th>
+                  <th style="min-width: 150px; width: 160px;">Município &amp; Índice</th>
+                  <th style="min-width: 130px; width: 140px;">Regional / MR</th>
+                  <th style="min-width: 140px; width: 150px;">Responsável</th>
+                  <th style="width: 290px; min-width: 290px;">Indicadores</th>
+                  <th style="width: 180px; min-width: 180px;">Instrumentos</th>
+                  <th style="width: 95px;">Status</th>
+                  <th style="min-width: 160px; text-align: right;">Ações</th>
                 </tr>
               </thead>
               <tbody id="admin-municipalities-tbody">
@@ -2279,6 +2280,6 @@
   <script src="config.js"></script>
 
   <!-- Admin Controller -->
-  <script src="admin.js?v=33"></script>
+  <script src="admin.js?v=34"></script>
 </body>
 </html>

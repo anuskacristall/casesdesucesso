@@ -782,12 +782,31 @@ function setPresetVisibleIndicators(preset) {
   onMunMultiselectChange("mun-ms-visible");
 }
 
+let showOnlyPositiveIndicators = false;
+
+function toggleOnlyPositiveIndicators() {
+  showOnlyPositiveIndicators = !showOnlyPositiveIndicators;
+  const btn = document.getElementById("btn-toggle-positive-ind");
+  if (btn) {
+    btn.style.background = showOnlyPositiveIndicators ? "#dcfce7" : "";
+    btn.style.color = showOnlyPositiveIndicators ? "#15803d" : "#16a34a";
+  }
+  renderMunicipalitiesTable();
+}
+
 function clearMunicipalityFilters() {
   selectedMunRegionais.clear();
   selectedMunTiers.clear();
   selectedMunInstrumentos.clear();
   selectedMunIndicadores.clear();
   selectedMunVisibleIndicators = new Set(ALL_CRITERIA_KEYS);
+  showOnlyPositiveIndicators = false;
+
+  const btnPos = document.getElementById("btn-toggle-positive-ind");
+  if (btnPos) {
+    btnPos.style.background = "";
+    btnPos.style.color = "#16a34a";
+  }
 
   // Desmarcar nos primeiros 4 dropdowns
   ["mun-ms-regional", "mun-ms-tier", "mun-ms-instrumento", "mun-ms-indicador"].forEach((id) => {
@@ -971,36 +990,51 @@ function renderMunicipalitiesTable() {
       destaque_instrumentos: false
     };
 
-    // Filter which criteria to display in table according to selectedMunVisibleIndicators
+    // Filter which criteria to display in table according to selectedMunVisibleIndicators and showOnlyPositiveIndicators
     let visibleCriterios = (scoreData.criterios || []).filter((c) => selectedMunVisibleIndicators.has(c.identificador));
+    if (showOnlyPositiveIndicators) {
+      visibleCriterios = visibleCriterios.filter((c) => c.atendido);
+    }
+
+    const atendidosCount = (scoreData.criterios || []).filter((c) => c.atendido).length;
+    const totalCount = (scoreData.criterios || []).length || 13;
 
     const indBadges = visibleCriterios.map((c) => {
       const cls = c.atendido ? "sim" : "nao";
+      const icon = c.atendido ? "✓" : "✗";
       const statusText = c.atendido ? "Sim" : "Não";
       const label = CRITERIA_SHORT_LABELS[c.identificador] || c.identificador;
-      return `<span class="mini-badge ${cls}" title="${c.ordem_str} - ${c.nome} (${c.peso} pts): ${statusText}">${label}</span>`;
+      return `<span class="mini-badge ${cls}" title="${c.ordem_str} - ${c.nome} (${c.peso} pts): ${statusText}" style="display:inline-flex; align-items:center; justify-content:center; gap:3px; font-size:0.68rem; padding: 2px 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center;"><span style="font-weight:700;">${icon}</span> ${label}</span>`;
     });
 
     const indicatorsHtml = visibleCriterios.length > 0
-      ? `<div style="display: flex; flex-wrap: wrap; gap: 4px; max-width: 320px;">${indBadges.join("")}</div>`
+      ? `
+        <div style="width: 275px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; padding: 3px 6px; background: #f8fafc; border-radius: 5px; font-size: 0.72rem; font-weight: 700; color: #475569; border: 1px solid #e2e8f0;">
+            <span style="color: ${atendidosCount >= 7 ? '#166534' : '#64748b'};">${atendidosCount} de ${totalCount} atendidos</span>
+            <span style="color: ${scoreData.pontuacao >= 64 ? '#166534' : '#854d0e'};">${scoreData.pontuacao} pts</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3px;">
+            ${indBadges.join("")}
+          </div>
+        </div>
+      `
       : `<span style="color:#94a3b8; font-size: 0.78rem;">Nenhum no filtro</span>`;
 
-    // Instruments badges & Destaque
+    // Instruments badges & Destaque (horizontal flow)
     const instBadges = (scoreData.instrumentos_aplicados || []).map((code) => {
       const label = INSTRUMENT_LABELS[code] || code;
-      return `<span class="mini-badge" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:0.72rem;">${label}</span>`;
+      return `<span class="mini-badge" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:0.72rem; padding: 3px 6px;">${label}</span>`;
     });
 
     const destaqueBadge = scoreData.destaque_instrumentos
-      ? `<span class="mini-badge" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-weight:700; display:inline-flex; align-items:center; gap:3px;"><i data-lucide="award" style="width:11px; height:11px;"></i> Destaque (${scoreData.pontuacao_instrumentos} pts)</span>`
-      : (scoreData.pontuacao_instrumentos > 0 ? `<small style="color:#64748b; font-size:0.72rem; font-weight:600;">Total: ${scoreData.pontuacao_instrumentos} pts</small>` : `<span style="color:#94a3b8; font-size:0.75rem;">Nenhum</span>`);
+      ? `<span class="mini-badge" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-weight:700; display:inline-flex; align-items:center; gap:3px; padding: 3px 6px;"><i data-lucide="award" style="width:11px; height:11px;"></i> Destaque (${scoreData.pontuacao_instrumentos} pts)</span>`
+      : (scoreData.pontuacao_instrumentos > 0 ? `<small style="color:#64748b; font-size:0.72rem; font-weight:600; padding: 2px 4px;">Total: ${scoreData.pontuacao_instrumentos} pts</small>` : `<span style="color:#94a3b8; font-size:0.75rem;">Nenhum</span>`);
 
     const instrumentosHtml = `
-      <div style="display: flex; flex-direction: column; gap: 4px; min-width: 140px;">
-        <div style="display: flex; flex-wrap: wrap; gap: 3px;">
-          ${instBadges.length > 0 ? instBadges.join("") : ""}
-        </div>
-        <div>${destaqueBadge}</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 4px; width: 170px; align-items: center;">
+        ${instBadges.length > 0 ? instBadges.join("") : ""}
+        ${destaqueBadge}
       </div>
     `;
 
