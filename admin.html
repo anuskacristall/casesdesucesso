@@ -62,6 +62,21 @@
       object-fit: contain;
     }
 
+    .admin-header-logo-uee {
+      height: 38px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .logo-divider-line {
+      width: 1.5px;
+      height: 28px;
+      background-color: #0054A6;
+      opacity: 0.65;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
     .admin-header-divider {
       width: 1px;
       height: 32px;
@@ -1371,6 +1386,18 @@
       margin-bottom: 24px;
     }
 
+    .login-logos-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .login-logos-container img {
+      margin-bottom: 0 !important;
+    }
+
     .admin-login-header img {
       height: 52px;
       width: auto;
@@ -1524,7 +1551,11 @@
   <div id="admin-login-view" style="display: flex;">
     <div class="admin-login-box">
       <div class="admin-login-header">
-        <img src="logo-sebrae.png" alt="Sebrae Minas" />
+        <div class="login-logos-container">
+          <img src="logo-sebrae.png" alt="Sebrae Minas" />
+          <div class="logo-divider-line"></div>
+          <img src="logo-uee.png" alt="UEE - Unidade de Educação e Empreendedorismo" class="admin-header-logo-uee" />
+        </div>
         <h2>
           <i data-lucide="shield-check" style="width: 22px; height: 22px;"></i>
           <span>Portal do Administrador</span>
@@ -1580,6 +1611,8 @@
     <header class="admin-header">
       <div class="admin-header-left">
         <img src="logo-sebrae.png" alt="Sebrae Minas" class="admin-header-logo" />
+        <div class="logo-divider-line"></div>
+        <img src="logo-uee.png" alt="UEE - Unidade de Educação e Empreendedorismo" class="admin-header-logo admin-header-logo-uee" />
         <div class="admin-header-divider"></div>
         <div class="admin-header-titles">
           <h1>

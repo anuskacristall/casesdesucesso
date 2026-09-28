@@ -232,6 +232,7 @@ body.light-theme .glass-box {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 14px;
   height: 48px;
   box-shadow: none;
 }
@@ -240,6 +241,19 @@ body.light-theme .glass-box {
   height: 44px;
   width: auto;
   object-fit: contain;
+}
+
+.logo-image.logo-uee {
+  height: 42px;
+}
+
+.logo-divider-line {
+  width: 1.5px;
+  height: 28px;
+  background-color: #0054A6;
+  opacity: 0.65;
+  border-radius: 2px;
+  flex-shrink: 0;
 }
 
 .logo-text h1 {
@@ -2176,10 +2190,30 @@ body.light-theme .contact-subbox {
   border-bottom: 1px solid #e2e8f0;
 }
 
+.login-logos-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
 .login-card-header .logo-image {
-  height: 52px;
+  height: 48px;
   width: auto;
   object-fit: contain;
+}
+
+.login-card-header .logo-image.logo-uee {
+  height: 44px;
+}
+
+.login-card-header .logo-divider-line {
+  width: 1.5px;
+  height: 32px;
+  background-color: var(--sebrae-blue);
+  opacity: 0.65;
+  border-radius: 2px;
+  flex-shrink: 0;
 }
 
 /* Enlarge login form fonts/inputs specifically */
