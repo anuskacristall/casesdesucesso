@@ -3860,10 +3860,79 @@ function handleLogout() {
 let pendingExportCases = [];
 let pendingExportType = "all";
 
+function isMunicipalityMatchingLocationFilters(item, selectedRegs, selectedMrs, selectedMuns) {
+  const hasLocationFilter = selectedRegs.length > 0 || selectedMrs.length > 0 || selectedMuns.length > 0;
+  if (!hasLocationFilter) return true;
+
+  const munName = (item.nome || item.municipio || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+  const munMr = (item.mr || item.microregiao || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/^mr\s*/, "").trim();
+  const regVal = item.regional;
+
+  if (selectedRegs.length > 0 && selectedRegs.includes(regVal)) return true;
+  if (selectedMrs.length > 0 && selectedMrs.some(sm => munMr.includes(sm) || sm.includes(munMr))) return true;
+  if (selectedMuns.length > 0 && selectedMuns.includes(munName)) return true;
+
+  return false;
+}
+
+function formatInstrumentsForCSV(item, devIndex) {
+  let insts = item.instrumentos_aplicados;
+  if (!insts && devIndex && devIndex.instrumentos_aplicados) {
+    insts = devIndex.instrumentos_aplicados;
+  }
+  if (typeof insts === "string") {
+    try { insts = JSON.parse(insts); } catch (e) { insts = insts.split(",").map(s => s.trim()).filter(Boolean); }
+  }
+  if (!Array.isArray(insts)) insts = [];
+
+  const labels = {
+    material_didatico: "Aplicação de Material Didático (+10 pts)",
+    oficina: "Oficina (+10 pts)",
+    curso: "Curso (+10 pts)",
+    encontro_mediado: "Encontro Mediado (+10 pts)",
+    palestra: "Palestra (+5 pts)"
+  };
+  const priorityOrder = ["material_didatico", "oficina", "curso", "encontro_mediado", "palestra"];
+  const sorted = [...insts].sort((a, b) => priorityOrder.indexOf(a) - priorityOrder.indexOf(b));
+
+  const names = sorted.map(code => labels[code] || `${code} (+10 pts)`);
+  const score = (devIndex && devIndex.pontuacao_instrumentos !== undefined)
+    ? devIndex.pontuacao_instrumentos
+    : sorted.reduce((acc, c) => acc + (c === "palestra" ? 5 : 10), 0);
+  const destaque = (devIndex ? devIndex.destaque_instrumentos : score >= 25) ? "Sim (>= 25 pts)" : "Não";
+
+  return {
+    instrumentosStr: names.join("; ") || "Nenhum",
+    pontuacao: score || 0,
+    destaque: destaque
+  };
+}
+
 function getFilteredCasesForExport(selectedTypeScope = "all") {
   const { selectedRegs, selectedMrs, selectedMuns } = getActiveLocationFilters();
-  
   let effectiveType = (selectedTypeScope || "all").toLowerCase();
+
+  if (effectiveType === "municipios") {
+    let sourceMuns = allMunicipalities;
+    if (!Array.isArray(sourceMuns) || sourceMuns.length === 0) {
+      try {
+        sourceMuns = JSON.parse(localStorage.getItem("sebrae_approved_municipalities") || "[]");
+      } catch (e) {
+        sourceMuns = [];
+      }
+    }
+    const approvedMuns = sourceMuns.filter(m => !m.status || m.status === "approved");
+    const listToFilter = approvedMuns.length > 0 ? approvedMuns : sourceMuns;
+
+    const filteredMuns = listToFilter.filter(item => 
+      isMunicipalityMatchingLocationFilters(item, selectedRegs, selectedMrs, selectedMuns)
+    );
+    return {
+      filteredCases: filteredMuns,
+      effectiveType: "municipios"
+    };
+  }
+
   if (effectiveType === "all") {
     const sidebarType = document.getElementById("filter-type") ? document.getElementById("filter-type").value : "All";
     if (sidebarType && sidebarType.toLowerCase() !== "all") {
@@ -3928,6 +3997,8 @@ function openExportConfirmModal() {
       typeLabel.textContent = "Apenas Cases de Professor";
     } else if (effectiveType === "estudante") {
       typeLabel.textContent = "Apenas Cases de Estudante Empreendedor";
+    } else if (effectiveType === "municipios") {
+      typeLabel.textContent = "Municípios de Referência e Avaliados";
     } else {
       typeLabel.textContent = "Todos os Cases (Professor e Estudante Empreendedor)";
     }
@@ -3938,13 +4009,16 @@ function openExportConfirmModal() {
   const countText = document.getElementById("export-modal-count-text");
   const downloadBtn = document.getElementById("btn-confirm-export-download");
 
+  const isMun = effectiveType === "municipios";
+  const itemNoun = isMun ? "município(s)" : "case(s)";
+
   if (filteredCases.length === 0) {
     if (countBox) countBox.className = "export-count-box empty";
-    if (countText) countText.textContent = "Nenhum case encontrado para os filtros atuais.";
+    if (countText) countText.textContent = `Nenhum ${isMun ? "município" : "case"} encontrado para os filtros atuais.`;
     if (downloadBtn) downloadBtn.disabled = true;
   } else {
     if (countBox) countBox.className = "export-count-box";
-    if (countText) countText.textContent = `${filteredCases.length} case(s) pronto(s) para exportação.`;
+    if (countText) countText.textContent = `${filteredCases.length} ${itemNoun} pronto(s) para exportação.`;
     if (downloadBtn) downloadBtn.disabled = false;
   }
 
@@ -3961,123 +4035,243 @@ function closeExportConfirmModal() {
 
 function performFilteredCSVExport() {
   if (!pendingExportCases || pendingExportCases.length === 0) {
-    showToast("Não há cases correspondentes para exportar!");
+    const isMun = pendingExportType === "municipios";
+    showToast(isMun ? "Não há municípios correspondentes para exportar!" : "Não há cases correspondentes para exportar!");
     closeExportConfirmModal();
     return;
   }
 
   const casesToExport = pendingExportCases;
 
-  // Determine which contacts to include
-  const hasProf = casesToExport.some(c => c.tipoCase === "professor");
-  const hasEst = casesToExport.some(c => c.tipoCase === "estudante");
-
-  // Helper to escape values for CSV
+  // Helper to escape values for CSV (semicolon delimited, UTF-8)
   const escapeCSV = (val) => {
     if (val === undefined || val === null) return '""';
     let str = String(val).replace(/"/g, '""');
     return `"${str}"`;
   };
 
-  // Base Headers
+  const CRITERIA_HEADERS = [
+    "1º EE > 70% (13 pts)",
+    "2º Parceria Sec. Educação (12 pts)",
+    "3º JEPP no Município (11 pts)",
+    "4º Produto Despertar (10 pts)",
+    "5º Parceria Superintendência (9 pts)",
+    "6º Parceria IES (8 pts)",
+    "7º Rede Aqui Tem Sebrae (7 pts)",
+    "8º Convênio Sebrae (6 pts)",
+    "9º Comitê Gestor (5 pts)",
+    "10º Empresa Simulada (4 pts)",
+    "11º Escola Sebrae (3 pts)",
+    "12º Cooperativa de Crédito (2 pts)",
+    "13º Lei EE (1 pt)"
+  ];
+
+  // --------------------------------------------------------------------------
+  // EXPORT DE MUNICÍPIOS
+  // --------------------------------------------------------------------------
+  if (pendingExportType === "municipios") {
+    const headers = [
+      "Protocolo / ID",
+      "Município",
+      "Regional SEBRAE",
+      "Microrregião (MR)",
+      "Responsável / Solicitante",
+      "E-mail do Responsável",
+      "Telefone do Responsável",
+      "Status da Avaliação",
+      "Data de Cadastro",
+      "Pontuação do Índice (0 a 91)",
+      "Percentual de Aproveitamento (%)",
+      "Classificação do Município",
+      "Critérios Atendidos",
+      ...CRITERIA_HEADERS,
+      "Instrumentos Aplicados",
+      "Pontuação dos Instrumentos",
+      "Destaque em Instrumentos"
+    ];
+
+    const csvRows = [headers.join(";")];
+
+    casesToExport.forEach(item => {
+      const devIndex = calculateMunicipioDevelopmentIndex(item);
+      const criteriosList = (devIndex && Array.isArray(devIndex.criterios)) ? devIndex.criterios : [];
+      const attendedCount = criteriosList.filter(c => c.atendido).length;
+      const instInfo = formatInstrumentsForCSV(item, devIndex);
+
+      const protocol = item.request_code || (item.id ? `#${String(item.id).slice(-6)}` : "-");
+      const statusLabel = item.status === "approved" ? "Aprovado" : (item.status === "rejected" ? "Rejeitado" : "Pendente");
+      const dataCadastro = item.created_at ? new Date(item.created_at).toLocaleDateString("pt-BR") : "-";
+
+      const critValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(idx => {
+        const c = criteriosList[idx];
+        return escapeCSV(c && c.atendido ? "Sim" : "Não");
+      });
+
+      const row = [
+        escapeCSV(protocol),
+        escapeCSV(item.nome || item.municipio || ""),
+        escapeCSV(REGIONAL_NAMES[item.regional] || item.regional || ""),
+        escapeCSV(item.mr || item.microregiao || ""),
+        escapeCSV(item.responsavel_nome || item.solicitante_nome || ""),
+        escapeCSV(item.responsavel_email || item.solicitante_email || ""),
+        escapeCSV(item.responsavel_telefone || item.solicitante_telefone || ""),
+        escapeCSV(statusLabel),
+        escapeCSV(dataCadastro),
+        escapeCSV(devIndex ? devIndex.pontuacao : 0),
+        escapeCSV(devIndex ? `${devIndex.percentual}%` : "0%"),
+        escapeCSV(devIndex ? devIndex.classificacao : "Em Desenvolvimento"),
+        escapeCSV(`${attendedCount} de 13`),
+        ...critValues,
+        escapeCSV(instInfo.instrumentosStr),
+        escapeCSV(instInfo.pontuacao),
+        escapeCSV(instInfo.destaque)
+      ];
+
+      csvRows.push(row.join(";"));
+    });
+
+    const csvContent = csvRows.join("\r\n");
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "Planilha_Municipios_SEBRAE.csv");
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    closeExportConfirmModal();
+    showToast(`Planilha de municípios baixada com sucesso! (${casesToExport.length} municípios)`);
+    return;
+  }
+
+  // --------------------------------------------------------------------------
+  // EXPORT DE CASES (TODOS, PROFESSOR OU ESTUDANTE)
+  // --------------------------------------------------------------------------
+  const isOnlyProf = pendingExportType === "professor";
+  const isOnlyEst = pendingExportType === "estudante";
+  const includeProf = !isOnlyEst;
+  const includeEst = !isOnlyProf;
+
   const headers = [
-    "Título do Projeto",
+    "Protocolo / ID",
+    "Título do Projeto / Case",
     "Descrição Geral",
+    "Tipo de Case",
     "Município",
-    "Regional",
+    "Regional SEBRAE",
     "Microrregião (MR)",
     "Escola / Instituição",
     "Nível de Ensino",
     "Dependência Administrativa",
-    "Nome do Técnico",
+    "Status do Case",
+    "Técnico Responsável",
     "E-mail do Técnico",
-    "Telefone do Técnico",
-    "Tipo de Case"
+    "Telefone do Técnico"
   ];
 
-  // Conditional Contact Columns
-  if (hasProf) {
-    headers.push("Nome do Professor", "E-mail do Professor", "Telefone do Professor");
-  }
-  if (hasEst) {
-    headers.push("Nome do Estudante Empreendedor", "E-mail do Estudante Empreendedor", "Contato do Estudante Empreendedor");
+  if (includeProf) {
+    headers.push(
+      "Nome do Professor",
+      "E-mail do Professor",
+      "Telefone do Professor"
+    );
   }
 
-  // Enterprise Columns
-  headers.push("Nome da Empresa", "Tipo de Negócio", "Descrição da Empresa");
+  if (includeEst) {
+    headers.push(
+      "Nome do Estudante Empreendedor",
+      "E-mail do Estudante",
+      "Contato / Telefone do Estudante",
+      "Nome da Empresa / Empreendimento",
+      "Tipo de Negócio",
+      "Descrição da Empresa"
+    );
+  }
 
-  // Municipality Indicators
   headers.push(
-    "Status JEPP",
-    "Parceria com Cooperativa de Crédito",
-    "Possui Educação Empreendedora em mais de 70% do município?",
-    "Possui Lei Municipal de Educação Empreendedora",
-    "Possui Comitê Conjunto",
-    "Parceria com Instituição de Ensino Superior",
-    "Possui Empresa Simulada",
-    "Possui Sistema de Ensino Escola do Sebrae"
+    "Pontuação do Índice (0 a 91)",
+    "Percentual de Aproveitamento (%)",
+    "Classificação do Município",
+    "Critérios Atendidos",
+    ...CRITERIA_HEADERS,
+    "Instrumentos Aplicados",
+    "Pontuação dos Instrumentos",
+    "Destaque em Instrumentos"
   );
 
-  // Build CSV rows
   const csvRows = [headers.join(";")];
 
   casesToExport.forEach(item => {
+    const isEstudante = item.tipoCase === "estudante" || item.tipo_case === "estudante" || item.estudante_possui;
+    const protocol = item.request_code || (item.id ? `#${String(item.id).slice(-6)}` : "-");
+    const statusLabel = item.status === "approved" ? "Aprovado" : (item.status === "rejected" ? "Rejeitado" : "Pendente");
+
+    const devIndex = calculateMunicipioDevelopmentIndex(item);
+    const criteriosList = (devIndex && Array.isArray(devIndex.criterios)) ? devIndex.criterios : [];
+    const attendedCount = criteriosList.filter(c => c.atendido).length;
+    const instInfo = formatInstrumentsForCSV(item, devIndex);
+
     const row = [
-      escapeCSV(item.titulo),
-      escapeCSV(item.descricao),
-      escapeCSV(item.municipio),
-      escapeCSV(REGIONAL_NAMES[item.regional] || item.regional),
-      escapeCSV(item.mr),
-      escapeCSV(item.escola),
+      escapeCSV(protocol),
+      escapeCSV(item.titulo || item.titulo_projeto || ""),
+      escapeCSV(item.descricao || item.descricao_projeto || ""),
+      escapeCSV(isEstudante ? "Estudante Empreendedor" : "Professor"),
+      escapeCSV(item.municipio || ""),
+      escapeCSV(REGIONAL_NAMES[item.regional] || item.regional || ""),
+      escapeCSV(item.mr || item.microregiao || ""),
+      escapeCSV(item.escola || item.escola_instituicao || ""),
       escapeCSV(item.nivel_ensino || ""),
       escapeCSV(item.dependencia_adm || ""),
-      escapeCSV(item.tecnicoNome),
-      escapeCSV(item.tecnicoEmail),
-      escapeCSV(item.tecnicoContato),
-      escapeCSV(item.tipoCase === "estudante" ? "Estudante Empreendedor" : "Professor")
+      escapeCSV(statusLabel),
+      escapeCSV(item.tecnicoNome || item.tecnico_nome || ""),
+      escapeCSV(item.tecnicoEmail || item.tecnico_email || ""),
+      escapeCSV(item.tecnicoContato || item.tecnico_telefone || "")
     ];
 
-    if (hasProf) {
-      if (item.tipoCase === "professor") {
+    if (includeProf) {
+      if (!isEstudante) {
         row.push(
-          escapeCSV(item.professorNome),
-          escapeCSV(item.professorEmail),
-          escapeCSV(item.professorTelefone)
+          escapeCSV(item.professorNome || item.professor_nome || ""),
+          escapeCSV(item.professorEmail || item.professor_email || ""),
+          escapeCSV(item.professorTelefone || item.professor_telefone || "")
         );
       } else {
         row.push('""', '""', '""');
       }
     }
 
-    if (hasEst) {
-      if (item.tipoCase === "estudante") {
+    if (includeEst) {
+      if (isEstudante) {
         row.push(
-          escapeCSV(item.estudanteNome),
-          escapeCSV(item.estudanteEmail),
-          escapeCSV(item.estudanteTelefone || item.studentContact)
+          escapeCSV(item.estudanteNome || item.estudante_nome || ""),
+          escapeCSV(item.estudanteEmail || item.estudante_email || ""),
+          escapeCSV(item.estudanteTelefone || item.estudante_telefone || item.studentContact || ""),
+          escapeCSV(item.empresaNome || item.empresa_nome || ""),
+          escapeCSV(item.empresaTipo || item.empresa_tipo || ""),
+          escapeCSV(item.empresaDescricao || item.empresa_descricao || "")
         );
       } else {
-        row.push('""', '""', '""');
+        row.push('""', '""', '""', '""', '""', '""');
       }
     }
 
-    // Enterprise values
-    row.push(
-      escapeCSV(item.empresaNome || item.empresa_nome || ""),
-      escapeCSV(item.empresaTipo || item.empresa_tipo || ""),
-      escapeCSV(item.empresaDescricao || item.empresa_descricao || "")
-    );
+    const critValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(idx => {
+      const c = criteriosList[idx];
+      return escapeCSV(c && c.atendido ? "Sim" : "Não");
+    });
 
-    // Municipality indicators
     row.push(
-      escapeCSV(item.jeppStatus || "Não"),
-      escapeCSV(item.hasCoop ? "Sim" : "Não"),
-      escapeCSV(item.edu70 === "sim" ? "Sim" : "Não"),
-      escapeCSV(item.hasLaw ? "Sim" : "Não"),
-      escapeCSV(item.hasCommittee ? "Sim" : "Não"),
-      escapeCSV(item.hasIes ? "Sim" : "Não"),
-      escapeCSV(item.hasEmpresaSimulada ? "Sim" : "Não"),
-      escapeCSV(item.hasEscolaSebrae ? "Sim" : "Não")
+      escapeCSV(devIndex ? devIndex.pontuacao : 0),
+      escapeCSV(devIndex ? `${devIndex.percentual}%` : "0%"),
+      escapeCSV(devIndex ? devIndex.classificacao : "Em Desenvolvimento"),
+      escapeCSV(`${attendedCount} de 13`),
+      ...critValues,
+      escapeCSV(instInfo.instrumentosStr),
+      escapeCSV(instInfo.pontuacao),
+      escapeCSV(instInfo.destaque)
     );
 
     csvRows.push(row.join(";"));

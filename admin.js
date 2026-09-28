@@ -541,6 +541,11 @@ function switchAdminTab(tabName) {
   document.getElementById("admin-tab-content-municipalities").style.display = tabName === "municipalities" ? "block" : "none";
   document.getElementById("admin-tab-content-cases").style.display = tabName === "cases" ? "block" : "none";
 
+  const exportBtnLabel = document.getElementById("btn-admin-export-label");
+  if (exportBtnLabel) {
+    exportBtnLabel.textContent = tabName === "municipalities" ? "Exportar Municípios (CSV)" : "Exportar Cases (CSV)";
+  }
+
   renderCurrentAdminTab();
 }
 
@@ -865,10 +870,7 @@ function renderCurrentAdminTab() {
 // 5. RENDERING: MUNICIPALITIES TABLE
 // ============================================================================
 
-function renderMunicipalitiesTable() {
-  const tbody = document.getElementById("admin-municipalities-tbody");
-  if (!tbody) return;
-
+function getFilteredAdminMunicipalities() {
   let items = [...loadedMunicipalities];
 
   // 1. Apply Status Filter
@@ -940,6 +942,15 @@ function renderMunicipalitiesTable() {
       return score.criterios.some((c) => c.atendido && selectedMunIndicadores.has(c.identificador));
     });
   }
+
+  return items;
+}
+
+function renderMunicipalitiesTable() {
+  const tbody = document.getElementById("admin-municipalities-tbody");
+  if (!tbody) return;
+
+  const items = getFilteredAdminMunicipalities();
 
   // Update dynamic count badge
   const countBadge = document.getElementById("mun-filtered-count-badge");
@@ -1094,10 +1105,7 @@ function renderMunicipalitiesTable() {
 // 6. RENDERING: CASES TABLE
 // ============================================================================
 
-function renderCasesTable() {
-  const tbody = document.getElementById("admin-cases-tbody");
-  if (!tbody) return;
-
+function getFilteredAdminCases() {
   let items = [...loadedCases];
 
   // Apply Status Filter
@@ -1120,6 +1128,15 @@ function renderCasesTable() {
       );
     });
   }
+
+  return items;
+}
+
+function renderCasesTable() {
+  const tbody = document.getElementById("admin-cases-tbody");
+  if (!tbody) return;
+
+  const items = getFilteredAdminCases();
 
   if (items.length === 0) {
     tbody.innerHTML = `
@@ -2728,3 +2745,293 @@ document.addEventListener("DOMContentLoaded", () => {
 
   checkAdminAuth();
 });
+
+// ============================================================================
+// 11. ADMIN CSV EXPORT CONTROLLER (EXCEL COMPLIANT & FULL DATA)
+// ============================================================================
+
+function formatAdminInstrumentsForCSV(item, devIndex) {
+  let insts = item.instrumentos_aplicados;
+  if (!insts && devIndex && devIndex.instrumentos_aplicados) {
+    insts = devIndex.instrumentos_aplicados;
+  }
+  if (typeof insts === "string") {
+    try { insts = JSON.parse(insts); } catch (e) { insts = insts.split(",").map(s => s.trim()).filter(Boolean); }
+  }
+  if (!Array.isArray(insts)) insts = [];
+
+  const labels = {
+    material_didatico: "Aplicação de Material Didático (+10 pts)",
+    oficina: "Oficina (+10 pts)",
+    curso: "Curso (+10 pts)",
+    encontro_mediado: "Encontro Mediado (+10 pts)",
+    palestra: "Palestra (+5 pts)"
+  };
+  const priorityOrder = ["material_didatico", "oficina", "curso", "encontro_mediado", "palestra"];
+  const sorted = [...insts].sort((a, b) => priorityOrder.indexOf(a) - priorityOrder.indexOf(b));
+
+  const names = sorted.map(code => labels[code] || `${code} (+10 pts)`);
+  const score = (devIndex && devIndex.pontuacao_instrumentos !== undefined)
+    ? devIndex.pontuacao_instrumentos
+    : sorted.reduce((acc, c) => acc + (c === "palestra" ? 5 : 10), 0);
+  const destaque = (devIndex ? devIndex.destaque_instrumentos : score >= 25) ? "Sim (>= 25 pts)" : "Não";
+
+  return {
+    instrumentosStr: names.join("; ") || "Nenhum",
+    pontuacao: score || 0,
+    destaque: destaque
+  };
+}
+
+function exportCurrentAdminTableCSV() {
+  const escapeCSV = (val) => {
+    if (val === undefined || val === null) return '""';
+    let str = String(val).replace(/"/g, '""');
+    return `"${str}"`;
+  };
+
+  const CRITERIA_HEADERS = [
+    "1º EE > 70% (13 pts)",
+    "2º Parceria Sec. Educação (12 pts)",
+    "3º JEPP no Município (11 pts)",
+    "4º Produto Despertar (10 pts)",
+    "5º Parceria Superintendência (9 pts)",
+    "6º Parceria IES (8 pts)",
+    "7º Rede Aqui Tem Sebrae (7 pts)",
+    "8º Convênio Sebrae (6 pts)",
+    "9º Comitê Gestor (5 pts)",
+    "10º Empresa Simulada (4 pts)",
+    "11º Escola Sebrae (3 pts)",
+    "12º Cooperativa de Crédito (2 pts)",
+    "13º Lei EE (1 pt)"
+  ];
+
+  if (currentAdminTab === "municipalities") {
+    const list = getFilteredAdminMunicipalities();
+    if (!list || list.length === 0) {
+      showAdminToast("Não há municípios na listagem atual para exportar!", "warning");
+      return;
+    }
+
+    const headers = [
+      "Protocolo / ID",
+      "Município",
+      "Regional SEBRAE",
+      "Microrregião (MR)",
+      "Responsável / Solicitante",
+      "E-mail do Responsável",
+      "Telefone do Responsável",
+      "Status da Avaliação",
+      "Data de Cadastro",
+      "Pontuação do Índice (0 a 91)",
+      "Percentual de Aproveitamento (%)",
+      "Classificação do Município",
+      "Critérios Atendidos",
+      ...CRITERIA_HEADERS,
+      "Instrumentos Aplicados",
+      "Pontuação dos Instrumentos",
+      "Destaque em Instrumentos"
+    ];
+
+    const csvRows = [headers.join(";")];
+
+    list.forEach(item => {
+      const devIndex = calculateMunicipioDevelopmentIndex(item);
+      const criteriosList = (devIndex && Array.isArray(devIndex.criterios)) ? devIndex.criterios : [];
+      const attendedCount = criteriosList.filter(c => c.atendido).length;
+      const instInfo = formatAdminInstrumentsForCSV(item, devIndex);
+
+      const protocol = item.request_code || (item.id ? `#${String(item.id).slice(-6)}` : "-");
+      const statusLabel = item.status === "approved" ? "Aprovado" : (item.status === "rejected" ? "Rejeitado" : "Pendente");
+      const dataCadastro = item.created_at ? new Date(item.created_at).toLocaleDateString("pt-BR") : "-";
+
+      const critValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(idx => {
+        const c = criteriosList[idx];
+        return escapeCSV(c && c.atendido ? "Sim" : "Não");
+      });
+
+      const row = [
+        escapeCSV(protocol),
+        escapeCSV(item.nome || item.municipio || ""),
+        escapeCSV(REGIONAL_NAMES[item.regional] || item.regional || ""),
+        escapeCSV(item.mr || item.microregiao || ""),
+        escapeCSV(item.responsavel_nome || item.solicitante_nome || ""),
+        escapeCSV(item.responsavel_email || item.solicitante_email || ""),
+        escapeCSV(item.responsavel_telefone || item.solicitante_telefone || ""),
+        escapeCSV(statusLabel),
+        escapeCSV(dataCadastro),
+        escapeCSV(devIndex ? devIndex.pontuacao : 0),
+        escapeCSV(devIndex ? `${devIndex.percentual}%` : "0%"),
+        escapeCSV(devIndex ? devIndex.classificacao : "Em Desenvolvimento"),
+        escapeCSV(`${attendedCount} de 13`),
+        ...critValues,
+        escapeCSV(instInfo.instrumentosStr),
+        escapeCSV(instInfo.pontuacao),
+        escapeCSV(instInfo.destaque)
+      ];
+
+      csvRows.push(row.join(";"));
+    });
+
+    const csvContent = csvRows.join("\r\n");
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Planilha_Admin_Municipios_${currentStatusFilter}.csv`);
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showAdminToast(`Planilha de municípios exportada com sucesso! (${list.length} registros)`, "success");
+    return;
+  }
+
+  // TAB CASES
+  const list = getFilteredAdminCases();
+  if (!list || list.length === 0) {
+    showAdminToast("Não há cases na listagem atual para exportar!", "warning");
+    return;
+  }
+
+  const hasProf = list.some(c => c.tipo_case !== "estudante" && c.tipoCase !== "estudante" && !c.estudante_possui);
+  const hasEst = list.some(c => c.tipo_case === "estudante" || c.tipoCase === "estudante" || c.estudante_possui);
+
+  const headers = [
+    "Protocolo / ID",
+    "Título do Projeto / Case",
+    "Descrição Geral",
+    "Tipo de Case",
+    "Município",
+    "Regional SEBRAE",
+    "Microrregião (MR)",
+    "Escola / Instituição",
+    "Nível de Ensino",
+    "Dependência Administrativa",
+    "Status do Case",
+    "Técnico Responsável",
+    "E-mail do Técnico",
+    "Telefone do Técnico"
+  ];
+
+  if (hasProf) {
+    headers.push(
+      "Nome do Professor",
+      "E-mail do Professor",
+      "Telefone do Professor"
+    );
+  }
+
+  if (hasEst) {
+    headers.push(
+      "Nome do Estudante Empreendedor",
+      "E-mail do Estudante",
+      "Contato / Telefone do Estudante",
+      "Nome da Empresa / Empreendimento",
+      "Tipo de Negócio",
+      "Descrição da Empresa"
+    );
+  }
+
+  headers.push(
+    "Pontuação do Índice (0 a 91)",
+    "Percentual de Aproveitamento (%)",
+    "Classificação do Município",
+    "Critérios Atendidos",
+    ...CRITERIA_HEADERS,
+    "Instrumentos Aplicados",
+    "Pontuação dos Instrumentos",
+    "Destaque em Instrumentos"
+  );
+
+  const csvRows = [headers.join(";")];
+
+  list.forEach(item => {
+    const isEstudante = item.tipo_case === "estudante" || item.tipoCase === "estudante" || item.estudante_possui;
+    const protocol = item.request_code || (item.id ? `#${String(item.id).slice(-6)}` : "-");
+    const statusLabel = item.status === "approved" ? "Aprovado" : (item.status === "rejected" ? "Rejeitado" : "Pendente");
+
+    const devIndex = calculateMunicipioDevelopmentIndex(item);
+    const criteriosList = (devIndex && Array.isArray(devIndex.criterios)) ? devIndex.criterios : [];
+    const attendedCount = criteriosList.filter(c => c.atendido).length;
+    const instInfo = formatAdminInstrumentsForCSV(item, devIndex);
+
+    const row = [
+      escapeCSV(protocol),
+      escapeCSV(item.titulo || item.titulo_projeto || ""),
+      escapeCSV(item.descricao || item.descricao_projeto || ""),
+      escapeCSV(isEstudante ? "Estudante Empreendedor" : "Professor"),
+      escapeCSV(item.municipio || ""),
+      escapeCSV(REGIONAL_NAMES[item.regional] || item.regional || ""),
+      escapeCSV(item.mr || item.microregiao || ""),
+      escapeCSV(item.escola || item.escola_instituicao || ""),
+      escapeCSV(item.nivel_ensino || ""),
+      escapeCSV(item.dependencia_adm || ""),
+      escapeCSV(statusLabel),
+      escapeCSV(item.tecnicoNome || item.tecnico_nome || ""),
+      escapeCSV(item.tecnicoEmail || item.tecnico_email || ""),
+      escapeCSV(item.tecnicoContato || item.tecnico_telefone || "")
+    ];
+
+    if (hasProf) {
+      if (!isEstudante) {
+        row.push(
+          escapeCSV(item.professorNome || item.professor_nome || ""),
+          escapeCSV(item.professorEmail || item.professor_email || ""),
+          escapeCSV(item.professorTelefone || item.professor_telefone || "")
+        );
+      } else {
+        row.push('""', '""', '""');
+      }
+    }
+
+    if (hasEst) {
+      if (isEstudante) {
+        row.push(
+          escapeCSV(item.estudanteNome || item.estudante_nome || ""),
+          escapeCSV(item.estudanteEmail || item.estudante_email || ""),
+          escapeCSV(item.estudanteTelefone || item.estudante_telefone || item.studentContact || ""),
+          escapeCSV(item.empresaNome || item.empresa_nome || ""),
+          escapeCSV(item.empresaTipo || item.empresa_tipo || ""),
+          escapeCSV(item.empresaDescricao || item.empresa_descricao || "")
+        );
+      } else {
+        row.push('""', '""', '""', '""', '""', '""');
+      }
+    }
+
+    const critValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(idx => {
+      const c = criteriosList[idx];
+      return escapeCSV(c && c.atendido ? "Sim" : "Não");
+    });
+
+    row.push(
+      escapeCSV(devIndex ? devIndex.pontuacao : 0),
+      escapeCSV(devIndex ? `${devIndex.percentual}%` : "0%"),
+      escapeCSV(devIndex ? devIndex.classificacao : "Em Desenvolvimento"),
+      escapeCSV(`${attendedCount} de 13`),
+      ...critValues,
+      escapeCSV(instInfo.instrumentosStr),
+      escapeCSV(instInfo.pontuacao),
+      escapeCSV(instInfo.destaque)
+    );
+
+    csvRows.push(row.join(";"));
+  });
+
+  const csvContent = csvRows.join("\r\n");
+  const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", `Planilha_Admin_Cases_${currentStatusFilter}.csv`);
+  link.style.display = "none";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  showAdminToast(`Planilha de cases exportada com sucesso! (${list.length} registros)`, "success");
+}
