@@ -1032,7 +1032,7 @@ function renderMunicipalitiesTable() {
     });
 
     const destaqueBadge = scoreData.destaque_instrumentos
-      ? `<span class="mini-badge" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-weight:700; display:inline-flex; align-items:center; gap:3px; padding: 3px 6px;"><i data-lucide="award" style="width:11px; height:11px;"></i> Destaque (${scoreData.pontuacao_instrumentos} pts)</span>`
+      ? `<span class="mini-badge" style="background:#fffbeb; color:#9a3412; border:1px solid #fcd34d; font-weight:700; display:inline-flex; align-items:center; gap:3px; padding: 3px 6px;"><i data-lucide="award" style="width:11px; height:11px; color:#ea580c;"></i> Destaque (${scoreData.pontuacao_instrumentos} pts)</span>`
       : (scoreData.pontuacao_instrumentos > 0 ? `<small style="color:#64748b; font-size:0.72rem; font-weight:600; padding: 2px 4px;">Total: ${scoreData.pontuacao_instrumentos} pts</small>` : `<span style="color:#94a3b8; font-size:0.75rem;">Nenhum</span>`);
 
     const instrumentosHtml = `
