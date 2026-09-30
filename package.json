@@ -1,0 +1,24 @@
+{
+  "name": "mapa-cases-sucesso",
+  "version": "2.0.0",
+  "description": "Mapa Interativo de Cases de Sucesso — Sebrae Minas Gerais",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "python": "python server.py",
+    "test": "python -m unittest discover -v -s tests -p \"test_*.py\""
+  },
+  "keywords": [
+    "sebrae",
+    "mapa",
+    "cases-de-sucesso",
+    "educacao-empreendedora",
+    "minas-gerais"
+  ],
+  "author": "Sebrae Minas Gerais",
+  "license": "ISC",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {}
+}

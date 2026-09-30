@@ -19,6 +19,7 @@
 7. [Endpoints da API Backend (`server.py`)](#7-endpoints-da-api-backend-serverpy)
 8. [Suíte de Testes Automatizados](#8-suíte-de-testes-automatizados)
 9. [Instalação, Configuração e Deploy](#9-instalação-configuração-e-deploy)
+10. [Guia de Migração para o Supabase Corporativo](#10-guia-de-migração-para-o-supabase-corporativo)
 
 ---
 
@@ -345,4 +346,81 @@ python -m unittest discover -v -s tests -p "test_*.py"
 * Não necessita de dependências externas (`pip install` desnecessário para o servidor base), utilizando a biblioteca padrão do Python 3 com alta eficiência e baixo consumo de memória.
 
 ---
+
+## 10. Guia de Migração para o Supabase Corporativo
+
+Este guia orienta o processo de migração do banco de dados pessoal/desenvolvimento para a infraestrutura oficial do **Supabase Corporativo** do Sebrae.
+
+### 10.1 Arquivos e Estrutura Gerada
+
+O diretório `supabase/` contém todo o pacote de automação e schemas necessários:
+
+```
+supabase/
+├── migrations/
+│   ├── 20260929140000_create_cases_table.sql       # Criação da tabela cases (Professor + Estudante)
+│   ├── 20260929140001_create_municipalities_table.sql # Criação da tabela municipalities e system_counters
+│   ├── 20260929140002_enable_rls_and_policies.sql  # Row Level Security (RLS) e Triggers updated_at
+│   └── 20260929140003_seed_data.sql                # 23 Cases canônicos + 18 Municípios avaliados
+├── schema_completo.sql                              # Script UNIFICADO (DDL + RLS + Seed) para 1-clique
+└── supabase_export.json                             # Exportação JSON estruturada de todos os dados
+```
+
+### 10.2 Procedimento de Importação no Supabase Corporativo
+
+Existem duas formas recomendadas para criar as tabelas e importar os dados no novo Supabase:
+
+#### Opção 1: Via SQL Editor do Dashboard Supabase (Mais Rápido e Simples)
+1. Acesse o painel do seu projeto no **Supabase da Empresa** (`https://supabase.com/dashboard/project/<PROJECT_REF>`).
+2. No menu lateral esquerdo, clique no ícone **SQL Editor**.
+3. Clique em **+ New query**.
+4. Abra o arquivo `supabase/schema_completo.sql` deste projeto, copie todo o seu conteúdo e cole no editor.
+5. Clique no botão verde **Run** (ou pressione `Ctrl + Enter`).
+6. O script criará:
+   - Tabela `public.cases` com todos os campos e índices.
+   - Tabela `public.municipalities` com todos os 13 indicadores oficiais.
+   - Tabela `public.system_counters` inicializada no protocolo `#40000`.
+   - Segurança RLS (Row Level Security) e políticas públicas/administrativas.
+   - Carga de dados inicial (23 cases e 18 municípios harmonizados).
+
+#### Opção 2: Via Script de Migração Automatizado (`migrate_to_supabase.py`)
+O projeto disponibiliza um utilitário CLI em Python com suporte a REST API PostgREST:
+
+```bash
+# 1. Gerar/Atualizar os scripts SQL locais a partir dos dados atuais
+python migrate_to_supabase.py --generate-sql --dump-json
+
+# 2. Enviar os dados diretamente via API para o Supabase Corporativo
+python migrate_to_supabase.py --push-rest --target-url "https://seu-supabase-empresa.supabase.co" --target-key "sua-service-role-key"
+
+# 3. Verificar o status e contagem de registros no novo banco
+python migrate_to_supabase.py --verify --target-url "https://seu-supabase-empresa.supabase.co" --target-key "sua-anon-key"
+```
+
+### 10.3 Apontando a Aplicação para o Novo Supabase
+
+Após criar as tabelas e dados no Supabase corporativo, atualize as credenciais no projeto:
+
+1. **Variáveis de Ambiente do Backend (`.env`)**:
+   ```env
+   SUPABASE_URL=https://seu-supabase-empresa.supabase.co
+   SUPABASE_KEY=sua-service-role-ou-anon-key
+   ```
+
+2. **Configuração do Frontend (`config.js`)**:
+   ```javascript
+   window.SEBRAE_CONFIG = {
+     SUPABASE_URL: "https://seu-supabase-empresa.supabase.co",
+     SUPABASE_KEY: "sua-anon-key-publica"
+   };
+   ```
+
+3. **Validação Automática**:
+   Execute a suíte de testes para garantir que tudo está 100% operacional:
+   ```bash
+   python -m unittest discover -v -s tests -p "test_*.py"
+   ```
+
+---
 *Documentação técnica oficial consolidada para o Sebrae Minas Gerais.*
+
